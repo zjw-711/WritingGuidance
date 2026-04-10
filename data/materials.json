@@ -1,0 +1,740 @@
+{
+  "categories": [
+    {
+      "id": "tech",
+      "name": "科技创新",
+      "icon": "🔬",
+      "subcategories": [
+        {
+          "id": "tech-ai",
+          "name": "AI与人工智能"
+        },
+        {
+          "id": "tech-aerospace",
+          "name": "航天科技"
+        },
+        {
+          "id": "tech-ethics",
+          "name": "科技伦理"
+        },
+        {
+          "id": "tech-digital",
+          "name": "数字经济"
+        }
+      ]
+    },
+    {
+      "id": "virtue",
+      "name": "品德修养",
+      "icon": "💎",
+      "subcategories": [
+        {
+          "id": "virtue-honesty",
+          "name": "诚信"
+        },
+        {
+          "id": "virtue-persist",
+          "name": "坚持"
+        },
+        {
+          "id": "virtue-modest",
+          "name": "谦虚"
+        },
+        {
+          "id": "virtue-duty",
+          "name": "担当"
+        }
+      ]
+    },
+    {
+      "id": "nature",
+      "name": "人与自然",
+      "icon": "🌿",
+      "subcategories": [
+        {
+          "id": "nature-env",
+          "name": "环境保护"
+        },
+        {
+          "id": "nature-eco",
+          "name": "生态文明"
+        },
+        {
+          "id": "nature-sustain",
+          "name": "可持续发展"
+        },
+        {
+          "id": "nature-revere",
+          "name": "敬畏自然"
+        }
+      ]
+    },
+    {
+      "id": "culture",
+      "name": "文化传承",
+      "icon": "🏮",
+      "subcategories": [
+        {
+          "id": "culture-craft",
+          "name": "传统技艺"
+        },
+        {
+          "id": "culture-heritage",
+          "name": "文化遗产"
+        },
+        {
+          "id": "culture-confident",
+          "name": "文化自信"
+        },
+        {
+          "id": "culture-exchange",
+          "name": "中外交流"
+        }
+      ]
+    },
+    {
+      "id": "society",
+      "name": "社会民生",
+      "icon": "🏘️",
+      "subcategories": [
+        {
+          "id": "society-edu",
+          "name": "教育公平"
+        },
+        {
+          "id": "society-rural",
+          "name": "乡村振兴"
+        },
+        {
+          "id": "society-health",
+          "name": "医疗健康"
+        },
+        {
+          "id": "society-fair",
+          "name": "社会公平"
+        }
+      ]
+    },
+    {
+      "id": "youth",
+      "name": "青春成长",
+      "icon": "🌱",
+      "subcategories": [
+        {
+          "id": "youth-dream",
+          "name": "梦想与奋斗"
+        },
+        {
+          "id": "youth-choice",
+          "name": "选择与责任"
+        },
+        {
+          "id": "youth-growth",
+          "name": "挫折与成长"
+        },
+        {
+          "id": "youth-think",
+          "name": "独立思考"
+        }
+      ]
+    },
+    {
+      "id": "patriotism",
+      "name": "家国情怀",
+      "icon": "🇨🇳",
+      "subcategories": [
+        {
+          "id": "patriotism-spirit",
+          "name": "爱国精神"
+        },
+        {
+          "id": "patriotism-revive",
+          "name": "民族复兴"
+        },
+        {
+          "id": "patriotism-mission",
+          "name": "时代使命"
+        },
+        {
+          "id": "patriotism-duty",
+          "name": "家国担当"
+        }
+      ]
+    },
+    {
+      "id": "philosophy",
+      "name": "哲理思辨",
+      "icon": "🧠",
+      "subcategories": [
+        {
+          "id": "phil-contradict",
+          "name": "矛盾与统一"
+        },
+        {
+          "id": "phil-change",
+          "name": "变与不变"
+        },
+        {
+          "id": "phil-tradeoff",
+          "name": "得失取舍"
+        },
+        {
+          "id": "phil-dialectic",
+          "name": "辩证思维"
+        }
+      ]
+    },
+    {
+      "id": "humanity",
+      "name": "人文关怀",
+      "icon": "🤝",
+      "subcategories": [
+        {
+          "id": "humanity-empathy",
+          "name": "善良与共情"
+        },
+        {
+          "id": "humanity-respect",
+          "name": "尊重与包容"
+        },
+        {
+          "id": "humanity-love",
+          "name": "大爱无疆"
+        },
+        {
+          "id": "humanity-care",
+          "name": "弱者关怀"
+        }
+      ]
+    },
+    {
+      "id": "rolemodel",
+      "name": "时代楷模",
+      "icon": "⭐",
+      "subcategories": [
+        {
+          "id": "rolemodel-scientist",
+          "name": "科学家精神"
+        },
+        {
+          "id": "rolemodel-hero",
+          "name": "平凡英雄"
+        },
+        {
+          "id": "rolemodel-youth",
+          "name": "青年榜样"
+        },
+        {
+          "id": "rolemodel-dedicate",
+          "name": "奉献担当"
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "id": "quote",
+      "name": "名言金句"
+    },
+    {
+      "id": "story",
+      "name": "人物事例"
+    },
+    {
+      "id": "hot",
+      "name": "时事热点"
+    }
+  ],
+  "materials": [
+    {
+      "id": "m001",
+      "title": "ChatGPT与AI时代的思考",
+      "content": "2022年底，ChatGPT横空出世，引发了全球对人工智能的广泛讨论。AI技术既带来了效率革命，也引发了对就业、隐私、伦理等问题的深思。面对AI，我们既不能盲目排斥，也不能全盘接受，而应以理性态度拥抱变革。",
+      "category": "tech",
+      "type": "hot",
+      "tags": [
+        "AI",
+        "人工智能",
+        "科技伦理",
+        "变革"
+      ],
+      "source": "时事热点",
+      "applicableTopics": [
+        "科技与人文",
+        "变革与守正",
+        "理性思考"
+      ],
+      "createdAt": "2026-01-15",
+      "subcategory": "tech-ai"
+    },
+    {
+      "id": "m002",
+      "title": "天宫空间站全面建成",
+      "content": "中国天宫空间站的全面建成，标志着中国航天事业迈入新纪元。从两弹一星到载人航天，从嫦娥探月到天问探火，中国航天人用几十年如一日的坚持与拼搏，将中国人的太空梦一步步变为现实。这背后凝聚的是无数航天人的心血与汗水。",
+      "category": "tech",
+      "type": "story",
+      "tags": [
+        "航天",
+        "太空",
+        "坚持",
+        "梦想"
+      ],
+      "source": "中国航天报",
+      "applicableTopics": [
+        "科技强国",
+        "追梦",
+        "坚持",
+        "自主创新"
+      ],
+      "createdAt": "2026-02-01",
+      "subcategory": "tech-aerospace"
+    },
+    {
+      "id": "m003",
+      "title": "袁隆平——让中国人端牢饭碗",
+      "content": "袁隆平，杂交水稻之父，一生致力于杂交水稻技术的研究。他常说：我毕生的追求就是让所有人远离饥饿。即便年过九旬，他仍坚持下田。他用一粒种子改变了世界，用一生践行了将论文写在祖国大地上的诺言。",
+      "category": "rolemodel",
+      "type": "story",
+      "tags": [
+        "袁隆平",
+        "坚持",
+        "奉献",
+        "科学家精神"
+      ],
+      "source": "人民日报",
+      "applicableTopics": [
+        "奉献",
+        "坚持",
+        "责任",
+        "知行合一"
+      ],
+      "createdAt": "2026-01-10",
+      "subcategory": "rolemodel-scientist"
+    },
+    {
+      "id": "m004",
+      "title": "张桂梅——燃烧自己照亮大山",
+      "content": "张桂梅，云南丽江华坪女子高级中学校长。她扎根贫困山区四十余年，创办全国第一所全免费的女子高中，帮助近两千名贫困山区女孩考入大学，改变了她们的命运。身患多种疾病仍坚持陪伴学生，她用瘦弱的肩膀扛起大山女孩的希望。",
+      "category": "rolemodel",
+      "type": "story",
+      "tags": [
+        "张桂梅",
+        "教育",
+        "奉献",
+        "改变命运"
+      ],
+      "source": "新华社",
+      "applicableTopics": [
+        "教育",
+        "奉献",
+        "大爱",
+        "改变",
+        "责任"
+      ],
+      "createdAt": "2026-01-10",
+      "subcategory": "rolemodel-dedicate"
+    },
+    {
+      "id": "m005",
+      "title": "士不可以不弘毅，任重而道远",
+      "content": "曾子曰：士不可以不弘毅，任重而道远。仁以为己任，不亦重乎？死而后已，不亦远乎？\n\n释义：读书人不可以不弘大刚毅，因为他肩负的责任重大，而且路途遥远。以实现仁德为自己的责任，不是很重大吗？到死才停止，不是很遥远吗？",
+      "category": "virtue",
+      "type": "quote",
+      "tags": [
+        "论语",
+        "曾子",
+        "责任",
+        "坚持"
+      ],
+      "source": "《论语·泰伯》",
+      "applicableTopics": [
+        "责任担当",
+        "坚持不懈",
+        "理想与信念"
+      ],
+      "createdAt": "2026-01-05",
+      "subcategory": "virtue-duty"
+    },
+    {
+      "id": "m006",
+      "title": "绿水青山就是金山银山",
+      "content": "绿水青山就是金山银山是习近平提出的科学论断，揭示了经济发展与生态保护的辩证关系。浙江安吉余村从卖石头到卖风景的转型，正是这一理念的生动实践。保护生态环境就是保护生产力，改善生态环境就是发展生产力。",
+      "category": "nature",
+      "type": "hot",
+      "tags": [
+        "环保",
+        "生态",
+        "绿色发展",
+        "可持续"
+      ],
+      "source": "时事政治",
+      "applicableTopics": [
+        "人与自然",
+        "绿色发展",
+        "可持续发展",
+        "辩证思考"
+      ],
+      "createdAt": "2026-01-20",
+      "subcategory": "nature-sustain"
+    },
+    {
+      "id": "m007",
+      "title": "樊锦诗——敦煌的女儿",
+      "content": "樊锦诗，北京大学毕业后扎根敦煌半个多世纪，致力于莫高窟的保护与研究。面对大漠戈壁的艰苦条件，她从未动摇。她推动了数字敦煌项目，用现代科技永久保存了千年石窟艺术，被誉为敦煌的女儿。",
+      "category": "culture",
+      "type": "story",
+      "tags": [
+        "敦煌",
+        "文化遗产",
+        "坚持",
+        "文化传承"
+      ],
+      "source": "光明日报",
+      "applicableTopics": [
+        "文化传承",
+        "坚守",
+        "科技与文化",
+        "选择"
+      ],
+      "createdAt": "2026-02-05",
+      "subcategory": "culture-heritage"
+    },
+    {
+      "id": "m008",
+      "title": "不以规矩，不能成方圆",
+      "content": "孟子曰：离娄之明，公输子之巧，不以规矩，不能成方圆。\n\n释义：即使有离娄的精明，公输班的技巧，如果不用圆规和曲尺，也不能画出方形和圆形。比喻做事要遵循一定的法则和标准。",
+      "category": "philosophy",
+      "type": "quote",
+      "tags": [
+        "孟子",
+        "规矩",
+        "规则",
+        "方法论"
+      ],
+      "source": "《孟子·离娄上》",
+      "applicableTopics": [
+        "规则与自由",
+        "制度",
+        "方法",
+        "秩序"
+      ],
+      "createdAt": "2026-01-05",
+      "subcategory": "phil-dialectic"
+    },
+    {
+      "id": "m009",
+      "title": "外卖小哥彭清林——纵身一跃见勇毅",
+      "content": "2023年6月，杭州外卖小哥彭清林在送单途中，看到有人落水，毫不犹豫地从12米高的钱塘江大桥上一跃而下，成功救起落水者。事后他说：我只是一个普通人，做了该做的事。这一跳，跳出了平凡人的英雄本色。",
+      "category": "humanity",
+      "type": "story",
+      "tags": [
+        "见义勇为",
+        "平凡英雄",
+        "勇气",
+        "善良"
+      ],
+      "source": "央视新闻",
+      "applicableTopics": [
+        "平凡与伟大",
+        "勇气",
+        "善良",
+        "担当"
+      ],
+      "createdAt": "2026-02-10",
+      "subcategory": "rolemodel-hero"
+    },
+    {
+      "id": "m010",
+      "title": "中国女足逆转夺冠——铿锵玫瑰永不言弃",
+      "content": "2022年女足亚洲杯决赛，中国女足在上半场0:2落后的绝境下，下半场连进三球，以3:2逆转韩国队夺冠。主教练水庆霞赛后说：我们从未放弃，因为我们是中国女足。这种永不言弃的精神，正是中华民族坚韧品格的写照。",
+      "category": "youth",
+      "type": "story",
+      "tags": [
+        "女足",
+        "逆转",
+        "拼搏",
+        "永不言弃"
+      ],
+      "source": "体育新闻",
+      "applicableTopics": [
+        "拼搏",
+        "永不言弃",
+        "团队精神",
+        "逆境翻盘"
+      ],
+      "createdAt": "2026-02-08",
+      "subcategory": "youth-dream"
+    },
+    {
+      "id": "m011",
+      "title": "苟利国家生死以，岂因祸福避趋之",
+      "content": "林则徐《赴戍登程口占示家人》：苟利国家生死以，岂因祸福避趋之。\n\n释义：只要对国家有利，即使牺牲自己生命也心甘情愿，绝不会因为自己可能受到祸害而躲开。体现了崇高的爱国情怀。",
+      "category": "patriotism",
+      "type": "quote",
+      "tags": [
+        "林则徐",
+        "爱国",
+        "担当",
+        "家国"
+      ],
+      "source": "林则徐《赴戍登程口占示家人》",
+      "applicableTopics": [
+        "爱国",
+        "担当",
+        "家国情怀",
+        "个人与国家"
+      ],
+      "createdAt": "2026-01-05",
+      "subcategory": "patriotism-spirit"
+    },
+    {
+      "id": "m012",
+      "title": "大山里的校长——时代楷模陈立群",
+      "content": "陈立群退休后放弃百万年薪，到贵州贫困山区担任台江民族中学校长。他分文不取，用三年时间将一所升学率不足10%的学校提升到近80%。他说：给我百万年薪不如给我一个改变孩子命运的机会。",
+      "category": "society",
+      "type": "story",
+      "tags": [
+        "教育公平",
+        "支教",
+        "奉献",
+        "改变"
+      ],
+      "source": "时代楷模",
+      "applicableTopics": [
+        "教育公平",
+        "奉献",
+        "选择",
+        "社会责任"
+      ],
+      "createdAt": "2026-01-25",
+      "subcategory": "society-edu"
+    }
+  ],
+  "questionAnalysis": [
+    {
+      "id": "qa001",
+      "title": "科技发展与人文精神",
+      "category": "tech",
+      "subcategory": "tech-ai",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n随着人工智能技术的飞速发展，AI已经深入到我们生活的方方面面。有人欢呼科技带来的便利，也有人担忧人类正在被技术异化。对此，你有怎样的思考？",
+      "angles": [
+        "科技进步的双面性",
+        "科技伦理的边界",
+        "工具理性与价值理性",
+        "人与技术的共生关系"
+      ],
+      "tips": "可从正反两面展开辩证论述，既肯定科技进步的价值，又指出需要人文精神的引导和规范。",
+      "materialIds": [
+        "m001",
+        "m002"
+      ]
+    },
+    {
+      "id": "qa002",
+      "title": "自主创新与科技强国",
+      "category": "tech",
+      "subcategory": "tech-aerospace",
+      "questionType": "命题作文",
+      "sampleQuestion": "请以\"自主创新的力量\"为题，写一篇不少于800字的文章。",
+      "angles": [
+        "自力更生的精神",
+        "科技创新的国家意义",
+        "从追赶到引领",
+        "坚持与突破"
+      ],
+      "tips": "可用中国航天从零起步到空间站建成的历程作为核心论据，结合个人或群体角度展开。",
+      "materialIds": [
+        "m002"
+      ]
+    },
+    {
+      "id": "qa003",
+      "title": "奉献精神的当代诠释",
+      "category": "rolemodel",
+      "subcategory": "rolemodel-scientist",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n袁隆平一生致力于杂交水稻研究，即使在九十岁高龄仍坚持下田。他说：\"我毕生的追求就是让所有人远离饥饿。\"",
+      "angles": [
+        "小我与大我",
+        "选择与坚守",
+        "平凡中的伟大",
+        "知行合一"
+      ],
+      "tips": "以袁隆平为核心素材，可对比张桂梅、陈立群等人物，从不同角度诠释奉献精神。",
+      "materialIds": [
+        "m003",
+        "m004",
+        "m012"
+      ]
+    },
+    {
+      "id": "qa004",
+      "title": "教育改变命运",
+      "category": "society",
+      "subcategory": "society-edu",
+      "questionType": "任务驱动型作文",
+      "sampleQuestion": "某校举办\"教育与公平\"主题论坛，请你作为学生代表写一篇发言稿，谈谈你对教育公平的理解。",
+      "angles": [
+        "教育公平的社会意义",
+        "个人努力与制度保障",
+        "知识改变命运的当代思考"
+      ],
+      "tips": "可引用张桂梅、陈立群两个素材，一个讲个人坚守，一个讲制度层面的推动，层次更丰富。",
+      "materialIds": [
+        "m004",
+        "m012"
+      ]
+    },
+    {
+      "id": "qa005",
+      "title": "人与自然的和谐共生",
+      "category": "nature",
+      "subcategory": "nature-sustain",
+      "questionType": "话题作文",
+      "sampleQuestion": "以\"人与自然\"为话题，写一篇文章，谈谈你的感悟与思考。",
+      "angles": [
+        "敬畏自然",
+        "发展与保护的平衡",
+        "可持续发展的哲学思考",
+        "绿水青山就是金山银山"
+      ],
+      "tips": "可从宏观政策（两山理论）和微观行动两个层面展开，结合余村转型的具体案例。",
+      "materialIds": [
+        "m006"
+      ]
+    },
+    {
+      "id": "qa006",
+      "title": "文化传承与时代创新",
+      "category": "culture",
+      "subcategory": "culture-heritage",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n樊锦诗扎根敦煌半个多世纪，用\"数字敦煌\"将千年石窟艺术永久保存。有人说这是最好的传承，也有人说数字化让文化失去了\"温度\"。",
+      "angles": [
+        "传承与创新的辩证关系",
+        "文化保护的时代课题",
+        "科技助力文化传承",
+        "坚守与变革"
+      ],
+      "tips": "以樊锦诗为主线，讨论传承方式是否只有一种，数字化保存的价值与意义。",
+      "materialIds": [
+        "m007"
+      ]
+    },
+    {
+      "id": "qa007",
+      "title": "平凡中的英雄主义",
+      "category": "humanity",
+      "subcategory": "humanity-empathy",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n外卖小哥彭清林从12米高的桥上纵身跃下，救起落水者。事后他说：\"我只是个普通人，做了该做的事。\"",
+      "angles": [
+        "平凡与伟大",
+        "勇气的本质",
+        "普通人的社会责任",
+        "善良的力量"
+      ],
+      "tips": "以彭清林为核心素材，可拓展讨论平凡人不平凡的选择，用对比论证深化主题。",
+      "materialIds": [
+        "m009"
+      ]
+    },
+    {
+      "id": "qa008",
+      "title": "青春与梦想",
+      "category": "youth",
+      "subcategory": "youth-dream",
+      "questionType": "命题作文",
+      "sampleQuestion": "请以\"青春的模样\"为题，写一篇不少于800字的文章。",
+      "angles": [
+        "梦想的力量",
+        "永不言弃的精神",
+        "青春的责任与担当",
+        "个人梦与中国梦"
+      ],
+      "tips": "可引用中国女足逆转夺冠的拼搏精神，结合当代青年的使命担当展开论述。",
+      "materialIds": [
+        "m010"
+      ]
+    },
+    {
+      "id": "qa009",
+      "title": "家国情怀与个人选择",
+      "category": "patriotism",
+      "subcategory": "patriotism-spirit",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n林则徐写道：\"苟利国家生死以，岂因祸福避趋之。\"从古至今，无数仁人志士在国家需要时挺身而出。",
+      "angles": [
+        "个人命运与国家命运",
+        "大我与小我",
+        "时代赋予的使命",
+        "青年担当"
+      ],
+      "tips": "可从古代（林则徐）到当代（航天人、张桂梅）纵向列举，体现家国情怀的时代传承。",
+      "materialIds": [
+        "m011",
+        "m002",
+        "m004"
+      ]
+    },
+    {
+      "id": "qa010",
+      "title": "规则与自由",
+      "category": "philosophy",
+      "subcategory": "phil-dialectic",
+      "questionType": "话题作文",
+      "sampleQuestion": "以\"规则与自由\"为话题，写一篇不少于800字的文章，谈谈你的思考。",
+      "angles": [
+        "规则是自由的前提",
+        "没有规矩不成方圆",
+        "自由是规则的目的",
+        "辩证统一"
+      ],
+      "tips": "引用\"不以规矩，不能成方圆\"作为论据，可结合社会现象讨论规则意识的必要性。",
+      "materialIds": [
+        "m008"
+      ]
+    },
+    {
+      "id": "qa011",
+      "title": "品德修养与人生价值",
+      "category": "virtue",
+      "subcategory": "virtue-duty",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n曾子曰：\"士不可以不弘毅，任重而道远。\"在当今社会，这句话带给你怎样的启示？",
+      "angles": [
+        "责任与担当",
+        "志向与毅力",
+        "个人修养与社会责任",
+        "知行合一"
+      ],
+      "tips": "从经典名句出发，联系当代青年的责任担当，可结合时代楷模素材展开。",
+      "materialIds": [
+        "m005",
+        "m004",
+        "m003"
+      ]
+    },
+    {
+      "id": "qa012",
+      "title": "平凡人的不平凡选择",
+      "category": "rolemodel",
+      "subcategory": "rolemodel-hero",
+      "questionType": "材料作文",
+      "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n有人说英雄是改变历史的人，有人说英雄是在关键时刻做出正确选择的普通人。你如何看待\"英雄\"？",
+      "angles": [
+        "英雄的时代内涵",
+        "平凡与伟大",
+        "选择的勇气",
+        "英雄在民间"
+      ],
+      "tips": "可引用彭清林见义勇为等平凡英雄素材，讨论英雄不问出处。",
+      "materialIds": [
+        "m009",
+        "m004",
+        "m003"
+      ]
+    }
+  ]
+}

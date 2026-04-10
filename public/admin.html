@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>素材管理后台</title>
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container admin-header-inner">
+      <h1>⚙️ 素材管理后台</h1>
+      <nav class="admin-nav">
+        <a href="/" target="_blank">查看前台</a>
+        <button onclick="showSection('list')" class="nav-btn active" id="navList">素材列表</button>
+        <button onclick="showSection('add')" class="nav-btn" id="navAdd">添加素材</button>
+        <button onclick="showSection('import')" class="nav-btn" id="navImport">导入导出</button>
+        <button onclick="showSection('stats')" class="nav-btn" id="navStats">数据统计</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container admin-main">
+
+    <!-- ====== 素材列表 ====== -->
+    <section id="sectionList" class="admin-section">
+      <div class="section-toolbar">
+        <h2>素材列表</h2>
+        <div class="toolbar-actions">
+          <input type="text" id="adminSearch" placeholder="搜索..." oninput="adminSearchMaterials()">
+          <select id="adminCategoryFilter" onchange="adminSearchMaterials()">
+            <option value="">全部分类</option>
+          </select>
+          <select id="adminTypeFilter" onchange="adminSearchMaterials()">
+            <option value="">全部类型</option>
+          </select>
+          <button class="btn-danger" onclick="batchDelete()">批量删除</button>
+        </div>
+      </div>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+            <th>标题</th>
+            <th>分类</th>
+            <th>类型</th>
+            <th>标签</th>
+            <th>日期</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="adminTableBody"></tbody>
+      </table>
+      <div class="pagination" id="adminPagination"></div>
+    </section>
+
+    <!-- ====== 添加/编辑素材 ====== -->
+    <section id="sectionAdd" class="admin-section" style="display:none;">
+      <h2 id="formTitle">添加素材</h2>
+      <form id="materialForm" class="material-form" onsubmit="saveMaterial(event)">
+        <input type="hidden" id="editId" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>标题 *</label>
+            <input type="text" id="formTitleInput" required placeholder="素材标题">
+          </div>
+          <div class="form-group">
+            <label>出处/来源</label>
+            <input type="text" id="formSource" placeholder="如：人民日报、《论语》">
+          </div>
+        </div>
+
+        <div class="form-row three-col">
+          <div class="form-group">
+            <label>一级分类 *</label>
+            <select id="formCategory" required></select>
+          </div>
+          <div class="form-group">
+            <label>二级分类</label>
+            <select id="formSubcategory" disabled><option value="">无子分类</option></select>
+          </div>
+          <div class="form-group">
+            <label>类型 *</label>
+            <select id="formType" required></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>素材内容 *</label>
+          <textarea id="formContent" required rows="6" placeholder="素材正文内容..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>标签 <span class="hint">（回车添加，多个标签）</span></label>
+          <div class="tag-input-wrapper" id="tagInputWrapper">
+            <input type="text" id="tagInput" placeholder="输入标签后按回车">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>适用话题 <span class="hint">（回车添加，多个话题）</span></label>
+          <div class="tag-input-wrapper" id="topicInputWrapper">
+            <input type="text" id="topicInput" placeholder="如：坚持、追梦、责任">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">保存素材</button>
+          <button type="button" class="btn-secondary" onclick="resetForm()">重置</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ====== 导入导出 ====== -->
+    <section id="sectionImport" class="admin-section" style="display:none;">
+      <h2>数据导入导出</h2>
+      <div class="import-export-grid">
+        <div class="ie-card">
+          <h3>📤 导出数据</h3>
+          <p>将所有素材数据导出为 JSON 文件</p>
+          <button class="btn-primary" onclick="exportData()">导出 JSON</button>
+        </div>
+        <div class="ie-card">
+          <h3>📥 导入数据</h3>
+          <p>从 JSON 文件导入素材（追加到现有数据）</p>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+          <button class="btn-primary" onclick="document.getElementById('importFile').click()">选择文件导入</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== 数据统计 ====== -->
+    <section id="sectionStats" class="admin-section" style="display:none;">
+      <h2>数据统计</h2>
+      <div class="stats-grid" id="statsGrid"></div>
+    </section>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
