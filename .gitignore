@@ -1,1 +1,8 @@
 node_modules/
+
+# SQLite 临时文件
+*.db-shm
+*.db-wal
+
+# Claude Code 本地配置
+.claude/settings.local.json
