@@ -3,96 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>高考作文素材库</title>
+  <title>作文素材 - 拾光阅</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
 
+  <div class="noise-overlay"></div>
+
   <!-- 移动端顶栏 -->
   <header class="mobile-header">
-    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
-    <h1 class="mobile-logo">📝 高考作文素材库</h1>
-    <a href="/exam" class="mobile-nav-link" title="历年真题">📜</a>
+    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+    <h1 class="mobile-logo">拾光阅</h1>
+    <a href="/exam" class="mobile-nav-link">📜</a>
   </header>
 
-  <!-- 遮罩层 -->
-  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <!-- 侧边栏遮罩 -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
   <div class="layout">
 
-    <!-- 左侧边栏 -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <h1 class="logo">📝 高考作文素材库</h1>
+    <!-- 左侧：文艺导航 -->
+    <aside class="art-sidebar" id="artSidebar">
+      <div class="brand">
+        <h1 class="vertical-title">高考<br>作文<br>素材</h1>
+        <span class="seal">拾光</span>
       </div>
 
-      <!-- 快捷导航 -->
-      <div class="sidebar-section sidebar-nav-links">
-        <a href="/exam" class="sidebar-link">📜 历年高考真题（2016-2025）</a>
+      <div class="poetic-quote">
+        " 腹有诗书气自华，<br>&nbsp;&nbsp;读书万卷始通神。"
       </div>
 
-      <!-- 搜索 -->
-      <div class="sidebar-search">
-        <div class="search-box">
-          <input type="text" id="searchInput" placeholder="搜索素材..." autocomplete="off">
-          <button onclick="doSearch()">搜索</button>
-        </div>
+      <div class="search-v3">
+        <input type="text" id="searchInput" placeholder="寻觅佳句 / 典故..." autocomplete="off">
+        <div class="search-line"></div>
       </div>
 
-      <!-- 分类 -->
-      <div class="sidebar-section">
-        <div class="sidebar-title">📂 分类</div>
-        <div class="sidebar-nav" id="categoryFilter"></div>
+      <nav class="filter-nav" id="categoryFilter">
+        <!-- 动态分类 + 子分类 -->
+      </nav>
+
+      <div class="tag-filter" id="tagFilter">
+        <!-- 动态标签 -->
       </div>
 
-      <!-- 类型 -->
-      <div class="sidebar-section">
-        <div class="sidebar-title">📑 类型</div>
-        <div class="sidebar-nav" id="typeFilter"></div>
-      </div>
-
-      <!-- 热门标签 -->
-      <div class="sidebar-section">
-        <div class="sidebar-title">🏷️ 热门标签</div>
-        <div class="sidebar-tags" id="tagFilter"></div>
-      </div>
-
-      <!-- 统计 -->
-      <div class="sidebar-footer">
-        共 <strong id="totalCount">0</strong> 条素材
+      <div class="sidebar-footer-v3">
+        共收录佳作 <span id="totalCount" class="highlight-num">0</span> 篇
       </div>
     </aside>
 
-    <!-- 主内容区 -->
-    <main class="main-content">
-      <section class="materials-grid" id="materialsGrid"></section>
-      <div class="empty-state" id="emptyState" style="display:none;">
-        <p>暂无匹配的素材</p>
+    <!-- 右侧：阅读区 -->
+    <main class="art-main">
+      <div class="page-header">
+        <div class="type-bar" id="typeFilter"></div>
+        <a href="/exam" class="link-exam">阅览历年真题 ➔</a>
       </div>
-      <div class="load-more-wrapper" id="loadMoreWrapper" style="display:none;">
-        <button class="btn-load-more" onclick="loadMore()">加载更多</button>
+
+      <div class="magazine-grid" id="materialsGrid"></div>
+
+      <div class="empty-state-v3" id="emptyState" style="display:none;">
+        未寻得相关笔墨，换个词试试罢。
+      </div>
+
+      <div class="load-more-v3" id="loadMoreWrapper" style="display:none;">
+        <button class="btn-text" onclick="loadMore()">展卷更多</button>
       </div>
     </main>
 
   </div>
 
-  <!-- 素材详情弹窗 -->
-  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
-    <div class="modal" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="closeModalDirect()">&times;</button>
-      <div class="modal-body" id="modalBody"></div>
-      <div class="modal-footer">
-        <button class="btn-copy" onclick="copyMaterial()">📋 复制全文</button>
+  <!-- 阅读浮窗 (仿书本打开) -->
+  <div class="reader-overlay" id="readerOverlay" onclick="closeReader()"></div>
+  <div class="reader-modal" id="readerModal">
+    <div class="reader-paper">
+      <button class="reader-close" onclick="closeReader()">×</button>
+      <div class="reader-content" id="readerContent"></div>
+      <div class="reader-actions">
+        <button class="btn-seal" onclick="copyMaterial()">临摹此卷 (复制)</button>
       </div>
     </div>
   </div>
 
-  <!-- 回到顶部 -->
-  <button class="btn-top" id="btnTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="回到顶部">↑</button>
-
-  <footer class="footer">
-    高考作文素材库 · 祝各位考生金榜题名 🎓
-  </footer>
+  <div id="toast" class="toast-v3"></div>
 
   <script src="/js/main.js"></script>
 </body>

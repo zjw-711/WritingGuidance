@@ -20,6 +20,8 @@ async function init() {
   populateFormSelects();
   setupTagInputs();
   loadAdminMaterials();
+  loadAiConfig();
+  populateAiCategorySelect();
 }
 
 // ========== 页面切换 ==========
@@ -32,6 +34,7 @@ function showSection(name) {
   if (name === 'stats') loadStats();
   if (name === 'list') loadAdminMaterials();
   if (name === 'categories') loadCatMgmt();
+  if (name === 'ai') loadPendingMaterials();
 }
 
 function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
@@ -641,3 +644,177 @@ function escapeHtml(str) {
 
 // ========== 启动 ==========
 init();
+
+// ========== AI 素材功能 ==========
+
+function populateAiCategorySelect() {
+  const sel = document.getElementById('aiCategory');
+  let html = '<option value="">不限分类</option>';
+  categories.forEach(c => {
+    html += `<option value="${c.id}">${c.name}</option>`;
+  });
+  sel.innerHTML = html;
+}
+
+async function loadAiConfig() {
+  try {
+    const config = await fetch('/api/ai/config').then(r => r.json());
+    document.getElementById('aiBaseUrl').value = config.baseUrl || '';
+    document.getElementById('aiApiKey').value = config.apiKey || '';
+    document.getElementById('aiModel').value = config.model || '';
+    const statusEl = document.getElementById('aiStatus');
+    if (config.enabled) {
+      statusEl.textContent = '✅ 已配置';
+      statusEl.className = 'ai-status success';
+    } else {
+      statusEl.textContent = '⚠️ 未配置';
+      statusEl.className = 'ai-status';
+    }
+  } catch {}
+}
+
+async function saveAiConfig() {
+  const config = {
+    provider: 'openai-compatible',
+    baseUrl: document.getElementById('aiBaseUrl').value.trim(),
+    apiKey: document.getElementById('aiApiKey').value.trim(),
+    model: document.getElementById('aiModel').value.trim()
+  };
+  try {
+    const res = await fetch('/api/ai/config', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    }).then(r => r.json());
+    if (res.success) {
+      alert('配置已保存');
+      loadAiConfig();
+    } else {
+      alert('保存失败：' + (res.error || '未知错误'));
+    }
+  } catch (err) {
+    alert('保存失败：' + err.message);
+  }
+}
+
+async function testAiConnection() {
+  const statusEl = document.getElementById('aiStatus');
+  statusEl.textContent = '⏳ 测试中...';
+  statusEl.className = 'ai-status';
+  try {
+    await saveAiConfig();
+    const res = await fetch('/api/ai/test', { method: 'POST' }).then(r => r.json());
+    if (res.success) {
+      statusEl.textContent = '✅ ' + res.message;
+      statusEl.className = 'ai-status success';
+    } else {
+      statusEl.textContent = '❌ ' + res.error;
+      statusEl.className = 'ai-status error';
+    }
+  } catch (err) {
+    statusEl.textContent = '❌ 测试失败：' + err.message;
+    statusEl.className = 'ai-status error';
+  }
+}
+
+async function generateAiMaterials() {
+  const topic = document.getElementById('aiTopic').value.trim();
+  const category = document.getElementById('aiCategory').value;
+  const count = parseInt(document.getElementById('aiCount').value);
+  const progressEl = document.getElementById('aiGenProgress');
+  const btn = document.getElementById('aiGenBtn');
+
+  if (!topic) { alert('请输入话题'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '生成中...';
+  progressEl.style.display = 'block';
+  progressEl.textContent = `正在生成 ${count} 条素材，请稍候（约需 10-30 秒）...`;
+  progressEl.className = 'ai-gen-progress';
+
+  try {
+    const res = await fetch('/api/ai/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, category, count })
+    }).then(r => r.json());
+
+    if (res.success) {
+      progressEl.textContent = `生成完成！共 ${res.count} 条素材通过筛选，已加入待审核队列。`;
+      progressEl.className = 'ai-gen-progress';
+      document.getElementById('aiTopic').value = '';
+      loadPendingMaterials();
+    } else {
+      progressEl.textContent = '生成失败：' + (res.error || '未知错误');
+      progressEl.className = 'ai-gen-progress error';
+    }
+  } catch (err) {
+    progressEl.textContent = '请求失败：' + err.message;
+    progressEl.className = 'ai-gen-progress error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '生成素材';
+  }
+}
+
+async function loadPendingMaterials() {
+  try {
+    const res = await fetch('/api/materials/pending?pageSize=50').then(r => r.json());
+    document.getElementById('pendingCount').textContent = res.total;
+    const tbody = document.getElementById('pendingTableBody');
+    tbody.innerHTML = '';
+
+    res.data.forEach(m => {
+      const cat = categories.find(c => c.id === m.category);
+      const type = types.find(t => t.id === m.type);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(m.title)}</td>
+        <td>${cat ? cat.name : '-'}</td>
+        <td>${type ? type.name : '-'}</td>
+        <td><span class="score-badge medium">AI生成</span></td>
+        <td>${escapeHtml(m.source || '')}</td>
+        <td>
+          <div class="review-actions">
+            <button class="btn-approve" onclick="approveMaterial('${m.id}')">通过</button>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:0.8rem" onclick="editPendingMaterial('${m.id}')">编辑</button>
+            <button class="btn-reject" onclick="rejectMaterial('${m.id}')">拒绝</button>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch {}
+}
+
+async function approveMaterial(id) {
+  try {
+    const res = await fetch(`/api/materials/${id}/approve`, { method: 'PUT' }).then(r => r.json());
+    if (res.success) {
+      loadPendingMaterials();
+    } else {
+      alert('操作失败');
+    }
+  } catch (err) {
+    alert('操作失败：' + err.message);
+  }
+}
+
+async function rejectMaterial(id) {
+  if (!confirm('确定拒绝此素材？')) return;
+  try {
+    const res = await fetch(`/api/materials/${id}/reject`, { method: 'PUT' }).then(r => r.json());
+    if (res.success) {
+      loadPendingMaterials();
+    } else {
+      alert('操作失败');
+    }
+  } catch (err) {
+    alert('操作失败：' + err.message);
+  }
+}
+
+function editPendingMaterial(id) {
+  // 跳转到编辑表单，审核通过后保存
+  editMaterial(id);
+}

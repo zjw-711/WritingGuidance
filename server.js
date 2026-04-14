@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { getDb, generateId } = require('./db');
+const ai = require('./ai');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,6 +28,7 @@ function buildMaterial(row) {
     tags: [],
     applicableTopics: [],
     links: [],
+    status: row.status || 'approved',
     createdAt: row.created_at
   };
   // tags
@@ -150,6 +152,9 @@ app.get('/api/materials', (req, res) => {
   let whereClauses = [];
   let params = [];
 
+  // 前台只显示已发布素材
+  whereClauses.push("m.status = 'approved'");
+
   if (category) { whereClauses.push('m.category_id = ?'); params.push(category); }
   if (subcategory) { whereClauses.push('m.subcategory_id = ?'); params.push(subcategory); }
   if (type) { whereClauses.push('m.type_id = ?'); params.push(type); }
@@ -178,6 +183,16 @@ app.get('/api/materials', (req, res) => {
 
   const data = rows.map(r => buildMaterial(r));
 
+  res.json({ total, page: parseInt(page), pageSize: parseInt(pageSize), data });
+});
+
+// 获取待审核素材（必须在 :id 路由之前）
+app.get('/api/materials/pending', (req, res) => {
+  const { page = 1, pageSize = 15 } = req.query;
+  const total = db.prepare("SELECT COUNT(*) as c FROM materials WHERE status = 'pending'").get().c;
+  const offset = (parseInt(page) - 1) * parseInt(pageSize);
+  const rows = db.prepare("SELECT * FROM materials WHERE status = 'pending' ORDER BY created_at DESC LIMIT ? OFFSET ?").all(parseInt(pageSize), offset);
+  const data = rows.map(r => buildMaterial(r));
   res.json({ total, page: parseInt(page), pageSize: parseInt(pageSize), data });
 });
 
@@ -518,6 +533,97 @@ app.post('/api/import', (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+});
+
+// ========== AI 配置 ==========
+app.get('/api/ai/config', (req, res) => {
+  const config = ai.readAiConfig();
+  // apiKey 脱敏
+  res.json({
+    ...config,
+    apiKey: config.apiKey ? config.apiKey.slice(0, 6) + '***' : ''
+  });
+});
+
+app.put('/api/ai/config', (req, res) => {
+  const config = req.body;
+  // 如果 apiKey 是脱敏的（含 ***），保留原有的
+  if (config.apiKey && config.apiKey.includes('***')) {
+    const existing = ai.readAiConfig();
+    config.apiKey = existing.apiKey;
+  }
+  const saved = ai.saveAiConfig(config);
+  res.json({ success: true, config: { ...saved, apiKey: saved.apiKey ? saved.apiKey.slice(0, 6) + '***' : '' } });
+});
+
+// AI 连通性测试（真正发一次请求）
+app.post('/api/ai/test', async (req, res) => {
+  const config = ai.readAiConfig();
+  if (!config.enabled) return res.status(400).json({ error: '请先完成配置' });
+  try {
+    const result = await ai.chatCompletion([
+      { role: 'user', content: '请回复"连接成功"四个字，只返回 JSON：{"ok":true}' }
+    ]);
+    res.json({ success: true, message: 'AI 服务连接正常' });
+  } catch (err) {
+    res.status(400).json({ error: '连接失败：' + err.message });
+  }
+});
+
+// ========== AI 素材生成 ==========
+app.post('/api/ai/generate', async (req, res) => {
+  const { topic, category, count = 3 } = req.body;
+  if (!topic) return res.status(400).json({ error: '请输入话题' });
+
+  const config = ai.readAiConfig();
+  if (!config.enabled) return res.status(400).json({ error: 'AI 未配置，请先填写 API Key 和 Base URL' });
+
+  try {
+    // 获取该分类的子分类列表
+    const subs = db.prepare('SELECT id, name FROM subcategories WHERE category_id = ?').all(category || '');
+
+    // 查出已有素材标题，用于去重
+    const existing = db.prepare('SELECT title FROM materials').all();
+    const existingTitles = existing.map(r => r.title);
+
+    const materials = await ai.generateMaterialsByTopic(topic, category, subs, count, existingTitles);
+
+    // 存入数据库（status=pending）
+    const saved = [];
+    const insertMat = db.prepare(`INSERT INTO materials (id, title, content, category_id, subcategory_id, type_id, source, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', date('now'))`);
+    const insertTag = db.prepare('INSERT INTO material_tags (material_id, tag) VALUES (?, ?)');
+    const insertTopic = db.prepare('INSERT INTO material_topics (material_id, topic) VALUES (?, ?)');
+
+    const insertAll = db.transaction((items) => {
+      for (const mat of items) {
+        const id = generateId('m');
+        // 随机选一个子分类
+        const subId = subs.length > 0 ? subs[Math.floor(Math.random() * subs.length)].id : null;
+        insertMat.run(id, mat.title, mat.content, category || null, subId, mat.type || 'story', mat.source || 'AI 生成');
+        for (const tag of (mat.tags || [])) insertTag.run(id, tag);
+        for (const topic of (mat.applicableTopics || [])) insertTopic.run(id, topic);
+        saved.push({ id, ...mat });
+      }
+    });
+
+    insertAll(materials);
+    res.json({ success: true, count: saved.length, materials: saved });
+  } catch (err) {
+    res.status(500).json({ error: 'AI 生成失败：' + err.message });
+  }
+});
+
+// ========== 素材审核 ==========
+app.put('/api/materials/:id/approve', (req, res) => {
+  const result = db.prepare("UPDATE materials SET status = 'approved' WHERE id = ?").run(req.params.id);
+  if (result.changes === 0) return res.status(404).json({ error: '素材不存在' });
+  res.json({ success: true });
+});
+
+app.put('/api/materials/:id/reject', (req, res) => {
+  const result = db.prepare("UPDATE materials SET status = 'rejected' WHERE id = ?").run(req.params.id);
+  if (result.changes === 0) return res.status(404).json({ error: '素材不存在' });
+  res.json({ success: true });
 });
 
 app.listen(PORT, () => {

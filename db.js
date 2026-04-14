@@ -122,6 +122,9 @@ function initDb() {
     CREATE INDEX IF NOT EXISTS idx_exam_materials_exam ON exam_materials(exam_id);
   `);
 
+  // 新增 status 字段（兼容重复执行）
+  try { db.exec(`ALTER TABLE materials ADD COLUMN status TEXT DEFAULT 'approved'`); } catch {}
+
   return db;
 }
 
