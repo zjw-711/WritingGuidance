@@ -89,7 +89,6 @@ function toggleOrSelectCategory(catId, btn) {
   filters.subcategory = '';
   currentPage = 1;
   loadMaterials();
-  loadQuestionAnalysis();
 
   if (window.innerWidth <= 768) closeSidebar();
 }
@@ -112,7 +111,6 @@ function selectSubcategory(catId, subId, btn) {
   filters.subcategory = subId;
   currentPage = 1;
   loadMaterials();
-  loadQuestionAnalysis();
 
   if (window.innerWidth <= 768) closeSidebar();
 }
@@ -126,7 +124,6 @@ function selectCategory(catId, subId, btn) {
     filters.subcategory = '';
     currentPage = 1;
     loadMaterials();
-    loadQuestionAnalysis();
     if (window.innerWidth <= 768) closeSidebar();
   }
 }
@@ -229,7 +226,10 @@ function renderMaterials(materials) {
         <div class="card-tags">
           ${(m.tags || []).slice(0, 3).map(t => `<span class="card-tag">${escapeHtml(t)}</span>`).join('')}
         </div>
-        <span class="card-source">${escapeHtml(m.source || '')}</span>
+        <div class="card-meta-right">
+          ${m.links && m.links.length ? '<span class="card-link-badge" title="含延伸阅读链接">🔗</span>' : ''}
+          <span class="card-source">${escapeHtml(m.source || '')}</span>
+        </div>
       </div>
     `;
     grid.appendChild(card);
@@ -268,6 +268,20 @@ async function openModal(id) {
       <div class="detail-topics">
         <div class="detail-label">适用话题</div>
         <div class="tag-list">${m.applicableTopics.map(t => `<span class="topic-item">${escapeHtml(t)}</span>`).join('')}</div>
+      </div>
+    ` : ''}
+    ${m.links && m.links.length ? `
+      <div class="detail-links">
+        <div class="detail-label">延伸阅读</div>
+        <div class="link-list">
+          ${m.links.map(link => `
+            <a class="link-item" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">
+              <span class="link-icon">${getLinkIcon(link.type)}</span>
+              <span class="link-title">${escapeHtml(link.title)}</span>
+              <span class="link-arrow">↗</span>
+            </a>
+          `).join('')}
+        </div>
       </div>
     ` : ''}
   `;
@@ -313,61 +327,22 @@ function showToast(msg) {
 }
 
 // ========== 工具函数 ==========
+function getLinkIcon(type) {
+  const icons = {
+    'video': '🎬',
+    'article': '📄',
+    'wiki': '📚',
+    'news': '📰',
+    'social': '💬'
+  };
+  return icons[type] || '🔗';
+}
+
 function escapeHtml(str) {
   if (!str) return '';
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
-}
-
-// ========== 右侧命题分析面板 ==========
-async function loadQuestionAnalysis() {
-  const params = new URLSearchParams();
-  if (filters.subcategory) {
-    params.set('subcategory', filters.subcategory);
-  } else if (filters.category) {
-    params.set('category', filters.category);
-  }
-
-  const res = await fetch('/api/question-analysis?' + params).then(r => r.json());
-  renderQuestionAnalysis(res);
-}
-
-function renderQuestionAnalysis(list) {
-  const body = document.getElementById('rightBody');
-
-  if (!list.length) {
-    body.innerHTML = '<div class="qa-hint">该分类暂无命题分析<br>可在管理后台添加</div>';
-    return;
-  }
-
-  body.innerHTML = list.map(qa => `
-    <div class="qa-card">
-      <div class="qa-card-title">${escapeHtml(qa.title)}</div>
-      <span class="qa-card-type">${escapeHtml(qa.questionType || '')}</span>
-      <div class="qa-card-question">${escapeHtml(qa.sampleQuestion)}</div>
-      <div class="qa-card-angles">
-        <div class="qa-card-label">💡 写作角度</div>
-        <div class="qa-angle-list">
-          ${(qa.angles || []).map(a => `<span class="qa-angle">${escapeHtml(a)}</span>`).join('')}
-        </div>
-      </div>
-      <div class="qa-card-tips">✏️ ${escapeHtml(qa.tips || '')}</div>
-      <div class="qa-materials-title">📎 推荐素材</div>
-      ${(qa.materials || []).map(m => `
-        <div class="qa-material-item" onclick="openModal('${m.id}')">
-          <span class="qa-material-dot"></span>
-          <span>${escapeHtml(m.title)}</span>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
-}
-
-// 右侧面板切换（移动端/中等屏幕）
-function toggleRightPanel() {
-  document.getElementById('rightPanel').classList.toggle('open');
-  document.getElementById('rightOverlay').classList.toggle('active');
 }
 
 // ========== 启动 ==========

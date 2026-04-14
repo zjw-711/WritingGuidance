@@ -15,6 +15,7 @@
         <button onclick="showSection('list')" class="nav-btn active" id="navList">素材列表</button>
         <button onclick="showSection('add')" class="nav-btn" id="navAdd">添加素材</button>
         <button onclick="showSection('import')" class="nav-btn" id="navImport">导入导出</button>
+        <button onclick="showSection('categories')" class="nav-btn" id="navCategories">分类管理</button>
         <button onclick="showSection('stats')" class="nav-btn" id="navStats">数据统计</button>
       </nav>
     </div>
@@ -105,6 +106,12 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label>延伸链接 <span class="hint">（添加百度百科、B站视频等外部链接，帮助学生深入了解素材背后的故事）</span></label>
+          <div id="linksContainer" class="links-container"></div>
+          <button type="button" class="btn-add-link" onclick="addLinkRow()">+ 添加链接</button>
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="btn-primary">保存素材</button>
           <button type="button" class="btn-secondary" onclick="resetForm()">重置</button>
@@ -130,12 +137,44 @@
       </div>
     </section>
 
+    <!-- ====== 分类管理 ====== -->
+    <section id="sectionCategories" class="admin-section" style="display:none;">
+      <div class="section-toolbar">
+        <h2>分类管理</h2>
+        <div class="toolbar-actions">
+          <button class="btn-primary" onclick="addCategory()">+ 新增一级分类</button>
+        </div>
+      </div>
+      <div class="cat-mgmt-grid" id="catMgmtGrid"></div>
+    </section>
+
     <!-- ====== 数据统计 ====== -->
     <section id="sectionStats" class="admin-section" style="display:none;">
       <h2>数据统计</h2>
       <div class="stats-grid" id="statsGrid"></div>
     </section>
   </main>
+
+  <!-- 分类编辑弹窗 -->
+  <div class="cat-modal-overlay" id="catEditModal" onclick="if(event.target===this)closeCatEditModal()">
+    <div class="cat-modal">
+      <div class="cat-modal-title">编辑分类</div>
+      <div class="cat-modal-body">
+        <div class="form-group" id="catEditIconRow">
+          <label>图标（Emoji）</label>
+          <input type="text" id="catEditIcon" placeholder="如：🔬 💎 🌿" maxlength="4">
+        </div>
+        <div class="form-group">
+          <label>分类名称 *</label>
+          <input type="text" id="catEditName" placeholder="输入分类名称" maxlength="20" onkeydown="if(event.key==='Enter')confirmCatEdit()">
+        </div>
+      </div>
+      <div class="cat-modal-footer">
+        <button class="btn-primary" onclick="confirmCatEdit()">确定</button>
+        <button class="btn-secondary" onclick="closeCatEditModal()">取消</button>
+      </div>
+    </div>
+  </div>
 
   <script src="/js/admin.js"></script>
 </body>

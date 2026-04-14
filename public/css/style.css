@@ -177,6 +177,31 @@ body {
 
 .sidebar-item-icon { font-size: 1rem; }
 
+/* ========== 侧边栏快捷导航 ========== */
+.sidebar-nav-links {
+  padding: 8px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-link {
+  display: block;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.sidebar-link:hover {
+  background: var(--primary-bg);
+}
+.mobile-nav-link {
+  color: white;
+  font-size: 1.2rem;
+  text-decoration: none;
+  padding: 4px 8px;
+}
+
 /* ========== 分类树：一级分类 ========== */
 .cat-group { /* 每个一级分类容器 */ }
 
@@ -253,168 +278,6 @@ body {
   font-weight: 500;
   margin-bottom: 8px;
   margin-left: 6px;
-}
-
-/* ========== 右侧命题分析面板 ========== */
-.right-panel {
-  width: 320px;
-  min-width: 320px;
-  background: var(--card-bg);
-  border-left: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  z-index: 60;
-}
-
-.right-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  z-index: 59;
-}
-
-.right-overlay.active { display: block; }
-
-.right-header {
-  padding: 24px 16px 12px;
-  border-bottom: 1px solid var(--border);
-}
-
-.right-header h2 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.right-body {
-  padding: 16px;
-}
-
-.qa-hint {
-  text-align: center;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  padding: 30px 10px;
-}
-
-/* 命题分析卡片 */
-.qa-card {
-  background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 14px;
-  margin-bottom: 14px;
-  transition: border-color 0.2s;
-}
-
-.qa-card:hover { border-color: var(--primary-light); }
-
-.qa-card-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 6px;
-}
-
-.qa-card-type {
-  display: inline-block;
-  font-size: 0.72rem;
-  padding: 2px 8px;
-  border-radius: 10px;
-  background: #fef3c7;
-  color: #92400e;
-  font-weight: 500;
-  margin-bottom: 8px;
-}
-
-.qa-card-question {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 10px;
-  padding: 8px;
-  background: white;
-  border-radius: 6px;
-  border-left: 3px solid var(--primary-light);
-}
-
-.qa-card-angles {
-  margin-bottom: 10px;
-}
-
-.qa-card-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 4px;
-}
-
-.qa-angle-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.qa-angle {
-  font-size: 0.72rem;
-  padding: 2px 8px;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 4px;
-}
-
-.qa-card-tips {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 10px;
-  padding: 8px;
-  background: #fffbeb;
-  border-radius: 6px;
-}
-
-.qa-materials-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.qa-material-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  background: white;
-  border-radius: 6px;
-  margin-bottom: 4px;
-  cursor: pointer;
-  transition: background 0.15s;
-  font-size: 0.82rem;
-}
-
-.qa-material-item:hover { background: var(--primary-bg); }
-
-.qa-material-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--primary);
-  flex-shrink: 0;
-}
-
-/* 移动端右侧面板按钮 */
-.qa-toggle-mobile {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 4px;
-  line-height: 1;
 }
 
 /* ========== 侧边栏标签 ========== */
@@ -549,6 +412,18 @@ body {
   background: var(--tag-bg);
   color: var(--tag-text);
   border-radius: 4px;
+}
+
+.card-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.card-link-badge {
+  font-size: 0.85rem;
+  opacity: 0.6;
 }
 
 .card-source {
@@ -773,34 +648,64 @@ body {
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ========== 滚动条美化 ========== */
-.sidebar::-webkit-scrollbar,
-.right-panel::-webkit-scrollbar { width: 4px; }
-.sidebar::-webkit-scrollbar-track,
-.right-panel::-webkit-scrollbar-track { background: transparent; }
-.sidebar::-webkit-scrollbar-thumb,
-.right-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+/* ========== 弹窗：延伸阅读链接 ========== */
+.modal-body .detail-links { margin-top: 8px; }
+
+.modal-body .link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-body .link-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--primary-bg);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.modal-body .link-item:hover {
+  border-color: var(--primary-light);
+  background: #e0e7ff;
+}
+
+.modal-body .link-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.modal-body .link-title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modal-body .link-arrow {
+  color: var(--primary);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+}
+
+.modal-body .link-item:hover .link-arrow {
+  transform: translate(2px, -2px);
+}
 
 /* ========== 响应式 ========== */
-@media (max-width: 1200px) {
-  /* 中等屏幕：右侧面板变成抽屉 */
-  .right-panel {
-    position: fixed;
-    right: -340px;
-    top: 0;
-    height: 100vh;
-    transition: right 0.3s ease;
-    box-shadow: var(--shadow-lg);
-    z-index: 160;
-  }
-  .right-panel.open { right: 0; }
-  .qa-toggle-mobile { display: block; }
-}
-
-@media (min-width: 1201px) {
-  .qa-toggle-mobile { display: none; }
-  .right-overlay { display: none !important; }
-}
-
 @media (max-width: 768px) {
   .mobile-header { display: flex; }
 
@@ -814,11 +719,6 @@ body {
   }
 
   .sidebar.open { left: 0; }
-
-  .right-panel {
-    width: 300px;
-    min-width: 300px;
-  }
 
   .main-content { padding: 16px; }
 

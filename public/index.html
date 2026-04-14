@@ -12,12 +12,11 @@
   <header class="mobile-header">
     <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
     <h1 class="mobile-logo">📝 高考作文素材库</h1>
-    <button class="qa-toggle-mobile" onclick="toggleRightPanel()">💡</button>
+    <a href="/exam" class="mobile-nav-link" title="历年真题">📜</a>
   </header>
 
   <!-- 遮罩层 -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
-  <div class="right-overlay" id="rightOverlay" onclick="toggleRightPanel()"></div>
 
   <div class="layout">
 
@@ -25,6 +24,11 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h1 class="logo">📝 高考作文素材库</h1>
+      </div>
+
+      <!-- 快捷导航 -->
+      <div class="sidebar-section sidebar-nav-links">
+        <a href="/exam" class="sidebar-link">📜 历年高考真题（2016-2025）</a>
       </div>
 
       <!-- 搜索 -->
@@ -70,15 +74,6 @@
       </div>
     </main>
 
-    <!-- 右侧命题分析面板 -->
-    <aside class="right-panel" id="rightPanel">
-      <div class="right-header">
-        <h2>💡 命题分析与素材推荐</h2>
-      </div>
-      <div class="right-body" id="rightBody">
-        <div class="qa-hint">选择左侧分类，查看相关命题分析和推荐素材</div>
-      </div>
-    </aside>
   </div>
 
   <!-- 素材详情弹窗 -->

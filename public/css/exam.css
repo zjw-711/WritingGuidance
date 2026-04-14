@@ -1,0 +1,510 @@
+/* ========== 真题页面导航栏 ========== */
+.exam-header {
+  background: white;
+  border-bottom: 3px solid var(--primary);
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.exam-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.exam-logo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
+}
+.exam-nav {
+  display: flex;
+  gap: 4px;
+}
+.exam-nav a {
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.exam-nav a:hover {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+.exam-nav a.active {
+  background: var(--primary);
+  color: white;
+}
+
+/* ========== 标题区 ========== */
+.exam-hero {
+  text-align: center;
+  padding: 40px 24px 20px;
+  background: linear-gradient(135deg, var(--primary-bg), #f0f4ff);
+}
+.exam-hero h1 {
+  font-size: 2rem;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.exam-subtitle {
+  color: var(--text-light);
+  font-size: 1rem;
+}
+
+/* ========== 筛选栏 ========== */
+.exam-filters {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+.year-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.year-tag {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.year-tag:hover {
+  border-color: var(--primary-light);
+  color: var(--primary);
+}
+.year-tag.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.filter-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-row select,
+.filter-row input {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  background: white;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.filter-row select:focus,
+.filter-row input:focus {
+  border-color: var(--primary);
+}
+.filter-row input {
+  flex: 1;
+  min-width: 200px;
+}
+.filter-row button {
+  padding: 8px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.filter-row button:hover {
+  background: var(--primary-dark, #4338ca);
+}
+
+/* ========== 统计条 ========== */
+.exam-stats-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 16px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+/* ========== 卡片网格 ========== */
+.exam-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  gap: 20px;
+}
+.exam-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+}
+.exam-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-light);
+}
+.exam-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.exam-card-year {
+  font-size: 0.8rem;
+  padding: 3px 12px;
+  border-radius: 12px;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.exam-card-region {
+  font-size: 0.8rem;
+  padding: 3px 12px;
+  border-radius: 12px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.exam-card-content {
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.exam-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.exam-card-keywords {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.exam-card-keywords .card-tag {
+  font-size: 0.75rem;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+.exam-card-arrow {
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ========== 空状态 ========== */
+.exam-main .empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-light);
+}
+.exam-main .empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+/* ========== 加载更多 ========== */
+.load-more-wrapper {
+  text-align: center;
+  margin-top: 32px;
+}
+.btn-load-more {
+  padding: 10px 36px;
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-load-more:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* ========== 弹窗 ========== */
+.exam-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+.exam-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+.exam-modal-overlay .modal {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  max-width: 700px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+}
+.exam-modal-overlay .modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.exam-modal-overlay .modal-close:hover {
+  background: var(--bg);
+}
+
+/* 弹窗内容 */
+.detail-badges {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.detail-badges span {
+  font-size: 0.85rem;
+  padding: 4px 14px;
+  border-radius: 14px;
+  font-weight: 600;
+}
+.detail-badges .badge-year {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+.detail-badges .badge-region {
+  background: #fef3c7;
+  color: #92400e;
+}
+.detail-content {
+  font-size: 1rem;
+  line-height: 1.9;
+  color: var(--text);
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.exam-requirement {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #fffbeb;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid #f59e0b;
+}
+.detail-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.tag-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.tag-list .tag-item {
+  padding: 4px 14px;
+  border-radius: 14px;
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 0.85rem;
+}
+.exam-section {
+  margin-bottom: 20px;
+}
+.exam-angles {
+  list-style: none;
+  padding: 0;
+}
+.exam-angles li {
+  padding: 8px 0 8px 20px;
+  position: relative;
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.exam-angles li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 16px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary-light);
+}
+.exam-analysis {
+  color: var(--text);
+  font-size: 0.92rem;
+  line-height: 1.8;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+}
+.qa-material-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.qa-material-item:hover {
+  background: var(--primary-bg);
+}
+.qa-material-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+.modal-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+}
+.btn-copy {
+  padding: 8px 20px;
+  background: white;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.15s;
+}
+.btn-copy:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* ========== 回到顶部 ========== */
+.btn-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s;
+  z-index: 90;
+}
+.btn-top.visible {
+  opacity: 1;
+  visibility: visible;
+}
+.btn-top:hover {
+  transform: translateY(-2px);
+}
+
+/* ========== 页脚 ========== */
+.exam-footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 1100px) {
+  .exam-grid {
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  }
+}
+@media (max-width: 768px) {
+  .exam-header-inner {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .exam-nav {
+    flex-wrap: wrap;
+  }
+  .exam-hero h1 {
+    font-size: 1.5rem;
+  }
+  .exam-grid {
+    grid-template-columns: 1fr;
+  }
+  .exam-card-content {
+    -webkit-line-clamp: 3;
+  }
+  .filter-row {
+    flex-direction: column;
+  }
+  .filter-row input {
+    min-width: auto;
+  }
+  .year-tags {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 4px;
+  }
+  .year-tags::-webkit-scrollbar {
+    height: 3px;
+  }
+  .exam-modal-overlay .modal {
+    width: 95%;
+    padding: 20px;
+  }
+}

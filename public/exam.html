@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>历年高考真题 - 高考作文素材库</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/exam.css">
+</head>
+<body>
+
+  <!-- 导航栏 -->
+  <header class="exam-header">
+    <div class="exam-header-inner">
+      <a href="/" class="exam-logo">📝 高考作文素材库</a>
+      <nav class="exam-nav">
+        <a href="/">素材首页</a>
+        <a href="/exam" class="active">历年真题</a>
+        <a href="/admin">管理后台</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 标题区 -->
+  <div class="exam-hero">
+    <h1>📜 历年高考真题</h1>
+    <p class="exam-subtitle">2016 - 2025 全国各省市高考作文题目</p>
+  </div>
+
+  <!-- 筛选栏 -->
+  <div class="exam-filters">
+    <div class="year-tags" id="yearTags"></div>
+    <div class="filter-row">
+      <select id="regionFilter" onchange="applyFilters()">
+        <option value="">全部地区</option>
+      </select>
+      <select id="regionTypeFilter" onchange="applyFilters()">
+        <option value="">全部试卷类型</option>
+        <option value="national">全国卷</option>
+        <option value="new">新高考卷</option>
+        <option value="independent">自主命题</option>
+      </select>
+      <input type="text" id="examSearch" placeholder="搜索关键词..." onkeydown="if(event.key==='Enter')applyFilters()">
+      <button onclick="applyFilters()">搜索</button>
+    </div>
+  </div>
+
+  <!-- 统计条 -->
+  <div class="exam-stats-bar">
+    共 <strong id="examTotal">0</strong> 道真题
+  </div>
+
+  <!-- 题目卡片 -->
+  <main class="exam-main">
+    <div class="exam-grid" id="examGrid"></div>
+    <div class="empty-state" id="examEmpty" style="display:none;">
+      <div class="empty-icon">🔍</div>
+      <p>暂无匹配的真题</p>
+    </div>
+    <div class="load-more-wrapper" id="examLoadMore" style="display:none;">
+      <button class="btn-load-more" onclick="loadMore()">加载更多</button>
+    </div>
+  </main>
+
+  <!-- 详情弹窗 -->
+  <div class="exam-modal-overlay" id="examModalOverlay" onclick="closeExamModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeExamModalDirect()">&times;</button>
+      <div class="modal-body" id="examModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn-copy" onclick="copyExamQuestion()">📋 复制题目</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 回到顶部 -->
+  <button class="btn-top" id="btnTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+  <!-- 页脚 -->
+  <footer class="exam-footer">高考作文素材库 · 祝各位考生金榜题名</footer>
+
+  <script src="/js/exam.js"></script>
+</body>
+</html>
