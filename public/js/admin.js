@@ -6,9 +6,65 @@ let formTopics = [];
 let formLinks = [];
 let adminPage = 1;
 let adminPageSize = 15;
+let currentUser = null;
+
+// ========== 认证工具 ==========
+
+// 带认证检查的 fetch 封装，遇到 401 自动跳转登录页
+async function authFetch(url, options = {}) {
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    window.location.href = '/login';
+    throw new Error('未登录');
+  }
+  return res;
+}
+
+async function logout() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+  } catch {}
+  window.location.href = '/login';
+}
+
+// 根据角色隐藏/显示功能区
+function applyRolePermissions() {
+  if (!currentUser) return;
+  const isAdmin = currentUser.role === 'admin';
+
+  // editor 不能看到：分类管理、导入导出、AI 配置
+  const navImport = document.getElementById('navImport');
+  const navCategories = document.getElementById('navCategories');
+  if (navImport) navImport.style.display = isAdmin ? '' : 'none';
+  if (navCategories) navCategories.style.display = isAdmin ? '' : 'none';
+
+  // AI 配置区（AI 生成和名著挖掘保留）
+  const aiConfigCard = document.querySelector('.ai-config-card');
+  if (aiConfigCard) aiConfigCard.style.display = isAdmin ? '' : 'none';
+
+  // 显示当前用户
+  const userEl = document.getElementById('currentUser');
+  if (userEl) {
+    userEl.textContent = `${currentUser.username}（${currentUser.role === 'admin' ? '管理员' : '编辑'}）`;
+  }
+}
 
 // ========== 初始化 ==========
 async function init() {
+  // 先检查登录状态
+  try {
+    const meRes = await fetch('/api/auth/me');
+    if (!meRes.ok) {
+      window.location.href = '/login';
+      return;
+    }
+    const meData = await meRes.json();
+    currentUser = meData.user;
+  } catch {
+    window.location.href = '/login';
+    return;
+  }
+
   const [catRes, typeRes] = await Promise.all([
     fetch('/api/categories').then(r => r.json()),
     fetch('/api/types').then(r => r.json())
@@ -16,11 +72,14 @@ async function init() {
   categories = catRes;
   types = typeRes;
 
+  applyRolePermissions();
   populateFilters();
   populateFormSelects();
   setupTagInputs();
   loadAdminMaterials();
-  loadAiConfig();
+  if (currentUser.role === 'admin') {
+    loadAiConfig();
+  }
   populateAiCategorySelect();
 }
 
@@ -165,15 +224,15 @@ function renderAdminTable(materials) {
     const type = types.find(t => t.id === m.type);
     return `
       <tr>
-        <td><input type="checkbox" class="row-check" data-id="${m.id}"></td>
+        <td><input type="checkbox" class="row-check" data-id="${escapeAttr(m.id)}"></td>
         <td title="${escapeHtml(m.title)}">${escapeHtml(m.title)}</td>
         <td>${cat ? cat.icon + ' ' + cat.name : '-'}</td>
         <td>${type ? type.name : '-'}</td>
         <td>${(m.tags || []).map(t => `<span class="table-tag">${escapeHtml(t)}</span>`).join('')}</td>
         <td>${m.createdAt || '-'}</td>
         <td>
-          <button class="btn-sm btn-edit" onclick="editMaterial('${m.id}')">编辑</button>
-          <button class="btn-sm btn-del" onclick="deleteMaterial('${m.id}')">删除</button>
+          <button class="btn-sm btn-edit" onclick="editMaterial('${escapeAttr(m.id)}')">编辑</button>
+          <button class="btn-sm btn-del" onclick="deleteMaterial('${escapeAttr(m.id)}')">删除</button>
         </td>
       </tr>
     `;
@@ -233,13 +292,13 @@ async function saveMaterial(e) {
 
   let res;
   if (editId) {
-    res = await fetch('/api/materials/' + editId, {
+    res = await authFetch('/api/materials/' + editId, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(material)
     });
   } else {
-    res = await fetch('/api/materials', {
+    res = await authFetch('/api/materials', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(material)
@@ -295,7 +354,7 @@ function resetForm() {
 // ========== 删除 ==========
 async function deleteMaterial(id) {
   if (!confirm('确定要删除这条素材吗？')) return;
-  const res = await fetch('/api/materials/' + id, { method: 'DELETE' }).then(r => r.json());
+  const res = await authFetch('/api/materials/' + id, { method: 'DELETE' }).then(r => r.json());
   if (res.success) {
     showToast('已删除', 'success');
     loadAdminMaterials();
@@ -307,7 +366,7 @@ async function batchDelete() {
   if (!ids.length) { showToast('请先勾选素材', 'error'); return; }
   if (!confirm(`确定要删除选中的 ${ids.length} 条素材吗？`)) return;
 
-  const res = await fetch('/api/materials/batch-delete', {
+  const res = await authFetch('/api/materials/batch-delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ ids })
@@ -338,7 +397,7 @@ async function importData(e) {
     return;
   }
 
-  const res = await fetch('/api/import', {
+  const res = await authFetch('/api/import', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
@@ -354,7 +413,7 @@ async function importData(e) {
 
 // ========== 数据统计 ==========
 async function loadStats() {
-  const stats = await fetch('/api/stats').then(r => r.json());
+  const stats = await authFetch('/api/stats').then(r => r.json());
   const grid = document.getElementById('statsGrid');
 
   let html = `
@@ -565,14 +624,14 @@ async function saveAllCategories() {
   });
 
   if (removedCatIds.length > 0 || removedSubIds.length > 0) {
-    const stats = await fetch('/api/stats').then(r => r.json());
+    const stats = await authFetch('/api/stats').then(r => r.json());
     const affectedMats = removedCatIds.reduce((n, cid) => n + (stats.categoryStats[cid] || 0), 0);
     if (affectedMats > 0) {
       if (!confirm(`本次操作将移除 ${removedCatIds.length} 个分类，其中有 ${affectedMats} 条素材会失去分类归属（素材不会被删除）。\n\n确定继续？`)) return;
     }
   }
 
-  const res = await fetch('/api/categories', {
+  const res = await authFetch('/api/categories', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(catMgmtData)
@@ -642,6 +701,11 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function escapeAttr(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ========== 启动 ==========
 init();
 
@@ -658,7 +722,7 @@ function populateAiCategorySelect() {
 
 async function loadAiConfig() {
   try {
-    const config = await fetch('/api/ai/config').then(r => r.json());
+    const config = await authFetch('/api/ai/config').then(r => r.json());
     document.getElementById('aiBaseUrl').value = config.baseUrl || '';
     document.getElementById('aiApiKey').value = config.apiKey || '';
     document.getElementById('aiModel').value = config.model || '';
@@ -670,7 +734,9 @@ async function loadAiConfig() {
       statusEl.textContent = '⚠️ 未配置';
       statusEl.className = 'ai-status';
     }
-  } catch {}
+  } catch (err) {
+    console.error('加载 AI 配置失败：', err);
+  }
 }
 
 async function saveAiConfig() {
@@ -681,7 +747,7 @@ async function saveAiConfig() {
     model: document.getElementById('aiModel').value.trim()
   };
   try {
-    const res = await fetch('/api/ai/config', {
+    const res = await authFetch('/api/ai/config', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(config)
@@ -703,7 +769,7 @@ async function testAiConnection() {
   statusEl.className = 'ai-status';
   try {
     await saveAiConfig();
-    const res = await fetch('/api/ai/test', { method: 'POST' }).then(r => r.json());
+    const res = await authFetch('/api/ai/test', { method: 'POST' }).then(r => r.json());
     if (res.success) {
       statusEl.textContent = '✅ ' + res.message;
       statusEl.className = 'ai-status success';
@@ -733,7 +799,7 @@ async function generateAiMaterials() {
   progressEl.className = 'ai-gen-progress';
 
   try {
-    const res = await fetch('/api/ai/generate', {
+    const res = await authFetch('/api/ai/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic, category, count })
@@ -759,7 +825,7 @@ async function generateAiMaterials() {
 
 async function loadPendingMaterials() {
   try {
-    const res = await fetch('/api/materials/pending?pageSize=50').then(r => r.json());
+    const res = await authFetch('/api/materials/pending?pageSize=50').then(r => r.json());
     document.getElementById('pendingCount').textContent = res.total;
     const tbody = document.getElementById('pendingTableBody');
     tbody.innerHTML = '';
@@ -776,20 +842,22 @@ async function loadPendingMaterials() {
         <td>${escapeHtml(m.source || '')}</td>
         <td>
           <div class="review-actions">
-            <button class="btn-approve" onclick="approveMaterial('${m.id}')">通过</button>
-            <button class="btn-secondary" style="padding:4px 10px;font-size:0.8rem" onclick="editPendingMaterial('${m.id}')">编辑</button>
-            <button class="btn-reject" onclick="rejectMaterial('${m.id}')">拒绝</button>
+            <button class="btn-approve" onclick="approveMaterial('${escapeAttr(m.id)}')">通过</button>
+            <button class="btn-secondary" style="padding:4px 10px;font-size:0.8rem" onclick="editPendingMaterial('${escapeAttr(m.id)}')">编辑</button>
+            <button class="btn-reject" onclick="rejectMaterial('${escapeAttr(m.id)}')">拒绝</button>
           </div>
         </td>
       `;
       tbody.appendChild(tr);
     });
-  } catch {}
+  } catch (err) {
+    console.error('加载待审核素材失败：', err);
+  }
 }
 
 async function approveMaterial(id) {
   try {
-    const res = await fetch(`/api/materials/${id}/approve`, { method: 'PUT' }).then(r => r.json());
+    const res = await authFetch(`/api/materials/${id}/approve`, { method: 'PUT' }).then(r => r.json());
     if (res.success) {
       loadPendingMaterials();
     } else {
@@ -803,7 +871,7 @@ async function approveMaterial(id) {
 async function rejectMaterial(id) {
   if (!confirm('确定拒绝此素材？')) return;
   try {
-    const res = await fetch(`/api/materials/${id}/reject`, { method: 'PUT' }).then(r => r.json());
+    const res = await authFetch(`/api/materials/${id}/reject`, { method: 'PUT' }).then(r => r.json());
     if (res.success) {
       loadPendingMaterials();
     } else {
@@ -818,3 +886,116 @@ function editPendingMaterial(id) {
   // 跳转到编辑表单，审核通过后保存
   editMaterial(id);
 }
+
+// ========== 名著素材挖掘 ==========
+
+let classicsList = [];
+
+// 加载名著建议列表到 datalist
+async function loadClassicsList() {
+  try {
+    classicsList = await fetch('/api/classics').then(r => r.json());
+    const datalist = document.getElementById('classicSuggestions');
+    datalist.innerHTML = classicsList.map(c =>
+      `<option value="${c.title}（${c.era}·${c.author}）">`
+    ).join('');
+    // 输入时联动主题
+    document.getElementById('classicInput').addEventListener('input', updateClassicThemes);
+  } catch (err) {
+    console.error('加载名著列表失败：', err);
+  }
+}
+
+function updateClassicThemes() {
+  const inputVal = document.getElementById('classicInput').value.trim();
+  const themeSel = document.getElementById('classicTheme');
+  themeSel.innerHTML = '<option value="">全部主题</option>';
+
+  // 尝试匹配预置名著（按标题模糊匹配）
+  const matched = classicsList.find(c => inputVal.includes(c.title) || c.title.includes(inputVal));
+  if (!matched || !matched.themes) return;
+
+  matched.themes.forEach(t => {
+    themeSel.innerHTML += `<option value="${t}">${t}</option>`;
+  });
+}
+
+// 解析用户输入，匹配预置名著或构建自定义名著信息
+function resolveClassicInput() {
+  const inputVal = document.getElementById('classicInput').value.trim();
+  if (!inputVal) return null;
+
+  // 先尝试精确/模糊匹配预置名著
+  const matched = classicsList.find(c => inputVal.includes(c.title) || c.title.includes(inputVal));
+  if (matched) return { type: 'preset', classic: matched };
+
+  // 自定义输入：提取用户输入的书名
+  // 支持格式："书名"、"书名·作者"、"书名（作者）" 等
+  const title = inputVal.replace(/[（()·\-\s].*$/, '').replace(/《》/g, '').trim();
+  return { type: 'custom', classic: { id: '', title: title || inputVal, author: '', era: '', description: '', themes: [] } };
+}
+
+async function generateClassicsMaterials() {
+  const resolved = resolveClassicInput();
+  if (!resolved) { alert('请输入或选择名著名称'); return; }
+
+  const theme = document.getElementById('classicTheme').value;
+  const count = parseInt(document.getElementById('classicCount').value);
+  const progressEl = document.getElementById('classicGenProgress');
+  const resultEl = document.getElementById('classicGenResult');
+  const btn = document.getElementById('classicGenBtn');
+
+  const classic = resolved.classic;
+  const themeHint = theme ? `「${theme}」角度` : '全部主题角度';
+
+  btn.disabled = true;
+  btn.textContent = '挖掘中...';
+  progressEl.style.display = 'block';
+  progressEl.textContent = `正在从《${classic.title}》中挖掘 ${themeHint} 的素材，请稍候...`;
+  progressEl.className = 'ai-gen-progress';
+  resultEl.style.display = 'none';
+
+  try {
+    const body = resolved.type === 'preset'
+      ? { classicId: classic.id, theme, count }
+      : { customTitle: classic.title, theme, count };
+
+    const res = await authFetch('/api/ai/generate-classics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).then(r => r.json());
+
+    if (res.success) {
+      progressEl.textContent = `挖掘完成！从《${classic.title}》中找到 ${res.count} 条素材，已加入待审核队列。`;
+
+      if (res.materials && res.materials.length > 0) {
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = `
+          <div style="margin-bottom:8px;font-weight:600;">生成预览：</div>
+          ${res.materials.map(m => `
+            <div style="background:#f8f8f0;border-left:3px solid #b5493b;padding:8px 12px;margin-bottom:8px;border-radius:0 4px 4px 0;">
+              <div style="font-weight:600;margin-bottom:4px;">${escapeHtml(m.title)}</div>
+              <div style="font-size:0.85rem;color:#666;line-height:1.5;">${escapeHtml((m.content || '').substring(0, 120))}...</div>
+              <div style="margin-top:4px;">${(m.tags || []).map(t => `<span style="display:inline-block;background:#e8e4db;padding:2px 8px;border-radius:10px;font-size:0.75rem;margin-right:4px;">${escapeHtml(t)}</span>`).join('')}</div>
+            </div>
+          `).join('')}
+        `;
+      }
+
+      loadPendingMaterials();
+    } else {
+      progressEl.textContent = '挖掘失败：' + (res.error || '未知错误');
+      progressEl.className = 'ai-gen-progress error';
+    }
+  } catch (err) {
+    progressEl.textContent = '请求失败：' + err.message;
+    progressEl.className = 'ai-gen-progress error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '挖掘素材';
+  }
+}
+
+// 初始化时加载名著列表
+loadClassicsList();

@@ -120,6 +120,24 @@ function initDb() {
     CREATE INDEX IF NOT EXISTS idx_exam_questions_region ON exam_questions(region);
     CREATE INDEX IF NOT EXISTS idx_qa_materials_qa ON qa_materials(qa_id);
     CREATE INDEX IF NOT EXISTS idx_exam_materials_exam ON exam_materials(exam_id);
+
+    -- ========== 用户与会话 ==========
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      role TEXT NOT NULL DEFAULT 'editor',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS sessions (
+      token TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TEXT DEFAULT (datetime('now')),
+      expires_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
   `);
 
   // 新增 status 字段（兼容重复执行）

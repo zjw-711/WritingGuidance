@@ -3,6 +3,16 @@ const cors = require('cors');
 const path = require('path');
 const { getDb, generateId } = require('./db');
 const ai = require('./ai');
+const fs = require('fs');
+const {
+  requireAuth, requireRole,
+  verifyPassword, createSession, destroySession,
+  setSessionCookie, clearSessionCookie, getSessionToken,
+  cleanExpiredSessions
+} = require('./auth');
+
+// 加载名著配置
+const CLASSICS = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'classics.json'), 'utf-8'));
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,16 +41,46 @@ function buildMaterial(row) {
     status: row.status || 'approved',
     createdAt: row.created_at
   };
-  // tags
   const tags = db.prepare('SELECT tag FROM material_tags WHERE material_id = ?').all(row.id);
   m.tags = tags.map(t => t.tag);
-  // topics
   const topics = db.prepare('SELECT topic FROM material_topics WHERE material_id = ?').all(row.id);
   m.applicableTopics = topics.map(t => t.topic);
-  // links
   const links = db.prepare('SELECT title, url, type FROM material_links WHERE material_id = ?').all(row.id);
   m.links = links;
   return m;
+}
+
+// 批量组装素材（减少 N+1 查询）
+function buildMaterials(rows) {
+  if (!rows || rows.length === 0) return [];
+  const ids = rows.map(r => r.id);
+  const placeholders = ids.map(() => '?').join(',');
+
+  const allTags = db.prepare(`SELECT material_id, tag FROM material_tags WHERE material_id IN (${placeholders})`).all(...ids);
+  const allTopics = db.prepare(`SELECT material_id, topic FROM material_topics WHERE material_id IN (${placeholders})`).all(...ids);
+  const allLinks = db.prepare(`SELECT material_id, title, url, type FROM material_links WHERE material_id IN (${placeholders})`).all(...ids);
+
+  const tagMap = new Map();
+  const topicMap = new Map();
+  const linkMap = new Map();
+  for (const t of allTags) { if (!tagMap.has(t.material_id)) tagMap.set(t.material_id, []); tagMap.get(t.material_id).push(t.tag); }
+  for (const t of allTopics) { if (!topicMap.has(t.material_id)) topicMap.set(t.material_id, []); topicMap.get(t.material_id).push(t.topic); }
+  for (const l of allLinks) { if (!linkMap.has(l.material_id)) linkMap.set(l.material_id, []); linkMap.get(l.material_id).push({ title: l.title, url: l.url, type: l.type }); }
+
+  return rows.map(row => ({
+    id: row.id,
+    title: row.title,
+    content: row.content,
+    category: row.category_id,
+    subcategory: row.subcategory_id,
+    type: row.type_id,
+    source: row.source,
+    tags: tagMap.get(row.id) || [],
+    applicableTopics: topicMap.get(row.id) || [],
+    links: linkMap.get(row.id) || [],
+    status: row.status || 'approved',
+    createdAt: row.created_at
+  }));
 }
 
 // ========== 前端页面路由 ==========
@@ -48,12 +88,44 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/admin', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin.html'));
 });
 
 app.get('/exam', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'exam.html'));
+});
+
+// ========== API：认证 ==========
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: '请输入用户名和密码' });
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return res.status(401).json({ error: '用户名或密码错误' });
+  }
+
+  const session = createSession(user.id);
+  setSessionCookie(res, session.token);
+  res.json({ success: true, user: { username: user.username, role: user.role } });
+});
+
+app.post('/api/auth/logout', requireAuth, (req, res) => {
+  const token = getSessionToken(req);
+  if (token) destroySession(token);
+  clearSessionCookie(res);
+  res.json({ success: true });
+});
+
+app.get('/api/auth/me', requireAuth, (req, res) => {
+  res.json({ user: req.user });
 });
 
 // ========== API：分类 ==========
@@ -66,7 +138,7 @@ app.get('/api/categories', (req, res) => {
   res.json(result);
 });
 
-app.put('/api/categories', (req, res) => {
+app.put('/api/categories', requireAuth, requireRole('admin'), (req, res) => {
   const newCats = req.body;
   if (!Array.isArray(newCats)) return res.status(400).json({ error: '数据格式错误' });
 
@@ -86,21 +158,22 @@ app.put('/api/categories', (req, res) => {
     const removedCatIds = [...oldCatIds].filter(id => !newCatIds.has(id));
     const removedSubIds = [...oldSubIds].filter(id => !newSubIds.has(id));
 
-    // 关键：INSERT OR REPLACE INTO categories 会先 DELETE 再 INSERT，
-    // 而 subcategories 有 ON DELETE CASCADE，会导致所有子分类被级联删除。
-    // 但 materials.subcategory_id → subcategories.id 是 NO ACTION，
-    // 所以必须先清除 materials 和 question_analysis 中所有对子分类的引用。
-    db.prepare('UPDATE materials SET subcategory_id = NULL WHERE subcategory_id IS NOT NULL').run();
-    db.prepare('UPDATE question_analysis SET subcategory_id = NULL WHERE subcategory_id IS NOT NULL').run();
-
-    // 清除被删除分类在素材和命题分析中的引用
-    for (const cid of removedCatIds) {
-      db.prepare('UPDATE materials SET category_id = NULL WHERE category_id = ?').run(cid);
-      db.prepare('UPDATE question_analysis SET category_id = NULL WHERE category_id = ?').run(cid);
+    // 只清除被删除的子分类在素材中的引用（而非全部清空）
+    for (const sid of removedSubIds) {
+      db.prepare('UPDATE materials SET subcategory_id = NULL WHERE subcategory_id = ?').run(sid);
+      db.prepare('UPDATE question_analysis SET subcategory_id = NULL WHERE subcategory_id = ?').run(sid);
     }
 
-    // 删除所有旧的子分类和分类（安全，因为引用已清除）
-    db.prepare('DELETE FROM subcategories').run();
+    // 清除被删除分类在素材中的引用
+    for (const cid of removedCatIds) {
+      db.prepare('UPDATE materials SET category_id = NULL, subcategory_id = NULL WHERE category_id = ?').run(cid);
+      db.prepare('UPDATE question_analysis SET category_id = NULL, subcategory_id = NULL WHERE category_id = ?').run(cid);
+    }
+
+    // 删除被移除的子分类和分类
+    for (const sid of removedSubIds) {
+      db.prepare('DELETE FROM subcategories WHERE id = ?').run(sid);
+    }
     for (const cid of removedCatIds) {
       db.prepare('DELETE FROM categories WHERE id = ?').run(cid);
     }
@@ -111,19 +184,11 @@ app.put('/api/categories', (req, res) => {
       upsertCat.run(c.id, c.name, c.icon || '📁');
     }
 
-    // 插入子分类
-    const insertSub = db.prepare('INSERT INTO subcategories (id, name, category_id) VALUES (?, ?, ?)');
+    // 更新或插入子分类（保留的子分类更新名称，新增的子分类插入）
+    const upsertSub = db.prepare('INSERT OR REPLACE INTO subcategories (id, name, category_id) VALUES (?, ?, ?)');
     for (const c of newCats) {
       for (const s of (c.subcategories || [])) {
-        insertSub.run(s.id, s.name, c.id);
-      }
-    }
-
-    // 恢复保留分类的子分类引用（被删除分类的子分类不再恢复，其素材引用已设为 NULL）
-    for (const c of newCats) {
-      for (const s of (c.subcategories || [])) {
-        db.prepare('UPDATE materials SET subcategory_id = ? WHERE subcategory_id IS NULL AND category_id = ?').run(s.id, c.id);
-        db.prepare('UPDATE question_analysis SET subcategory_id = ? WHERE subcategory_id IS NULL AND category_id = ?').run(s.id, c.id);
+        upsertSub.run(s.id, s.name, c.id);
       }
     }
   });
@@ -181,18 +246,18 @@ app.get('/api/materials', (req, res) => {
     `SELECT m.* FROM materials m ${where} ORDER BY m.created_at DESC LIMIT ? OFFSET ?`
   ).all(...params, parseInt(pageSize), offset);
 
-  const data = rows.map(r => buildMaterial(r));
+  const data = buildMaterials(rows);
 
   res.json({ total, page: parseInt(page), pageSize: parseInt(pageSize), data });
 });
 
 // 获取待审核素材（必须在 :id 路由之前）
-app.get('/api/materials/pending', (req, res) => {
+app.get('/api/materials/pending', requireAuth, (req, res) => {
   const { page = 1, pageSize = 15 } = req.query;
   const total = db.prepare("SELECT COUNT(*) as c FROM materials WHERE status = 'pending'").get().c;
   const offset = (parseInt(page) - 1) * parseInt(pageSize);
   const rows = db.prepare("SELECT * FROM materials WHERE status = 'pending' ORDER BY created_at DESC LIMIT ? OFFSET ?").all(parseInt(pageSize), offset);
-  const data = rows.map(r => buildMaterial(r));
+  const data = buildMaterials(rows);
   res.json({ total, page: parseInt(page), pageSize: parseInt(pageSize), data });
 });
 
@@ -204,7 +269,7 @@ app.get('/api/materials/:id', (req, res) => {
 });
 
 // 新增素材
-app.post('/api/materials', (req, res) => {
+app.post('/api/materials', requireAuth, (req, res) => {
   const id = generateId('m');
   const body = req.body;
 
@@ -238,7 +303,7 @@ app.post('/api/materials', (req, res) => {
 });
 
 // 更新素材
-app.put('/api/materials/:id', (req, res) => {
+app.put('/api/materials/:id', requireAuth, (req, res) => {
   const row = db.prepare('SELECT * FROM materials WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: '素材不存在' });
 
@@ -293,7 +358,7 @@ app.put('/api/materials/:id', (req, res) => {
 });
 
 // 删除素材（CASCADE 自动清理 qa_materials, exam_materials, tags, topics, links）
-app.delete('/api/materials/:id', (req, res) => {
+app.delete('/api/materials/:id', requireAuth, (req, res) => {
   const row = db.prepare('SELECT id FROM materials WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: '素材不存在' });
   const r = db.prepare('DELETE FROM materials WHERE id = ?').run(req.params.id);
@@ -301,7 +366,7 @@ app.delete('/api/materials/:id', (req, res) => {
 });
 
 // 批量删除素材
-app.post('/api/materials/batch-delete', (req, res) => {
+app.post('/api/materials/batch-delete', requireAuth, (req, res) => {
   const { ids } = req.body;
   if (!Array.isArray(ids)) return res.status(400).json({ error: 'ids 必须为数组' });
 
@@ -324,7 +389,7 @@ app.get('/api/tags', (req, res) => {
 });
 
 // 数据统计
-app.get('/api/stats', (req, res) => {
+app.get('/api/stats', requireAuth, (req, res) => {
   const totalMaterials = db.prepare('SELECT COUNT(*) as c FROM materials').get().c;
   const catStats = {};
   db.prepare('SELECT category_id, COUNT(*) as c FROM materials GROUP BY category_id').all()
@@ -337,13 +402,14 @@ app.get('/api/stats', (req, res) => {
 });
 
 // 数据导出
-app.get('/api/export', (req, res) => {
+app.get('/api/export', requireAuth, requireRole('admin'), (req, res) => {
   const categories = db.prepare('SELECT * FROM categories ORDER BY id').all().map(c => ({
     ...c,
     subcategories: db.prepare('SELECT id, name FROM subcategories WHERE category_id = ?').all(c.id)
   }));
   const types = db.prepare('SELECT * FROM types').all();
-  const materials = db.prepare('SELECT * FROM materials ORDER BY created_at DESC').all().map(m => buildMaterial(m));
+  const materialRows = db.prepare('SELECT * FROM materials ORDER BY created_at DESC').all();
+  const materials = buildMaterials(materialRows);
   const questionAnalysis = db.prepare('SELECT * FROM question_analysis ORDER BY id').all().map(qa => ({
     ...qa,
     category: qa.category_id,
@@ -496,7 +562,7 @@ app.get('/api/question-analysis/:id', (req, res) => {
 });
 
 // 数据导入
-app.post('/api/import', (req, res) => {
+app.post('/api/import', requireAuth, requireRole('admin'), (req, res) => {
   const imported = req.body;
   if (!imported.materials || !Array.isArray(imported.materials)) {
     return res.status(400).json({ error: '数据格式错误' });
@@ -536,7 +602,7 @@ app.post('/api/import', (req, res) => {
 });
 
 // ========== AI 配置 ==========
-app.get('/api/ai/config', (req, res) => {
+app.get('/api/ai/config', requireAuth, requireRole('admin'), (req, res) => {
   const config = ai.readAiConfig();
   // apiKey 脱敏
   res.json({
@@ -545,7 +611,7 @@ app.get('/api/ai/config', (req, res) => {
   });
 });
 
-app.put('/api/ai/config', (req, res) => {
+app.put('/api/ai/config', requireAuth, requireRole('admin'), (req, res) => {
   const config = req.body;
   // 如果 apiKey 是脱敏的（含 ***），保留原有的
   if (config.apiKey && config.apiKey.includes('***')) {
@@ -557,11 +623,11 @@ app.put('/api/ai/config', (req, res) => {
 });
 
 // AI 连通性测试（真正发一次请求）
-app.post('/api/ai/test', async (req, res) => {
+app.post('/api/ai/test', requireAuth, requireRole('admin'), async (req, res) => {
   const config = ai.readAiConfig();
   if (!config.enabled) return res.status(400).json({ error: '请先完成配置' });
   try {
-    const result = await ai.chatCompletion([
+    await ai.chatCompletion([
       { role: 'user', content: '请回复"连接成功"四个字，只返回 JSON：{"ok":true}' }
     ]);
     res.json({ success: true, message: 'AI 服务连接正常' });
@@ -571,7 +637,7 @@ app.post('/api/ai/test', async (req, res) => {
 });
 
 // ========== AI 素材生成 ==========
-app.post('/api/ai/generate', async (req, res) => {
+app.post('/api/ai/generate', requireAuth, async (req, res) => {
   const { topic, category, count = 3 } = req.body;
   if (!topic) return res.status(400).json({ error: '请输入话题' });
 
@@ -582,8 +648,13 @@ app.post('/api/ai/generate', async (req, res) => {
     // 获取该分类的子分类列表
     const subs = db.prepare('SELECT id, name FROM subcategories WHERE category_id = ?').all(category || '');
 
-    // 查出已有素材标题，用于去重
-    const existing = db.prepare('SELECT title FROM materials').all();
+    // 查出同分类下已有素材标题，用于去重（避免全表扫描）
+    let existing;
+    if (category) {
+      existing = db.prepare('SELECT title FROM materials WHERE category_id = ?').all(category);
+    } else {
+      existing = db.prepare('SELECT title FROM materials ORDER BY created_at DESC LIMIT 500').all();
+    }
     const existingTitles = existing.map(r => r.title);
 
     const materials = await ai.generateMaterialsByTopic(topic, category, subs, count, existingTitles);
@@ -597,9 +668,8 @@ app.post('/api/ai/generate', async (req, res) => {
     const insertAll = db.transaction((items) => {
       for (const mat of items) {
         const id = generateId('m');
-        // 随机选一个子分类
-        const subId = subs.length > 0 ? subs[Math.floor(Math.random() * subs.length)].id : null;
-        insertMat.run(id, mat.title, mat.content, category || null, subId, mat.type || 'story', mat.source || 'AI 生成');
+        // 子分类留空，由管理员在审核时手动归类
+        insertMat.run(id, mat.title, mat.content, category || null, null, mat.type || 'story', mat.source || 'AI 生成');
         for (const tag of (mat.tags || [])) insertTag.run(id, tag);
         for (const topic of (mat.applicableTopics || [])) insertTopic.run(id, topic);
         saved.push({ id, ...mat });
@@ -614,25 +684,89 @@ app.post('/api/ai/generate', async (req, res) => {
 });
 
 // ========== 素材审核 ==========
-app.put('/api/materials/:id/approve', (req, res) => {
+app.put('/api/materials/:id/approve', requireAuth, (req, res) => {
   const result = db.prepare("UPDATE materials SET status = 'approved' WHERE id = ?").run(req.params.id);
   if (result.changes === 0) return res.status(404).json({ error: '素材不存在' });
   res.json({ success: true });
 });
 
-app.put('/api/materials/:id/reject', (req, res) => {
+app.put('/api/materials/:id/reject', requireAuth, (req, res) => {
   const result = db.prepare("UPDATE materials SET status = 'rejected' WHERE id = ?").run(req.params.id);
   if (result.changes === 0) return res.status(404).json({ error: '素材不存在' });
   res.json({ success: true });
 });
 
+// ========== 名著素材挖掘 ==========
+
+// 获取名著列表
+app.get('/api/classics', (req, res) => {
+  res.json(CLASSICS);
+});
+
+// 从名著生成素材
+app.post('/api/ai/generate-classics', requireAuth, async (req, res) => {
+  const { classicId, customTitle, theme, count = 3 } = req.body;
+  if (!classicId && !customTitle) return res.status(400).json({ error: '请输入或选择名著名称' });
+
+  // 优先匹配预置名著，否则用自定义输入构造
+  let classic;
+  if (classicId) {
+    classic = CLASSICS.find(c => c.id === classicId);
+    if (!classic) return res.status(400).json({ error: '名著不存在' });
+  } else {
+    classic = { id: '', title: customTitle, author: '', era: '', description: '', themes: [] };
+  }
+
+  const config = ai.readAiConfig();
+  if (!config.enabled) return res.status(400).json({ error: 'AI 未配置，请先填写 API Key 和 Base URL' });
+
+  try {
+    // 查出同名著来源的已有素材标题，用于去重
+    const existing = db.prepare("SELECT title FROM materials WHERE source LIKE ? ORDER BY created_at DESC LIMIT 500").all(`%${classic.title}%`);
+    const existingTitles = existing.map(r => r.title);
+
+    const materials = await ai.generateClassicsMaterials(classic, theme || '', count, existingTitles);
+
+    // 名著素材尝试匹配"文化传承"分类
+    const cultureCat = db.prepare("SELECT id FROM categories WHERE name LIKE '%文化%' OR name LIKE '%传承%' LIMIT 1").get();
+    const categoryId = cultureCat ? cultureCat.id : null;
+
+    // 存入数据库（status=pending）
+    const saved = [];
+    const insertMat = db.prepare(`INSERT INTO materials (id, title, content, category_id, subcategory_id, type_id, source, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', date('now'))`);
+    const insertTag = db.prepare('INSERT INTO material_tags (material_id, tag) VALUES (?, ?)');
+    const insertTopic = db.prepare('INSERT INTO material_topics (material_id, topic) VALUES (?, ?)');
+
+    const insertAll = db.transaction((items) => {
+      for (const mat of items) {
+        const id = generateId('m');
+        insertMat.run(id, mat.title, mat.content, categoryId, null, mat.type || 'story', mat.source || `${classic.title}·${classic.author}`);
+        for (const tag of (mat.tags || [])) insertTag.run(id, tag);
+        for (const topic of (mat.applicableTopics || [])) insertTopic.run(id, topic);
+        saved.push({ id, ...mat });
+      }
+    });
+
+    insertAll(materials);
+    res.json({ success: true, count: saved.length, materials: saved });
+  } catch (err) {
+    res.status(500).json({ error: '名著素材生成失败：' + err.message });
+  }
+});
+
 app.listen(PORT, () => {
+  // 启动时清理过期 session
+  cleanExpiredSessions();
+  // 每小时清理一次过期 session
+  setInterval(() => cleanExpiredSessions(), 60 * 60 * 1000);
+
   console.log(`
   ========================================
     高考作文素材网站已启动！
     学生端：http://localhost:${PORT}
     管理端：http://localhost:${PORT}/admin
     真题库：http://localhost:${PORT}/exam
+    登录页：http://localhost:${PORT}/login
   ========================================
   `);
 });

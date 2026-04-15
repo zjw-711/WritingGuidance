@@ -18,6 +18,9 @@
         <button onclick="showSection('categories')" class="nav-btn" id="navCategories">分类管理</button>
         <button onclick="showSection('stats')" class="nav-btn" id="navStats">数据统计</button>
         <button onclick="showSection('ai')" class="nav-btn" id="navAi">AI 素材</button>
+        <span class="nav-spacer"></span>
+        <span id="currentUser" class="current-user"></span>
+        <button onclick="logout()" class="nav-btn logout-btn">退出登录</button>
       </nav>
     </div>
   </header>
@@ -208,6 +211,39 @@
           </div>
         </div>
         <div id="aiGenProgress" class="ai-gen-progress" style="display:none;"></div>
+      </div>
+
+      <!-- 名著挖掘 -->
+      <div class="ai-generate-card" style="margin-top: 20px;">
+        <h3>📖 名著素材挖掘</h3>
+        <p class="hint" style="margin-bottom: 16px; color: #666;">从经典名著中按高考主题角度挖掘作文素材，生成的素材自动进入待审核队列</p>
+        <div class="ai-gen-row">
+          <div class="form-group" style="flex:2">
+            <label>名著名称</label>
+            <input type="text" id="classicInput" list="classicSuggestions" placeholder="输入或选择名著，如：红楼梦、老人与海..." autocomplete="off">
+            <datalist id="classicSuggestions"></datalist>
+          </div>
+          <div class="form-group" style="flex:2">
+            <label>主题角度（可选）</label>
+            <select id="classicTheme">
+              <option value="">全部主题</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:0.5">
+            <label>数量</label>
+            <select id="classicCount">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3" selected>3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="form-group ai-gen-btn">
+            <button class="btn-primary" id="classicGenBtn" onclick="generateClassicsMaterials()">挖掘素材</button>
+          </div>
+        </div>
+        <div id="classicGenProgress" class="ai-gen-progress" style="display:none;"></div>
+        <div id="classicGenResult" class="ai-gen-progress" style="display:none;"></div>
       </div>
 
       <!-- 待审核队列 -->

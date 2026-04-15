@@ -23,7 +23,8 @@ function readAiConfig() {
       model: parsed.model || '',
       enabled: Boolean(parsed.enabled && parsed.apiKey && parsed.baseUrl && parsed.model)
     };
-  } catch {
+  } catch (err) {
+    console.error('[AI] 读取配置失败：', err.message);
     return {
       provider: 'mock',
       apiKey: '',
@@ -46,14 +47,17 @@ function saveAiConfig(config) {
   return readAiConfig();
 }
 
+// 请求超时时间（毫秒）
+const REQUEST_TIMEOUT = 60000;
+
 async function chatCompletion(messages) {
   const config = readAiConfig();
   if (!config.enabled) {
     return null;
   }
 
-  // 推理模型（如 glm-5）不支持 response_format 和 temperature，且需要更多 token
-  const isReasoningModel = /glm-5|glm-4-long|o1|o3|deepseek-r1/i.test(config.model);
+  // 推理模型不支持 response_format 和 temperature，且需要更多 token
+  const isReasoningModel = /glm-5|glm-4-long|o[13](-mini|-preview)?|deepseek-r1/i.test(config.model);
 
   const body = {
     model: config.model,
@@ -63,7 +67,6 @@ async function chatCompletion(messages) {
     body.temperature = 0.2;
     body.response_format = { type: 'json_object' };
   }
-  // 推理模型给足够 token 用于推理+输出
   body.max_tokens = isReasoningModel ? 8192 : 4096;
 
   const res = await fetch(config.baseUrl.replace(/\/$/, '') + '/chat/completions', {
@@ -72,7 +75,8 @@ async function chatCompletion(messages) {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + config.apiKey
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT)
   });
 
   if (!res.ok) {
@@ -87,11 +91,23 @@ async function chatCompletion(messages) {
 
   if (!content) throw new Error('AI 返回为空');
 
+  // 清理推理模型可能附带的 <think>...</think> 标签
+  content = content.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+
   // 尝试从 markdown 代码块中提取 JSON
   const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
   if (jsonMatch) content = jsonMatch[1].trim();
 
-  return JSON.parse(content);
+  try {
+    return JSON.parse(content);
+  } catch (e) {
+    // 尝试提取第一个 JSON 对象/数组
+    const objMatch = content.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
+    if (objMatch) {
+      return JSON.parse(objMatch[1]);
+    }
+    throw new Error('AI 返回内容无法解析为 JSON：' + content.slice(0, 200));
+  }
 }
 
 function truncateText(text, max = 4000) {
@@ -199,7 +215,7 @@ async function generateMaterialsByTopic(topic, category, subcategories, count = 
   // 构建去重提示
   let dedupHint = '';
   if (existingTitles.length > 0) {
-    const titleList = existingTitles.slice(0, 50).map(t => `「${t}」`).join('、');
+    const titleList = existingTitles.slice(0, 200).map(t => `「${t}」`).join('、');
     dedupHint = `\n\n6. 以下素材已经收录，请勿生成相同或高度相似的素材（标题或核心人物/事件重复均算）：\n${titleList}`;
   }
 
@@ -252,11 +268,104 @@ async function generateMaterialsByTopic(topic, category, subcategories, count = 
       mat._screening = screening;
       if (screening.recommended) {
         qualified.push(mat);
+      } else {
+        console.log(`[AI] 素材「${mat.title}」未通过筛选（${screening.totalScore}分）：${screening.reason}`);
       }
-    } catch {
-      // 筛选失败也保留
-      mat._screening = { recommended: true, totalScore: 70, reason: '筛选跳过' };
-      qualified.push(mat);
+    } catch (err) {
+      console.warn(`[AI] 素材「${mat.title}」筛选异常，使用回退筛选：`, err.message);
+      mat._screening = fallbackScreening(mat);
+      if (mat._screening.recommended) {
+        qualified.push(mat);
+      }
+    }
+  }
+
+  return qualified;
+}
+
+/**
+ * 从经典名著中按高考主题维度挖掘素材
+ * @param {Object} classic - 名著信息 { id, title, author, era, description, themes }
+ * @param {string} theme - 可选，指定某个主题角度（不指定则覆盖该书所有关联主题）
+ * @param {number} count - 生成素材数量
+ * @param {string[]} existingTitles - 已有素材标题（去重用）
+ */
+async function generateClassicsMaterials(classic, theme, count = 3, existingTitles = []) {
+  // 构建去重提示
+  let dedupHint = '';
+  if (existingTitles.length > 0) {
+    const titleList = existingTitles.slice(0, 200).map(t => `「${t}」`).join('、');
+    dedupHint = `\n\n6. 以下素材已经收录，请勿生成相同或高度相似的素材：\n${titleList}`;
+  }
+
+  const themeHint = theme
+    ? `请围绕"${theme}"这一主题角度进行挖掘。`
+    : `请从以下主题角度中选择最有写作价值的方向来挖掘：${(classic.themes || []).join('、')}。`;
+
+  const prompt = {
+    role: 'system',
+    content: `你是中国高三作文素材编辑，专精经典名著。请从用户指定的名著中挖掘高考作文素材。
+
+严格要求：
+1. 素材必须出自指定名著的真实内容，人物、情节、原句都要准确，禁止编造
+2. 每条素材围绕一个高考常考主题角度展开，说明如何用名著中的具体内容来论证该主题
+3. 内容要包含：具体人物/情节/原文引用 + 该角度如何用于作文论证的分析
+4. 每条素材 200-400 字，信息量饱满，让学生能直接引用到作文中
+5. 避免老生常谈的角度，寻找新颖、有深度的切入方式${dedupHint}
+
+${themeHint}
+
+只返回 JSON，格式为：
+{
+  "materials": [
+    {
+      "title": "素材标题（格式建议：名著名·主题角度）",
+      "content": "素材正文（200-400字，包含名著具体内容+论证角度分析）",
+      "type": "story 或 quote",
+      "source": "出处（格式：名著名·作者，如"红楼梦·曹雪芹"）",
+      "tags": ["标签1", "标签2", "标签3"],
+      "applicableTopics": ["适用高考话题1", "适用高考话题2"]
+    }
+  ]
+}`
+  };
+
+  const user = {
+    role: 'user',
+    content: JSON.stringify({
+      classic: {
+        title: classic.title,
+        author: classic.author,
+        era: classic.era,
+        description: classic.description
+      },
+      theme: theme || '',
+      count
+    })
+  };
+
+  const result = await chatCompletion([prompt, user]);
+  if (!result || !result.materials || !Array.isArray(result.materials)) {
+    return [];
+  }
+
+  // 对每条素材进行筛选
+  const qualified = [];
+  for (const mat of result.materials.slice(0, count)) {
+    try {
+      const screening = await screenCandidate(mat);
+      mat._screening = screening;
+      if (screening.recommended) {
+        qualified.push(mat);
+      } else {
+        console.log(`[AI] 名著素材「${mat.title}」未通过筛选（${screening.totalScore}分）：${screening.reason}`);
+      }
+    } catch (err) {
+      console.warn(`[AI] 名著素材「${mat.title}」筛选异常，使用回退筛选：`, err.message);
+      mat._screening = fallbackScreening(mat);
+      if (mat._screening.recommended) {
+        qualified.push(mat);
+      }
     }
   }
 
@@ -269,5 +378,6 @@ module.exports = {
   chatCompletion,
   screenCandidate,
   buildCandidateCard,
-  generateMaterialsByTopic
+  generateMaterialsByTopic,
+  generateClassicsMaterials
 };

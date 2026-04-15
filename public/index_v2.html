@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>高考作文素材库 - 探索版</title>
+  <link rel="stylesheet" href="/css/style_v2.css">
+</head>
+<body>
+  <!-- 顶部导航 & 搜索栏 -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="logo-emoji">✨</span>
+        <h1>高考作文素材库</h1>
+      </div>
+      <div class="search-container">
+        <svg class="search-btn" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" placeholder="搜索关键词，如：坚持、科技..." autocomplete="off">
+      </div>
+      <nav class="header-nav">
+        <a href="/exam" class="nav-link">历年真题</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- 分类导航 (横向标签) -->
+    <div class="filter-section">
+      <div class="filter-group">
+        <div class="filter-label">分类：</div>
+        <div class="pill-list" id="categoryFilter"></div>
+      </div>
+      <div class="filter-group" id="subcategoryFilterGroup" style="display: none;">
+        <div class="filter-label">子类：</div>
+        <div class="pill-list" id="subcategoryFilter"></div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">标签：</div>
+        <div class="pill-list" id="tagFilter"></div>
+      </div>
+    </div>
+
+    <!-- 数据展示 -->
+    <div class="content-header">
+      <h2>发现素材</h2>
+      <span class="meta-count">共找到 <strong id="totalCount">0</strong> 篇</span>
+    </div>
+
+    <section class="masonry-grid" id="materialsGrid"></section>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-icon">🍃</div>
+      <p>这里空空如也，换个关键词试试吧</p>
+    </div>
+
+    <div class="load-more-container" id="loadMoreWrapper" style="display:none;">
+      <button class="btn-primary" onclick="loadMore()">探索更多</button>
+    </div>
+  </main>
+
+  <!-- 侧边抽屉 (详情) -->
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <aside class="detail-drawer" id="detailDrawer">
+    <button class="drawer-close" onclick="closeDrawer()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    <div class="drawer-content" id="drawerContent">
+      <!-- 动态填充 -->
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-primary btn-full" onclick="copyMaterial()">📋 复制完整素材</button>
+    </div>
+  </aside>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <button class="fab-top" id="btnTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script src="/js/main_v2.js"></script>
+</body>
+</html>

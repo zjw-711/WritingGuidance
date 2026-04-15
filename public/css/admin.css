@@ -69,6 +69,23 @@ body {
 .nav-btn:hover { border-color: var(--primary); color: var(--primary); }
 .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
+.nav-spacer { flex: 1; }
+
+.current-user {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  padding: 0 4px;
+}
+
+.logout-btn {
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+}
+.logout-btn:hover {
+  background: var(--danger) !important;
+  color: white !important;
+}
+
 /* ========== 主内容 ========== */
 .admin-main { padding: 24px 0; }
 .admin-section { animation: fadeIn 0.2s; }
