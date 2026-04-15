@@ -4,6 +4,7 @@ const { getDb, generateId } = require('./db');
 
 const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 小时
 const BCRYPT_ROUNDS = 10;
+const IS_PROD = process.env.NODE_ENV === 'production';
 
 // ========== Cookie 解析 ==========
 
@@ -15,11 +16,13 @@ function getSessionToken(req) {
 
 function setSessionCookie(res, token) {
   const maxAge = SESSION_MAX_AGE / 1000; // 秒
-  res.setHeader('Set-Cookie', `session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}`);
+  const secure = IS_PROD ? '; Secure' : '';
+  res.setHeader('Set-Cookie', `session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${secure}`);
 }
 
 function clearSessionCookie(res) {
-  res.setHeader('Set-Cookie', 'session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0');
+  const secure = IS_PROD ? '; Secure' : '';
+  res.setHeader('Set-Cookie', `session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${secure}`);
 }
 
 // ========== 中间件 ==========

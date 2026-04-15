@@ -17,6 +17,11 @@ const CLASSICS = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'classi
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// 生产环境信任 Nginx 反向代理
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
