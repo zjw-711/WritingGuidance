@@ -1,7 +1,13 @@
-// ========== 全局状态 ==========
+// ========== 素材浏览页 ==========
+
 let categories = [];
 let allTags = [];
+let currentMaterial = null;
+let currentPage = 1;
+let pageSize = 12;
+let filters = { category: '', subcategory: '', type: '', tag: '', search: '' };
 let searchTimeout = null;
+let isLoading = false;
 
 // ========== 初始化 ==========
 async function init() {
@@ -17,35 +23,54 @@ async function init() {
     renderTagFilter();
     bindEvents();
 
-    // 初始化教程面板（加载第一个可用教程）
-    initTutorial();
+    // 支持 URL 参数（从教程页跳转）
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCategory = urlParams.get('category');
+    const urlType = urlParams.get('type');
+    if (urlCategory) {
+      filters.category = urlCategory;
+      // 高亮对应分类
+      document.querySelectorAll('.filter-item').forEach(btn => {
+        if (btn.dataset.cat === urlCategory) btn.classList.add('active');
+      });
+    }
+    if (urlType) {
+      filters.type = urlType;
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        if (btn.textContent.includes(getTypeName(urlType))) btn.classList.add('active');
+      });
+    }
+
+    loadMaterials();
   } catch (err) {
     showToast('卷帙浩繁，稍后再试');
   }
 }
 
 function bindEvents() {
-  // 防抖搜索（跳转到素材页）
   document.getElementById('searchInput').addEventListener('input', (e) => {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
-      const search = e.target.value.trim();
-      if (search) {
-        window.location.href = `/materials?search=${encodeURIComponent(search)}`;
-      }
+      filters.search = e.target.value.trim();
+      currentPage = 1;
+      loadMaterials();
     }, 400);
   });
 
-  // Esc 关闭阅读器
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeReader();
   });
 }
 
-// ========== 渲染分类 + 子分类 ==========
+function getTypeName(type) {
+  const names = { 'story': '人物事例', 'hot': '时事热点', 'quote': '名言金句' };
+  return names[type] || '';
+}
+
+// ========== 渲染分类 ==========
 function renderCategoryFilter() {
   const container = document.getElementById('categoryFilter');
-  let html = '';
+  let html = `<button class="filter-item active" data-cat="" onclick="selectCategory('','','',this)">全部卷宗</button>`;
 
   categories.forEach(c => {
     const subs = c.subcategories || [];
@@ -53,7 +78,7 @@ function renderCategoryFilter() {
     const hasSubs = subs.length > 0;
     html += `
       <div class="cat-group" data-cat="${c.id}">
-        <button class="filter-item${hasSubs ? ' has-subs' : ''}" onclick="selectCategory('${c.id}','','',this)">
+        <button class="filter-item${hasSubs ? ' has-subs' : ''}" data-cat="${c.id}" onclick="selectCategory('${c.id}','','',this)">
           <span class="cat-name">${catName}</span>
           ${hasSubs ? '<span class="cat-arrow">›</span>' : ''}
         </button>
@@ -69,43 +94,42 @@ function renderCategoryFilter() {
   });
 
   container.innerHTML = html;
-
-  // 默认加载第一个分类的教程
-  if (categories.length > 0) {
-    loadTutorialData(categories[0].id);
-  }
 }
 
 function selectCategory(catId, subId, level, el) {
-  // 记录当前展开状态
   const currentGroup = el.closest('.cat-group');
   const wasExpanded = currentGroup ? currentGroup.classList.contains('expanded') : false;
 
-  // 清除所有高亮和展开
   document.querySelectorAll('.filter-item').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sub-filter-item').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.cat-group').forEach(g => g.classList.remove('expanded'));
 
-  // 清除标签选中
+  filters.tag = '';
   document.querySelectorAll('.tag-btn').forEach(p => p.classList.remove('active'));
   const allTagBtn = document.querySelector('.tag-btn');
   if (allTagBtn) allTagBtn.classList.add('active');
 
-  if (level === 'sub') {
-    // 二级分类 → 跳转到素材页筛选
+  if (!catId) {
+    el.classList.add('active');
+    filters.category = '';
+    filters.subcategory = '';
+  } else if (level === 'sub') {
     const group = el.closest('.cat-group');
     group.classList.add('expanded');
     group.querySelector('.filter-item').classList.add('active');
     el.classList.add('active');
-    window.location.href = `/materials?category=${catId}&subcategory=${subId}`;
+    filters.category = catId;
+    filters.subcategory = subId;
   } else {
-    // 一级分类 → 显示教程
     el.classList.add('active');
     const hasSubs = currentGroup.querySelector('.sub-filter-list');
     if (hasSubs) currentGroup.classList.toggle('expanded', !wasExpanded);
-    loadTutorialData(catId);
+    filters.category = catId;
+    filters.subcategory = '';
   }
 
+  currentPage = 1;
+  loadMaterials();
   if (window.innerWidth <= 768) closeSidebar();
 }
 
@@ -120,7 +144,10 @@ function renderTagFilter() {
 }
 
 function selectTag(tag, el) {
-  // 选标签时清除分类
+  filters.tag = tag;
+  filters.category = '';
+  filters.subcategory = '';
+
   document.querySelectorAll('.filter-item').forEach(p => p.classList.remove('active'));
   const allFilterBtn = document.querySelector('.filter-item');
   if (allFilterBtn) allFilterBtn.classList.add('active');
@@ -130,14 +157,21 @@ function selectTag(tag, el) {
   document.querySelectorAll('.tag-btn').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
 
-  // 跳转到素材浏览页
-  if (tag) {
-    window.location.href = `/materials?tag=${encodeURIComponent(tag)}`;
-  }
-
+  currentPage = 1;
+  loadMaterials();
   if (window.innerWidth <= 768) closeSidebar();
 }
 
+// ========== 类型筛选 ==========
+function selectType(type, el) {
+  filters.type = type;
+  document.querySelectorAll('.type-btn').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  currentPage = 1;
+  loadMaterials();
+}
+
+// ========== 侧边栏控制 ==========
 function toggleSidebar() {
   document.getElementById('artSidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('active');
@@ -148,9 +182,80 @@ function closeSidebar() {
   document.getElementById('sidebarOverlay').classList.remove('active');
 }
 
+// ========== 加载素材 ==========
+async function loadMaterials() {
+  if (isLoading) return;
+  isLoading = true;
+
+  const grid = document.getElementById('materialsGrid');
+  if (currentPage === 1) {
+    grid.innerHTML = '<div class="loading-skeleton"><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div><div class="sk-card"></div></div>';
+  }
+
+  try {
+    const params = new URLSearchParams({
+      category: filters.category,
+      subcategory: filters.subcategory,
+      type: filters.type,
+      tag: filters.tag,
+      search: filters.search,
+      page: currentPage,
+      pageSize: pageSize
+    });
+
+    const res = await fetch('/api/materials?' + params);
+    if (!res.ok) throw new Error('请求失败');
+    const data = await res.json();
+    document.getElementById('totalCount').textContent = data.total;
+    renderGrid(data.data);
+
+    document.getElementById('loadMoreWrapper').style.display =
+      currentPage * pageSize < data.total ? 'block' : 'none';
+    document.getElementById('emptyState').style.display =
+      data.data.length === 0 ? 'block' : 'none';
+  } catch (err) {
+    showToast('获取卷宗失败');
+    if (currentPage === 1) grid.innerHTML = '';
+  } finally {
+    isLoading = false;
+  }
+}
+
+function renderGrid(materials) {
+  const grid = document.getElementById('materialsGrid');
+  if (currentPage === 1) grid.innerHTML = '';
+
+  const fragment = document.createDocumentFragment();
+
+  materials.forEach(m => {
+    const cat = categories.find(c => c.id === m.category);
+    const catName = cat ? cat.name.replace(/[^\u4e00-\u9fa5]/g, '') : '佚名卷';
+    const sourceStr = m.source ? ` · ${escapeHtml(m.source)}` : '';
+
+    const card = document.createElement('div');
+    card.className = 'mag-card';
+    card.onclick = () => openReader(m.id);
+    card.innerHTML = `
+      <div class="mag-card-inner">
+        <div class="mag-meta">${catName}${sourceStr}</div>
+        <div class="mag-title">${escapeHtml(m.title)}</div>
+        <div class="mag-excerpt">${escapeHtml(m.content)}</div>
+      </div>
+    `;
+    fragment.appendChild(card);
+  });
+
+  grid.appendChild(fragment);
+}
+
+function loadMore() {
+  if (isLoading) return;
+  currentPage++;
+  loadMaterials();
+}
+
 // ========== 阅读器 ==========
 async function openReader(id) {
-  // 先打开弹窗，显示加载状态
   document.getElementById('readerContent').innerHTML = '<div class="reader-loading">翻阅中...</div>';
   document.getElementById('readerOverlay').classList.add('active');
   document.getElementById('readerModal').classList.add('open');
@@ -165,7 +270,6 @@ async function openReader(id) {
     const cat = categories.find(c => c.id === m.category);
     const catName = cat ? cat.name.replace(/[^\u4e00-\u9fa5]/g, '') : '';
 
-    // 子分类名
     let subName = '';
     if (cat && cat.subcategories) {
       const sub = cat.subcategories.find(s => s.id === m.subcategory);
@@ -261,165 +365,3 @@ function escapeHtml(str) {
 
 // ========== 启动 ==========
 init();
-
-// ========== 教程数据管理 ==========
-let currentTutorialData = null;
-let currentQuestionIndex = 0;
-let currentExampleIndex = 0;
-let currentMiniType = '';
-
-// 从 API 加载教程数据
-async function loadTutorialData(categoryId) {
-  try {
-    // 先尝试按分类加载
-    const res = await fetch(`/api/tutorials/by-category/${categoryId}`);
-    if (!res.ok) {
-      // 如果按分类加载失败，尝试加载教程列表的第一个
-      const listRes = await fetch('/api/tutorials');
-      const tutorials = await listRes.json();
-      if (tutorials && tutorials.length > 0) {
-        const detailRes = await fetch(`/api/tutorials/${tutorials[0].id}`);
-        if (detailRes.ok) {
-          currentTutorialData = await detailRes.json();
-          renderTutorial(currentTutorialData);
-          return;
-        }
-      }
-      showEmptyTutorial('该分类暂无教程内容');
-      return;
-    }
-    currentTutorialData = await res.json();
-    renderTutorial(currentTutorialData);
-  } catch (err) {
-    console.error('加载教程失败:', err);
-    showToast('加载教程失败');
-    showEmptyTutorial('加载教程失败');
-  }
-}
-
-// 显示空教程提示
-function showEmptyTutorial(message = '该分类暂无教程内容，敬请期待。') {
-  document.getElementById('tutorialTitle').textContent = '📖 写作教程';
-  document.getElementById('tutorialProposition').textContent = message;
-  document.getElementById('tutorialDirections').innerHTML = '';
-  document.getElementById('questionTabs').innerHTML = '';
-  document.getElementById('questionContent').innerHTML = '';
-  document.getElementById('tutorialApproach').innerHTML = '';
-  document.getElementById('tutorialPhilosophy').innerHTML = '';
-  document.getElementById('tutorialMaterials').innerHTML = '';
-  document.getElementById('exampleTabs').innerHTML = '';
-  document.getElementById('exampleContent').innerHTML = '';
-  document.getElementById('tipsGrid').innerHTML = '';
-}
-
-// 渲染教程内容
-function renderTutorial(tutorial) {
-  document.getElementById('tutorialTitle').textContent = `📖 写作教程 · ${tutorial.title}`;
-  document.getElementById('tutorialProposition').textContent = tutorial.propositionAnalysis || '';
-
-  const directions = tutorial.directions || [];
-  document.getElementById('tutorialDirections').innerHTML = directions.map(d => `
-    <div class="direction-item">• <strong>${escapeHtml(d.title)}：</strong>${escapeHtml(d.description || '')}</div>
-  `).join('');
-
-  const questions = tutorial.questions || [];
-  document.getElementById('questionTabs').innerHTML = questions.map((q, i) => `
-    <button class="question-tab${i === 0 ? ' active' : ''}" onclick="selectQuestion(${i})">${escapeHtml(q.short_title || '')}</button>
-  `).join('');
-
-  currentQuestionIndex = 0;
-  if (questions.length > 0) renderQuestion(questions[0]);
-
-  document.getElementById('tutorialPhilosophy').innerHTML = tutorial.philosophyGuide || '';
-
-  currentMiniType = '';
-  renderMiniMaterials(tutorial.materials || []);
-
-  const examples = tutorial.examples || [];
-  document.getElementById('exampleTabs').innerHTML = examples.map((e, i) => `
-    <button class="example-tab${i === 0 ? ' active' : ''}" onclick="selectExample(${i})">${escapeHtml(e.short_title || '')}</button>
-  `).join('');
-  currentExampleIndex = 0;
-  if (examples.length > 0) renderExample(examples[0]);
-
-  renderTips(tutorial.tips || []);
-}
-
-function renderQuestion(question) {
-  document.getElementById('questionContent').innerHTML = `
-    <div class="question-title">${escapeHtml(question.title)}</div>
-    <div class="question-text">${escapeHtml(question.question_text || '')}</div>
-    <div class="question-note">${escapeHtml(question.note || '')}</div>
-  `;
-  document.getElementById('tutorialApproach').innerHTML = question.writing_approach || '';
-}
-
-function selectQuestion(index) {
-  currentQuestionIndex = index;
-  const questions = currentTutorialData?.questions || [];
-  if (questions[index]) {
-    document.querySelectorAll('.question-tab').forEach((tab, i) => tab.classList.toggle('active', i === index));
-    renderQuestion(questions[index]);
-  }
-}
-
-function renderExample(example) {
-  document.getElementById('exampleContent').innerHTML = `
-    <div class="example-title">${escapeHtml(example.title)}</div>
-    <div class="example-text">${example.example_text || ''}</div>
-    <div class="example-highlight">${escapeHtml(example.highlight || '')}</div>
-    <div class="example-analysis"><strong>结构解析：</strong>${escapeHtml(example.analysis || '')}</div>
-  `;
-}
-
-function selectExample(index) {
-  currentExampleIndex = index;
-  const examples = currentTutorialData?.examples || [];
-  if (examples[index]) {
-    document.querySelectorAll('.example-tab').forEach((tab, i) => tab.classList.toggle('active', i === index));
-    renderExample(examples[index]);
-  }
-}
-
-function renderMiniMaterials(materials) {
-  let filtered = currentMiniType ? materials.filter(m => m.type === currentMiniType) : materials;
-  const display = filtered.slice(0, 6);
-  document.getElementById('tutorialMaterials').innerHTML = display.map(m => `
-    <div class="mini-card" onclick="goToMaterial('${m.id}')">
-      <div class="mini-card-title">${escapeHtml(m.title)}</div>
-      <div class="mini-card-excerpt">${escapeHtml(m.excerpt || '')}</div>
-      <div class="mini-card-tag">${escapeHtml(m.tag || '')}</div>
-    </div>
-  `).join('');
-}
-
-function selectMiniType(type, el) {
-  currentMiniType = type;
-  document.querySelectorAll('.mini-type-btn').forEach(btn => btn.classList.remove('active'));
-  el.classList.add('active');
-  renderMiniMaterials(currentTutorialData?.materials || []);
-}
-
-function goToMaterial(id) {
-  window.location.href = `/materials?highlight=${id}`;
-}
-
-function showMoreMaterials() {
-  const catId = currentTutorialData?.categoryId || 'youth';
-  window.location.href = `/materials?category=${catId}`;
-}
-
-function renderTips(tips) {
-  if (!tips || tips.length === 0) {
-    document.getElementById('tipsGrid').innerHTML = '';
-    return;
-  }
-  document.getElementById('tipsGrid').innerHTML = tips.map(tip => `
-    <div class="tip-card">
-      <div class="tip-icon">${tip.icon || '💡'}</div>
-      <div class="tip-title">${escapeHtml(tip.title)}</div>
-      <div class="tip-content">${escapeHtml(tip.content)}</div>
-    </div>
-  `).join('');
-}
-

@@ -138,6 +138,77 @@ function initDb() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+
+    -- ========== 写作教程系统 ==========
+    -- 教程主表（每个分类对应一个教程）
+    CREATE TABLE IF NOT EXISTS tutorials (
+      id TEXT PRIMARY KEY,
+      category_id TEXT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      proposition_analysis TEXT DEFAULT '',
+      philosophy_guide TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- 教程的出题方向
+    CREATE TABLE IF NOT EXISTS tutorial_directions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程的出题示例
+    CREATE TABLE IF NOT EXISTS tutorial_questions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      short_title TEXT NOT NULL,
+      title TEXT NOT NULL,
+      question_text TEXT DEFAULT '',
+      note TEXT DEFAULT '',
+      writing_approach TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程的写作示例
+    CREATE TABLE IF NOT EXISTS tutorial_examples (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      short_title TEXT NOT NULL,
+      title TEXT NOT NULL,
+      example_text TEXT DEFAULT '',
+      highlight TEXT DEFAULT '',
+      analysis TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程的写作锦囊
+    CREATE TABLE IF NOT EXISTS tutorial_tips (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      icon TEXT DEFAULT '💡',
+      title TEXT NOT NULL,
+      content TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程推荐素材关联
+    CREATE TABLE IF NOT EXISTS tutorial_materials (
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      material_id TEXT NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+      sort_order INTEGER DEFAULT 0,
+      PRIMARY KEY (tutorial_id, material_id)
+    );
+
+    -- ========== 教程索引 ==========
+    CREATE INDEX IF NOT EXISTS idx_tutorials_category ON tutorials(category_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_directions_tutorial ON tutorial_directions(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_questions_tutorial ON tutorial_questions(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_examples_tutorial ON tutorial_examples(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_tips_tutorial ON tutorial_tips(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_materials_tutorial ON tutorial_materials(tutorial_id);
   `);
 
   // 新增 status 字段（兼容重复执行）
