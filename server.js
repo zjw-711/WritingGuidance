@@ -118,14 +118,14 @@ app.post('/api/auth/login', (req, res) => {
   }
 
   const session = createSession(user.id);
-  setSessionCookie(res, session.token);
+  setSessionCookie(res, session.token, req);
   res.json({ success: true, user: { username: user.username, role: user.role } });
 });
 
 app.post('/api/auth/logout', requireAuth, (req, res) => {
   const token = getSessionToken(req);
   if (token) destroySession(token);
-  clearSessionCookie(res);
+  clearSessionCookie(res, req);
   res.json({ success: true });
 });
 

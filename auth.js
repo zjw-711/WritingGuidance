@@ -4,8 +4,6 @@ const { getDb, generateId } = require('./db');
 
 const SESSION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 小时
 const BCRYPT_ROUNDS = 10;
-const IS_PROD = process.env.NODE_ENV === 'production';
-
 // ========== Cookie 解析 ==========
 
 function getSessionToken(req) {
@@ -14,14 +12,19 @@ function getSessionToken(req) {
   return match ? match.split('=')[1].trim() : null;
 }
 
-function setSessionCookie(res, token) {
+function isSecure(req) {
+  // 通过 Nginx 的 X-Forwarded-Proto 头判断是否 HTTPS
+  return req.headers['x-forwarded-proto'] === 'https';
+}
+
+function setSessionCookie(res, token, req) {
   const maxAge = SESSION_MAX_AGE / 1000; // 秒
-  const secure = IS_PROD ? '; Secure' : '';
+  const secure = isSecure(req) ? '; Secure' : '';
   res.setHeader('Set-Cookie', `session=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${maxAge}${secure}`);
 }
 
-function clearSessionCookie(res) {
-  const secure = IS_PROD ? '; Secure' : '';
+function clearSessionCookie(res, req) {
+  const secure = isSecure(req) ? '; Secure' : '';
   res.setHeader('Set-Cookie', `session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${secure}`);
 }
 
@@ -48,7 +51,7 @@ function requireAuth(req, res, next) {
     if (row) {
       db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
     }
-    clearSessionCookie(res);
+    clearSessionCookie(res, req);
     if (req.path.startsWith('/api/')) {
       return res.status(401).json({ error: '登录已过期，请重新登录' });
     }
