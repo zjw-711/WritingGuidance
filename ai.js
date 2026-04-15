@@ -48,7 +48,7 @@ function saveAiConfig(config) {
 }
 
 // 请求超时时间（毫秒）
-const REQUEST_TIMEOUT = 60000;
+const REQUEST_TIMEOUT = 120000;
 
 async function chatCompletion(messages) {
   const config = readAiConfig();

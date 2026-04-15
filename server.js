@@ -321,9 +321,9 @@ app.put('/api/materials/:id', requireAuth, (req, res) => {
     ).run(
       body.title !== undefined ? body.title : row.title,
       body.content !== undefined ? body.content : row.content,
-      body.category !== undefined ? body.category : row.category_id,
-      body.subcategory !== undefined ? body.subcategory : row.subcategory_id,
-      body.type !== undefined ? body.type : row.type_id,
+      body.category || null,
+      body.subcategory || null,
+      body.type || null,
       body.source !== undefined ? body.source : row.source,
       req.params.id
     );
@@ -566,41 +566,75 @@ app.get('/api/question-analysis/:id', (req, res) => {
   });
 });
 
-// 数据导入
+// 数据导入（支持批量上传，含字段校验）
 app.post('/api/import', requireAuth, requireRole('admin'), (req, res) => {
   const imported = req.body;
   if (!imported.materials || !Array.isArray(imported.materials)) {
-    return res.status(400).json({ error: '数据格式错误' });
+    return res.status(400).json({ error: '数据格式错误，需要 { "materials": [...] }' });
   }
 
-  let count = 0;
+  // 校验有效的分类/类型 ID
+  const validCategories = new Set(db.prepare('SELECT id FROM categories').all().map(r => r.id));
+  const validTypes = new Set(db.prepare('SELECT id FROM types').all().map(r => r.id));
+  const validSubcats = new Set(db.prepare('SELECT id FROM subcategories').all().map(r => r.id));
+
+  let imported_count = 0;
+  const skipped = [];
+  const errors = [];
+
   const doImport = db.transaction(() => {
-    for (const m of imported.materials) {
-      const id = generateId('m');
-      const createdAt = m.createdAt || new Date().toISOString().split('T')[0];
-      db.prepare(`INSERT INTO materials (id, title, content, category_id, subcategory_id, type_id, source, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
-          id, m.title || '', m.content || '', m.category || null,
-          m.subcategory || null, m.type || null, m.source || '', createdAt
-      );
-      for (const tag of (m.tags || [])) {
-        db.prepare('INSERT INTO material_tags (material_id, tag) VALUES (?, ?)').run(id, tag);
+    for (let i = 0; i < imported.materials.length; i++) {
+      const m = imported.materials[i];
+
+      // 校验必填字段
+      if (!m.title || !m.content) {
+        skipped.push({ index: i + 1, reason: '标题或正文为空' });
+        continue;
       }
-      for (const topic of (m.applicableTopics || [])) {
-        db.prepare('INSERT INTO material_topics (material_id, topic) VALUES (?, ?)').run(id, topic);
+
+      // 校验分类/类型 ID（如果提供了的话）
+      if (m.category && !validCategories.has(m.category)) {
+        skipped.push({ index: i + 1, title: m.title, reason: `分类 "${m.category}" 不存在` });
+        continue;
       }
-      for (const link of (m.links || [])) {
-        db.prepare('INSERT INTO material_links (material_id, title, url, type) VALUES (?, ?, ?, ?)').run(
-          id, link.title || '', link.url || '', link.type || 'article'
+      if (m.subcategory && !validSubcats.has(m.subcategory)) {
+        skipped.push({ index: i + 1, title: m.title, reason: `二级分类 "${m.subcategory}" 不存在` });
+        continue;
+      }
+      if (m.type && !validTypes.has(m.type)) {
+        skipped.push({ index: i + 1, title: m.title, reason: `类型 "${m.type}" 不存在` });
+        continue;
+      }
+
+      try {
+        const id = generateId('m');
+        const createdAt = m.createdAt || new Date().toISOString().split('T')[0];
+        db.prepare(`INSERT INTO materials (id, title, content, category_id, subcategory_id, type_id, source, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`).run(
+            id, m.title, m.content, m.category || null,
+            m.subcategory || null, m.type || null, m.source || '', createdAt
         );
+        for (const tag of (m.tags || [])) {
+          db.prepare('INSERT INTO material_tags (material_id, tag) VALUES (?, ?)').run(id, tag);
+        }
+        for (const topic of (m.applicableTopics || [])) {
+          db.prepare('INSERT INTO material_topics (material_id, topic) VALUES (?, ?)').run(id, topic);
+        }
+        for (const link of (m.links || [])) {
+          db.prepare('INSERT INTO material_links (material_id, title, url, type) VALUES (?, ?, ?, ?)').run(
+            id, link.title || '', link.url || '', link.type || 'article'
+          );
+        }
+        imported_count++;
+      } catch (err) {
+        skipped.push({ index: i + 1, title: m.title, reason: err.message });
       }
-      count++;
     }
   });
 
   try {
     doImport();
-    res.json({ success: true, imported: count });
+    res.json({ success: true, imported: imported_count, skipped: skipped.length, errors: skipped });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

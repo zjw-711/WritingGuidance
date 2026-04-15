@@ -411,6 +411,198 @@ async function importData(e) {
   }
 }
 
+// ========== 批量上传 ==========
+
+// 分类/类型名称映射（用于预览表格显示）
+const CATEGORY_NAMES = {
+  tech:'科技创新', virtue:'品德修养', nature:'人与自然', culture:'文化传承',
+  society:'社会民生', youth:'青春成长', patriotism:'家国情怀', philosophy:'哲理思辨',
+  humanity:'人文关怀', rolemodel:'时代楷模'
+};
+const TYPE_NAMES = { story:'人物事例', hot:'时事热点', quote:'名言金句' };
+
+// 缓存待导入数据
+let pendingBatchMaterials = [];
+
+// 下载模板
+function downloadTemplate() {
+  const template = {
+    materials: [
+      {
+        title: "示例素材1：人物事迹",
+        content: "这里写素材正文，200-400字。包含具体的人名、事件经过、关键细节……",
+        category: "tech",
+        subcategory: "tech-ai",
+        type: "story",
+        source: "来源出处",
+        tags: ["标签1", "标签2", "标签3"],
+        applicableTopics: ["适用话题1", "适用话题2"]
+      },
+      {
+        title: "示例素材2：时事热点",
+        content: "这里写时事素材正文……",
+        category: "society",
+        type: "hot",
+        source: "",
+        tags: ["热点", "社会"],
+        applicableTopics: ["社会公平", "责任担当"]
+      },
+      {
+        title: "示例素材3：名言金句",
+        content: "这里写名言金句及其解读……",
+        category: "philosophy",
+        type: "quote",
+        source: "出处",
+        tags: ["哲理"],
+        applicableTopics: ["思辨与智慧"]
+      }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '素材上传模板.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// 处理拖拽
+(function initDropZone() {
+  const zone = document.getElementById('dropZone');
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.json')) {
+      handleBatchUpload(file);
+    } else {
+      showToast('请上传 .json 文件', 'error');
+    }
+  });
+})();
+
+// 文件选择
+function handleBatchFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  handleBatchUpload(file);
+  e.target.value = '';
+}
+
+// 解析并校验上传文件
+async function handleBatchUpload(file) {
+  let data;
+  try {
+    const text = await file.text();
+    data = JSON.parse(text);
+  } catch {
+    showToast('文件解析失败，请检查 JSON 格式', 'error');
+    return;
+  }
+
+  // 兼容两种格式：{ materials: [...] } 或直接 [...]
+  const materials = Array.isArray(data) ? data : (data.materials || []);
+  if (!materials.length) {
+    showToast('未找到素材数据，请检查文件格式', 'error');
+    return;
+  }
+
+  // 校验
+  const validCategories = new Set(Object.keys(CATEGORY_NAMES));
+  const validTypes = new Set(Object.keys(TYPE_NAMES));
+  pendingBatchMaterials = [];
+
+  for (let i = 0; i < materials.length; i++) {
+    const m = materials[i];
+    const errors = [];
+    if (!m.title) errors.push('缺少标题');
+    if (!m.content) errors.push('缺少正文');
+    if (m.category && !validCategories.has(m.category)) errors.push(`分类 "${m.category}" 无效`);
+    if (m.type && !validTypes.has(m.type)) errors.push(`类型 "${m.type}" 无效`);
+    pendingBatchMaterials.push({ ...m, _index: i + 1, _errors: errors });
+  }
+
+  showBatchPreview();
+}
+
+// 渲染预览表格
+function showBatchPreview() {
+  const preview = document.getElementById('batchPreview');
+  const summary = document.getElementById('batchSummary');
+  const tbody = document.getElementById('batchTableBody');
+
+  const validCount = pendingBatchMaterials.filter(m => m._errors.length === 0).length;
+  const errCount = pendingBatchMaterials.filter(m => m._errors.length > 0).length;
+
+  summary.innerHTML = `
+    <div class="summary-item">共 <strong>${pendingBatchMaterials.length}</strong> 条</div>
+    <div class="summary-item" style="color:#16a34a;">有效 <strong>${validCount}</strong> 条</div>
+    ${errCount > 0 ? `<div class="summary-item" style="color:#dc2626;">无效 <strong>${errCount}</strong> 条</div>` : ''}
+  `;
+
+  tbody.innerHTML = pendingBatchMaterials.map(m => `
+    <tr>
+      <td>${m._index}</td>
+      <td title="${(m.title || '').replace(/"/g, '&quot;')}">${m.title || '<em style="color:#dc2626;">（空）</em>'}</td>
+      <td>${CATEGORY_NAMES[m.category] || m.category || '-'}</td>
+      <td>${TYPE_NAMES[m.type] || m.type || '-'}</td>
+      <td>${(m.tags || []).slice(0, 3).join('、') || '-'}</td>
+      <td class="${m._errors.length ? 'status-err' : 'status-ok'}">${m._errors.length ? m._errors.join('；') : '有效'}</td>
+    </tr>
+  `).join('');
+
+  // 禁用/启用导入按钮
+  document.getElementById('confirmBatchBtn').disabled = validCount === 0;
+
+  preview.style.display = 'block';
+}
+
+// 确认导入
+async function confirmBatchImport() {
+  const validMaterials = pendingBatchMaterials.filter(m => m._errors.length === 0);
+  if (!validMaterials.length) return;
+
+  const btn = document.getElementById('confirmBatchBtn');
+  btn.disabled = true;
+  btn.textContent = '导入中...';
+
+  try {
+    const res = await authFetch('/api/import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ materials: validMaterials })
+    }).then(r => r.json());
+
+    if (res.success) {
+      let msg = `成功导入 ${res.imported} 条素材`;
+      if (res.skipped > 0) {
+        msg += `，跳过 ${res.skipped} 条无效数据`;
+      }
+      showToast(msg, 'success');
+      cancelBatch();
+      loadMaterials(); // 刷新素材列表
+    } else {
+      showToast(res.error || '导入失败', 'error');
+    }
+  } catch (err) {
+    showToast('网络错误，请重试', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '确认导入';
+  }
+}
+
+// 取消批量上传
+function cancelBatch() {
+  pendingBatchMaterials = [];
+  document.getElementById('batchPreview').style.display = 'none';
+  document.getElementById('batchFile').value = '';
+}
+
 // ========== 数据统计 ==========
 async function loadStats() {
   const stats = await authFetch('/api/stats').then(r => r.json());

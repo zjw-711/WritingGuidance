@@ -138,7 +138,72 @@
           <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
           <button class="btn-primary" onclick="document.getElementById('importFile').click()">选择文件导入</button>
         </div>
+        <div class="ie-card">
+          <h3>📋 下载模板</h3>
+          <p>下载 JSON 格式模板，按模板填写后上传</p>
+          <button class="btn-primary" onclick="downloadTemplate()">下载模板</button>
+        </div>
       </div>
+
+      <!-- 批量上传区域 -->
+      <div class="batch-upload-area" id="batchUploadArea" style="margin-top:24px;">
+        <h3 style="margin-bottom:12px;">批量上传素材</h3>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('batchFile').click()">
+          <div class="drop-zone-text">
+            <span style="font-size:2rem;">📂</span>
+            <p>拖拽 JSON 文件到此处，或点击选择文件</p>
+            <p style="font-size:0.8rem;color:var(--text-secondary);">仅支持 .json 格式</p>
+          </div>
+        </div>
+        <input type="file" id="batchFile" accept=".json" style="display:none" onchange="handleBatchFile(event)">
+
+        <!-- 预览区 -->
+        <div id="batchPreview" style="display:none;">
+          <div class="batch-summary" id="batchSummary"></div>
+          <div style="overflow-x:auto;">
+            <table class="batch-table" id="batchTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>标题</th>
+                  <th>分类</th>
+                  <th>类型</th>
+                  <th>标签</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody id="batchTableBody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:16px;display:flex;gap:12px;">
+            <button class="btn-primary" id="confirmBatchBtn" onclick="confirmBatchImport()">确认导入</button>
+            <button class="btn-secondary" onclick="cancelBatch()">取消</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 格式说明 -->
+      <details style="margin-top:24px;">
+        <summary style="cursor:pointer;font-weight:600;color:var(--primary);">JSON 格式说明与分类/类型对照表</summary>
+        <div style="margin-top:12px;padding:16px;background:var(--bg);border-radius:8px;font-size:0.85rem;">
+          <p><strong>必填字段：</strong>title（标题）、content（正文）</p>
+          <p><strong>选填字段：</strong>category、subcategory、type、source、tags、applicableTopics</p>
+          <table style="width:100%;margin:8px 0;border-collapse:collapse;">
+            <tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border);">分类 ID</th><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border);">名称</th><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border);">二级分类示例</th></tr>
+            <tr><td style="padding:4px 8px;">tech</td><td style="padding:4px 8px;">科技创新</td><td style="padding:4px 8px;">tech-ai, tech-aerospace, tech-ethics, tech-digital</td></tr>
+            <tr><td style="padding:4px 8px;">virtue</td><td style="padding:4px 8px;">品德修养</td><td style="padding:4px 8px;">virtue-honesty, virtue-persist, virtue-modest, virtue-duty</td></tr>
+            <tr><td style="padding:4px 8px;">nature</td><td style="padding:4px 8px;">人与自然</td><td style="padding:4px 8px;">nature-env, nature-eco, nature-sustain, nature-revere</td></tr>
+            <tr><td style="padding:4px 8px;">culture</td><td style="padding:4px 8px;">文化传承</td><td style="padding:4px 8px;">culture-craft, culture-heritage, culture-confident, culture-exchange</td></tr>
+            <tr><td style="padding:4px 8px;">society</td><td style="padding:4px 8px;">社会民生</td><td style="padding:4px 8px;">society-edu, society-rural, society-health, society-fair</td></tr>
+            <tr><td style="padding:4px 8px;">youth</td><td style="padding:4px 8px;">青春成长</td><td style="padding:4px 8px;">youth-dream, youth-choice, youth-growth, youth-think</td></tr>
+            <tr><td style="padding:4px 8px;">patriotism</td><td style="padding:4px 8px;">家国情怀</td><td style="padding:4px 8px;">patriotism-spirit, patriotism-revive, patriotism-mission, patriotism-duty</td></tr>
+            <tr><td style="padding:4px 8px;">philosophy</td><td style="padding:4px 8px;">哲理思辨</td><td style="padding:4px 8px;">phil-contradict, phil-change, phil-tradeoff, phil-dialectic</td></tr>
+            <tr><td style="padding:4px 8px;">humanity</td><td style="padding:4px 8px;">人文关怀</td><td style="padding:4px 8px;">humanity-empathy, humanity-respect, humanity-love, humanity-care</td></tr>
+            <tr><td style="padding:4px 8px;">rolemodel</td><td style="padding:4px 8px;">时代楷模</td><td style="padding:4px 8px;">rolemodel-scientist, rolemodel-hero, rolemodel-youth, rolemodel-dedicate</td></tr>
+          </table>
+          <p style="margin-top:8px;"><strong>类型 ID：</strong>story（人物事例）、hot（时事热点）、quote（名言金句）</p>
+        </div>
+      </details>
     </section>
 
     <!-- ====== 分类管理 ====== -->
