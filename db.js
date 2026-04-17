@@ -202,6 +202,18 @@ function initDb() {
       PRIMARY KEY (tutorial_id, material_id)
     );
 
+    -- 教程范文
+    CREATE TABLE IF NOT EXISTS tutorial_essays (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      essay_text TEXT DEFAULT '',
+      score TEXT DEFAULT '',
+      highlight TEXT DEFAULT '',
+      analysis TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
     -- ========== 教程索引 ==========
     CREATE INDEX IF NOT EXISTS idx_tutorials_category ON tutorials(category_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_directions_tutorial ON tutorial_directions(tutorial_id);
@@ -209,6 +221,7 @@ function initDb() {
     CREATE INDEX IF NOT EXISTS idx_tutorial_examples_tutorial ON tutorial_examples(tutorial_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_tips_tutorial ON tutorial_tips(tutorial_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_materials_tutorial ON tutorial_materials(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_essays_tutorial ON tutorial_essays(tutorial_id);
   `);
 
   // 新增 status 字段（兼容重复执行）

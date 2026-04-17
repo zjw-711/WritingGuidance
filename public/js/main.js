@@ -16,9 +16,6 @@ async function init() {
     renderCategoryFilter();
     renderTagFilter();
     bindEvents();
-
-    // 初始化教程面板（加载第一个可用教程）
-    initTutorial();
   } catch (err) {
     showToast('卷帙浩繁，稍后再试');
   }
@@ -274,18 +271,8 @@ async function loadTutorialData(categoryId) {
     // 先尝试按分类加载
     const res = await fetch(`/api/tutorials/by-category/${categoryId}`);
     if (!res.ok) {
-      // 如果按分类加载失败，尝试加载教程列表的第一个
-      const listRes = await fetch('/api/tutorials');
-      const tutorials = await listRes.json();
-      if (tutorials && tutorials.length > 0) {
-        const detailRes = await fetch(`/api/tutorials/${tutorials[0].id}`);
-        if (detailRes.ok) {
-          currentTutorialData = await detailRes.json();
-          renderTutorial(currentTutorialData);
-          return;
-        }
-      }
-      showEmptyTutorial('该分类暂无教程内容');
+      currentTutorialData = null;
+      showEmptyTutorial('该分类暂无教程内容，敬请期待');
       return;
     }
     currentTutorialData = await res.json();
@@ -310,6 +297,8 @@ function showEmptyTutorial(message = '该分类暂无教程内容，敬请期待
   document.getElementById('exampleTabs').innerHTML = '';
   document.getElementById('exampleContent').innerHTML = '';
   document.getElementById('tipsGrid').innerHTML = '';
+  document.getElementById('essayTabs').innerHTML = '';
+  document.getElementById('essayContent').innerHTML = '';
 }
 
 // 渲染教程内容
@@ -343,6 +332,13 @@ function renderTutorial(tutorial) {
   if (examples.length > 0) renderExample(examples[0]);
 
   renderTips(tutorial.tips || []);
+
+  const essays = tutorial.essays || [];
+  document.getElementById('essayTabs').innerHTML = essays.map((e, i) => `
+    <button class="essay-tab${i === 0 ? ' active' : ''}" onclick="selectEssay(${i})">${escapeHtml(e.title || '范文' + (i + 1))}</button>
+  `).join('');
+  if (essays.length > 0) renderEssay(essays[0]);
+  else document.getElementById('essayContent').innerHTML = '';
 }
 
 function renderQuestion(question) {
@@ -351,7 +347,14 @@ function renderQuestion(question) {
     <div class="question-text">${escapeHtml(question.question_text || '')}</div>
     <div class="question-note">${escapeHtml(question.note || '')}</div>
   `;
-  document.getElementById('tutorialApproach').innerHTML = question.writing_approach || '';
+  const approachEl = document.getElementById('tutorialApproach');
+  if (question.writing_approach) {
+    approachEl.innerHTML = `<div class="approach-label">写作思路</div><div class="approach-content">${question.writing_approach}</div>`;
+    approachEl.style.display = '';
+  } else {
+    approachEl.innerHTML = '';
+    approachEl.style.display = 'none';
+  }
 }
 
 function selectQuestion(index) {
@@ -385,10 +388,10 @@ function renderMiniMaterials(materials) {
   let filtered = currentMiniType ? materials.filter(m => m.type === currentMiniType) : materials;
   const display = filtered.slice(0, 6);
   document.getElementById('tutorialMaterials').innerHTML = display.map(m => `
-    <div class="mini-card" onclick="goToMaterial('${m.id}')">
+    <div class="mini-card" onclick="openReader('${m.id}')">
       <div class="mini-card-title">${escapeHtml(m.title)}</div>
-      <div class="mini-card-excerpt">${escapeHtml(m.excerpt || '')}</div>
-      <div class="mini-card-tag">${escapeHtml(m.tag || '')}</div>
+      <div class="mini-card-content">${m.content || ''}</div>
+      ${m.tag ? `<div class="mini-card-tag">${escapeHtml(m.tag)}</div>` : ''}
     </div>
   `).join('');
 }
@@ -423,3 +426,159 @@ function renderTips(tips) {
   `).join('');
 }
 
+// ========== 范文 ==========
+let currentEssayIndex = 0;
+
+function renderEssay(essay) {
+  if (!essay) {
+    document.getElementById('essayContent').innerHTML = '';
+    return;
+  }
+  document.getElementById('essayContent').innerHTML = `
+    <div class="essay-title-row">
+      <span class="essay-title">${escapeHtml(essay.title || '')}</span>
+      ${essay.score ? `<span class="essay-score">${escapeHtml(essay.score)}</span>` : ''}
+    </div>
+    <div class="essay-text">${escapeHtml(essay.essay_text || '')}</div>
+    ${essay.highlight ? `
+      <div class="essay-highlight">
+        <div class="essay-highlight-label">亮点摘录</div>
+        ${escapeHtml(essay.highlight)}
+      </div>
+    ` : ''}
+    ${essay.analysis ? `
+      <div class="essay-analysis"><strong>名师点评：</strong>${escapeHtml(essay.analysis)}</div>
+    ` : ''}
+  `;
+}
+
+function selectEssay(index) {
+  currentEssayIndex = index;
+  const essays = currentTutorialData?.essays || [];
+  if (essays[index]) {
+    document.querySelectorAll('.essay-tab').forEach((tab, i) => tab.classList.toggle('active', i === index));
+    renderEssay(essays[index]);
+  }
+}
+
+// ========== 打印/导出PDF ==========
+function printTutorial() {
+  if (!currentTutorialData) {
+    showToast('暂无教程内容可打印');
+    return;
+  }
+  closeReader();
+
+  const data = currentTutorialData;
+
+  // 为 Tab 类板块生成包含全部条目的 HTML
+  const questionsHTML = generatePrintQuestions(data.questions || []);
+  const examplesHTML = generatePrintExamples(data.examples || []);
+  const essaysHTML = generatePrintEssays(data.essays || []);
+
+  // 注入临时展开容器
+  const questionSection = document.getElementById('questionContent').parentElement;
+  const exampleSection = document.getElementById('exampleContent').parentElement;
+  const essaySection = document.getElementById('essayContent').parentElement;
+
+  const printQuestionsEl = createPrintContainer('printQuestionsAll', questionsHTML);
+  const printExamplesEl = createPrintContainer('printExamplesAll', examplesHTML);
+  const printEssaysEl = createPrintContainer('printEssaysAll', essaysHTML);
+
+  questionSection.appendChild(printQuestionsEl);
+  exampleSection.appendChild(printExamplesEl);
+  essaySection.appendChild(printEssaysEl);
+
+  // 隐藏单条 Tab 内容
+  document.getElementById('questionContent').classList.add('print-hide');
+  document.getElementById('exampleContent').classList.add('print-hide');
+  document.getElementById('essayContent').classList.add('print-hide');
+
+  // 推荐素材展示全部（不限 6 条）
+  const materialsContainer = document.getElementById('tutorialMaterials');
+  const originalMaterialsHTML = materialsContainer.innerHTML;
+  const allMaterials = data.materials || [];
+  materialsContainer.innerHTML = allMaterials.map(m => `
+    <div class="mini-card" onclick="openReader('${m.id}')">
+      <div class="mini-card-title">${escapeHtml(m.title)}</div>
+      <div class="mini-card-content">${m.content || ''}</div>
+      ${m.tag ? `<div class="mini-card-tag">${escapeHtml(m.tag)}</div>` : ''}
+    </div>
+  `).join('');
+  materialsContainer.dataset.originalHTML = originalMaterialsHTML;
+
+  // 清理函数
+  const cleanup = () => {
+    printQuestionsEl.remove();
+    printExamplesEl.remove();
+    printEssaysEl.remove();
+    document.getElementById('questionContent').classList.remove('print-hide');
+    document.getElementById('exampleContent').classList.remove('print-hide');
+    document.getElementById('essayContent').classList.remove('print-hide');
+    if (materialsContainer.dataset.originalHTML) {
+      materialsContainer.innerHTML = materialsContainer.dataset.originalHTML;
+      delete materialsContainer.dataset.originalHTML;
+    }
+    window.removeEventListener('afterprint', cleanup);
+  };
+
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+  // 兜底：部分浏览器不支持 afterprint
+  setTimeout(cleanup, 1000);
+}
+
+function createPrintContainer(id, innerHTML) {
+  const el = document.createElement('div');
+  el.id = id;
+  el.className = 'print-all-container';
+  el.innerHTML = innerHTML;
+  return el;
+}
+
+function generatePrintQuestions(questions) {
+  if (!questions.length) return '';
+  return questions.map((q, i) => `
+    <div class="print-items-group">
+      <div class="print-item-title">题目 ${i + 1}：${escapeHtml(q.title)}</div>
+      <div class="print-item-body">
+        <p>${escapeHtml(q.question_text || '')}</p>
+        ${q.note ? `<p class="question-note">${escapeHtml(q.note)}</p>` : ''}
+        ${q.writing_approach ? `<p><strong>写作思路：</strong>${q.writing_approach}</p>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function generatePrintExamples(examples) {
+  if (!examples.length) return '';
+  return examples.map((e, i) => `
+    <div class="print-items-group">
+      <div class="print-item-title">示例 ${i + 1}：${escapeHtml(e.title)}</div>
+      <div class="print-item-body">
+        ${e.example_text || ''}
+        ${e.highlight ? `<div class="example-highlight">${escapeHtml(e.highlight)}</div>` : ''}
+        ${e.analysis ? `<div class="example-analysis"><strong>结构解析：</strong>${escapeHtml(e.analysis)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function generatePrintEssays(essays) {
+  if (!essays.length) return '';
+  return essays.map((e, i) => `
+    <div class="print-items-group">
+      <div class="print-item-title">${e.title ? escapeHtml(e.title) : '范文' + (i + 1)}${e.score ? '（' + escapeHtml(e.score) + '）' : ''}</div>
+      <div class="print-item-body">
+        <div style="text-indent:2em;white-space:pre-wrap">${escapeHtml(e.essay_text || '')}</div>
+        ${e.highlight ? `
+          <div class="essay-highlight">
+            <div class="essay-highlight-label">亮点摘录</div>
+            ${escapeHtml(e.highlight)}
+          </div>
+        ` : ''}
+        ${e.analysis ? `<div class="essay-analysis"><strong>名师点评：</strong>${escapeHtml(e.analysis)}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}

@@ -57,6 +57,7 @@
       <div class="tutorial-panel full-height" id="tutorialPanel">
         <div class="tutorial-header">
           <h3 class="tutorial-title" id="tutorialTitle">📖 写作教程 · 青年成长</h3>
+          <button class="btn-print" onclick="printTutorial()">打印 / 导出PDF</button>
         </div>
         <div class="tutorial-body" id="tutorialBody">
           <!-- 命题分析 -->
@@ -86,13 +87,8 @@
             <div class="question-content" id="questionContent">
               <!-- 动态渲染题目详情 -->
             </div>
-          </div>
-
-          <!-- 写作思路（针对选中题目） -->
-          <div class="tutorial-section">
-            <div class="section-label">写作思路</div>
-            <div class="section-content" id="tutorialApproach">
-              <p><strong>并列式结构：</strong>从"梦想""担当""超越"三个维度展开...</p>
+            <div class="question-approach" id="tutorialApproach">
+              <!-- 写作思路（属于当前选中题目） -->
             </div>
           </div>
 
@@ -139,6 +135,17 @@
             <div class="section-label">写作锦囊</div>
             <div class="tips-grid" id="tipsGrid">
               <!-- 动态渲染锦囊卡片 -->
+            </div>
+          </div>
+
+          <!-- 范文赏析 -->
+          <div class="tutorial-section essay-section">
+            <div class="section-label">范文赏析</div>
+            <div class="essay-tabs" id="essayTabs">
+              <!-- 动态渲染范文标签 -->
+            </div>
+            <div class="essay-content" id="essayContent">
+              <!-- 动态渲染范文内容 -->
             </div>
           </div>
         </div>

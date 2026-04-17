@@ -205,8 +205,13 @@ async function loadAdminMaterials() {
   const search = document.getElementById('adminSearch').value.trim();
   const category = document.getElementById('adminCategoryFilter').value;
   const type = document.getElementById('adminTypeFilter').value;
+  const status = document.getElementById('adminStatusFilter').value;
 
   const params = new URLSearchParams({ search, category, type, page: adminPage, pageSize: adminPageSize });
+  // 管理后台传 status 参数：指定状态则只看对应状态，不指定则看全部
+  if (status) {
+    params.set('status', status);
+  }
   const res = await fetch('/api/materials?' + params).then(r => r.json());
 
   renderAdminTable(res.data);
@@ -220,15 +225,19 @@ function adminSearchMaterials() {
 
 function renderAdminTable(materials) {
   const tbody = document.getElementById('adminTableBody');
+  const statusLabels = { 'approved': '已发布', 'pending': '待审核', 'rejected': '已拒绝' };
+  const statusClasses = { 'approved': 'status-approved', 'pending': 'status-pending', 'rejected': 'status-rejected' };
   tbody.innerHTML = materials.map(m => {
     const cat = categories.find(c => c.id === m.category);
     const type = types.find(t => t.id === m.type);
+    const status = m.status || 'approved';
     return `
       <tr>
         <td><input type="checkbox" class="row-check" data-id="${escapeAttr(m.id)}"></td>
         <td title="${escapeHtml(m.title)}">${escapeHtml(m.title)}</td>
         <td>${cat ? cat.icon + ' ' + cat.name : '-'}</td>
         <td>${type ? type.name : '-'}</td>
+        <td><span class="table-status ${statusClasses[status] || ''}">${statusLabels[status] || status}</span></td>
         <td>${(m.tags || []).map(t => `<span class="table-tag">${escapeHtml(t)}</span>`).join('')}</td>
         <td>${m.createdAt || '-'}</td>
         <td>
@@ -610,16 +619,41 @@ async function loadStats() {
   const grid = document.getElementById('statsGrid');
 
   let html = `
+    <div class="stat-card stat-highlight">
+      <div class="stat-number">${stats.approvedCount || 0}</div>
+      <div class="stat-label">已发布素材</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.pendingCount || 0}</div>
+      <div class="stat-label">待审核</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.rejectedCount || 0}</div>
+      <div class="stat-label">已拒绝</div>
+    </div>
     <div class="stat-card">
       <div class="stat-number">${stats.totalMaterials}</div>
-      <div class="stat-label">素材总数</div>
+      <div class="stat-label">素材总计</div>
     </div>
     <div class="stat-card">
       <div class="stat-number">${stats.totalCategories}</div>
       <div class="stat-label">分类数</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.totalTutorials || 0}</div>
+      <div class="stat-label">写作教程</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.totalExamQuestions || 0}</div>
+      <div class="stat-label">历年真题</div>
+    </div>
   `;
 
+  // 分类统计标题
+  html += `<div class="stat-section-title">各分类素材数（已发布）</div>`;
+  // 统计已分类的总数，计算未分类数量
+  const classifiedCount = categories.reduce((sum, c) => sum + (stats.categoryStats[c.id] || 0), 0);
+  const unclassifiedCount = (stats.approvedCount || 0) - classifiedCount;
   categories.forEach(c => {
     html += `
       <div class="stat-card">
@@ -628,7 +662,19 @@ async function loadStats() {
       </div>
     `;
   });
+  if (unclassifiedCount > 0) {
+    html += `
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--warning)">${unclassifiedCount}</div>
+        <div class="stat-label">未分类</div>
+      </div>
+    `;
+  }
 
+  // 类型统计标题
+  html += `<div class="stat-section-title">各类型素材数（已发布）</div>`;
+  const typedCount = types.reduce((sum, t) => sum + (stats.typeStats[t.id] || 0), 0);
+  const untypedCount = (stats.approvedCount || 0) - typedCount;
   types.forEach(t => {
     html += `
       <div class="stat-card">
@@ -637,6 +683,14 @@ async function loadStats() {
       </div>
     `;
   });
+  if (untypedCount > 0) {
+    html += `
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--warning)">${untypedCount}</div>
+        <div class="stat-label">未设类型</div>
+      </div>
+    `;
+  }
 
   grid.innerHTML = html;
 }
@@ -1249,6 +1303,7 @@ function renderTutorialList() {
           <span>出题示例 ${t.questionsCount || 0}</span>
           <span>写作示例 ${t.examplesCount || 0}</span>
           <span>写作锦囊 ${t.tipsCount || 0}</span>
+          <span>范文 ${t.essaysCount || 0}</span>
         </div>
       </div>
     `;
@@ -1303,6 +1358,7 @@ function renderTutorialEditForm(tutorial) {
     questions: [],
     examples: [],
     tips: [],
+    essays: [],
     materialIds: []
   };
 
@@ -1376,6 +1432,17 @@ function renderTutorialEditForm(tutorial) {
         </div>
         <div id="tutTipsContainer" class="items-container tips-container">
           ${(data.tips || []).map((t, i) => renderTipItem(t, i)).join('')}
+        </div>
+      </div>
+
+      <!-- 范文赏析 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>范文赏析</label>
+          <button type="button" class="btn-add-item" onclick="addTutorialEssay()">+ 添加范文</button>
+        </div>
+        <div id="tutEssaysContainer" class="items-container">
+          ${(data.essays || []).map((e, i) => renderEssayItem(e, i)).join('')}
         </div>
       </div>
 
@@ -1476,6 +1543,27 @@ function renderTipItem(t, i) {
   `;
 }
 
+// 范文单项模板
+function renderEssayItem(e, i) {
+  return `
+    <div class="item-card essay-edit-item" data-index="${i}">
+      <div class="item-card-header">
+        <span>范文 ${i + 1}</span>
+        <button type="button" class="btn-remove-item" onclick="removeTutorialEssay(${i})">删除</button>
+      </div>
+      <div class="item-card-body">
+        <div class="form-row compact">
+          <input type="text" class="essay-title-input" placeholder="范文标题" value="${escapeHtml(e.title || '')}" style="flex:2">
+          <input type="text" class="essay-score-input" placeholder="评分（如：一类文 55/60）" value="${escapeHtml(e.score || '')}" style="width:160px">
+        </div>
+        <textarea class="essay-text-input" placeholder="范文正文..." rows="6">${escapeHtml(e.essay_text || e.text || '')}</textarea>
+        <textarea class="essay-highlight-input" placeholder="亮点摘录..." rows="2">${escapeHtml(e.highlight || '')}</textarea>
+        <textarea class="essay-analysis-input" placeholder="名师点评..." rows="2">${escapeHtml(e.analysis || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
 // 添加/删除出题方向
 function addTutorialDirection() {
   const container = document.getElementById('tutDirectionsContainer');
@@ -1549,6 +1637,25 @@ function removeTutorialTip(index) {
   if (item) item.remove();
   container.querySelectorAll('.tip-item').forEach((el, i) => {
     el.querySelector('.item-card-header span').textContent = `锦囊 ${i + 1}`;
+    el.dataset.index = i;
+  });
+}
+
+// 添加/删除范文
+function addTutorialEssay() {
+  const container = document.getElementById('tutEssaysContainer');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = renderEssayItem({}, index);
+  container.appendChild(div.firstElementChild);
+}
+
+function removeTutorialEssay(index) {
+  const container = document.getElementById('tutEssaysContainer');
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) item.remove();
+  container.querySelectorAll('.essay-edit-item').forEach((el, i) => {
+    el.querySelector('.item-card-header span').textContent = `范文 ${i + 1}`;
     el.dataset.index = i;
   });
 }
@@ -1749,6 +1856,18 @@ function collectTutorialFormData() {
     });
   });
 
+  // 收集范文
+  const essays = [];
+  document.querySelectorAll('.essay-edit-item').forEach(el => {
+    essays.push({
+      title: el.querySelector('.essay-title-input')?.value.trim() || '',
+      text: el.querySelector('.essay-text-input')?.value.trim() || '',
+      score: el.querySelector('.essay-score-input')?.value.trim() || '',
+      highlight: el.querySelector('.essay-highlight-input')?.value.trim() || '',
+      analysis: el.querySelector('.essay-analysis-input')?.value.trim() || ''
+    });
+  });
+
   // 收集推荐素材
   const materialIds = (document.getElementById('tutMaterialIds')?.value || '').split(',').filter(Boolean);
 
@@ -1761,6 +1880,7 @@ function collectTutorialFormData() {
     questions,
     examples,
     tips,
+    essays,
     materialIds
   };
 }
