@@ -14,7 +14,6 @@
   <header class="mobile-header">
     <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
     <h1 class="mobile-logo">拾光阅</h1>
-    <a href="/" class="mobile-nav-link">📖</a>
   </header>
 
   <!-- 侧边栏遮罩 -->
@@ -48,6 +47,11 @@
 
       <div class="sidebar-footer-v3">
         共收录佳作 <span id="totalCount" class="highlight-num">0</span> 篇
+      </div>
+
+      <div class="sidebar-cross-nav">
+        <a href="/" class="cross-nav-link">写作教程 <span class="link-arrow">↗</span></a>
+        <a href="/exam" class="cross-nav-link">历年真题 <span class="link-arrow">↗</span></a>
       </div>
     </aside>
 
@@ -89,6 +93,15 @@
   </div>
 
   <div id="toast" class="toast-v3"></div>
+
+  <!-- 移动端底栏导航 -->
+  <div class="global-nav-bar">
+    <nav>
+      <a href="/"><span class="nav-icon">📖</span>教程</a>
+      <a href="/materials" class="active"><span class="nav-icon">📚</span>素材库</a>
+      <a href="/exam"><span class="nav-icon">📜</span>真题</a>
+    </nav>
+  </div>
 
   <script src="/js/materials.js"></script>
 </body>

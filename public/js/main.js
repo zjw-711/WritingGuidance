@@ -49,10 +49,8 @@ function renderCategoryFilter() {
 
   container.innerHTML = html;
 
-  // 默认加载第一个分类的教程
-  if (categories.length > 0) {
-    loadTutorialData(categories[0].id);
-  }
+  // 显示教程全局概览，不再自动加载第一个教程
+  showTutorialDirectory();
 }
 
 function selectCategory(catId, subId, level, el) {
@@ -215,6 +213,12 @@ let currentMiniType = '';
 
 // 从 API 加载教程数据
 async function loadTutorialData(categoryId, subcategoryId = null) {
+  // 隐藏教程总览，显示教程面板
+  const directory = document.getElementById('tutorialDirectory');
+  const panel = document.getElementById('tutorialPanel');
+  if (directory) directory.style.display = 'none';
+  if (panel) panel.style.display = '';
+
   try {
     let res;
     if (subcategoryId) {
@@ -240,8 +244,19 @@ async function loadTutorialData(categoryId, subcategoryId = null) {
 
 // 显示空教程提示
 function showEmptyTutorial(message = '该分类暂无教程内容，敬请期待。') {
+  // 隐藏教程总览，显示教程面板
+  const directory = document.getElementById('tutorialDirectory');
+  const panel = document.getElementById('tutorialPanel');
+  if (directory) directory.style.display = 'none';
+  if (panel) panel.style.display = '';
+
   document.getElementById('tutorialTitle').textContent = '📖 写作教程';
-  document.getElementById('tutorialProposition').textContent = message;
+  document.getElementById('tutorialProposition').innerHTML = `
+    <p style="text-align:center;padding:40px 0;color:var(--ink-light);">${escapeHtml(message)}</p>
+    <div style="text-align:center;">
+      <button class="btn-back-directory" onclick="backToDirectory()">返回教程总览</button>
+    </div>
+  `;
   document.getElementById('tutorialDirections').innerHTML = '';
   document.getElementById('questionTabs').innerHTML = '';
   document.getElementById('questionContent').innerHTML = '';
@@ -539,4 +554,69 @@ function generatePrintEssays(essays) {
       </div>
     </div>
   `).join('');
+}
+
+// ========== 教程全局概览 ==========
+async function showTutorialDirectory() {
+  const directory = document.getElementById('tutorialDirectory');
+  const panel = document.getElementById('tutorialPanel');
+
+  // 显示目录，隐藏面板
+  if (directory) directory.style.display = '';
+  if (panel) panel.style.display = 'none';
+
+  const grid = document.getElementById('directoryGrid');
+  grid.innerHTML = '<div class="reader-loading">加载中...</div>';
+
+  try {
+    const res = await fetch('/api/tutorials');
+    if (!res.ok) throw new Error('加载失败');
+    const tutorials = await res.json();
+    renderDirectory(tutorials);
+  } catch (err) {
+    grid.innerHTML = '<div class="reader-loading">加载失败，请稍后再试</div>';
+  }
+}
+
+function renderDirectory(tutorials) {
+  const grid = document.getElementById('directoryGrid');
+  if (!tutorials || tutorials.length === 0) {
+    grid.innerHTML = '<div class="reader-loading">暂无教程内容</div>';
+    return;
+  }
+
+  grid.innerHTML = tutorials.map(t => {
+    const catName = t.categoryName || '';
+    const excerpt = t.propositionAnalysis || '暂无命题分析';
+    const questionCount = t.questionsCount || 0;
+    const directionCount = t.directionsCount || 0;
+
+    return `
+      <div class="directory-card" onclick="loadTutorialFromDirectory('${t.categoryId || ''}', '${t.subcategoryId || ''}')">
+        <div class="directory-card-cat">${escapeHtml(catName)}</div>
+        <div class="directory-card-title">${escapeHtml(t.title || '未命名教程')}</div>
+        <div class="directory-card-excerpt">${escapeHtml(excerpt)}</div>
+        <div class="directory-card-meta">
+          <span>📝 ${questionCount} 道出题示例</span>
+          <span>🧭 ${directionCount} 个出题方向</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function loadTutorialFromDirectory(categoryId, subcategoryId) {
+  if (subcategoryId && subcategoryId !== 'null' && subcategoryId !== 'undefined') {
+    loadTutorialData(categoryId, subcategoryId);
+  } else {
+    loadTutorialData(categoryId);
+  }
+}
+
+function backToDirectory() {
+  showTutorialDirectory();
+  // 重置侧边栏选中状态
+  document.querySelectorAll('.filter-item').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sub-filter-item').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.cat-group').forEach(g => g.classList.remove('expanded'));
 }

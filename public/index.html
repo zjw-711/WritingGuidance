@@ -14,7 +14,6 @@
   <header class="mobile-header">
     <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
     <h1 class="mobile-logo">拾光阅</h1>
-    <a href="/exam" class="mobile-nav-link">📜</a>
   </header>
 
   <!-- 侧边栏遮罩 -->
@@ -40,10 +39,26 @@
       <div class="sidebar-footer-v3">
         共收录佳作 <span id="totalCount" class="highlight-num">0</span> 篇
       </div>
+
+      <div class="sidebar-cross-nav">
+        <a href="/materials" class="cross-nav-link">素材库 <span class="link-arrow">↗</span></a>
+        <a href="/exam" class="cross-nav-link">历年真题 <span class="link-arrow">↗</span></a>
+      </div>
     </aside>
 
     <!-- 右侧：教程区 -->
     <main class="art-main">
+      <!-- 教程全局概览 -->
+      <div class="tutorial-directory" id="tutorialDirectory">
+        <div class="directory-header">
+          <h2 class="directory-title">写作教程总览</h2>
+          <p class="directory-subtitle">选择一个分类，开始你的写作之旅</p>
+        </div>
+        <div class="directory-grid" id="directoryGrid">
+          <!-- 动态渲染教程卡片 -->
+        </div>
+      </div>
+
       <!-- 写作教程面板（全屏） -->
       <div class="tutorial-panel full-height" id="tutorialPanel">
         <div class="tutorial-header">
@@ -158,6 +173,15 @@
   </div>
 
   <div id="toast" class="toast-v3"></div>
+
+  <!-- 移动端底栏导航 -->
+  <div class="global-nav-bar">
+    <nav>
+      <a href="/" class="active"><span class="nav-icon">📖</span>教程</a>
+      <a href="/materials"><span class="nav-icon">📚</span>素材库</a>
+      <a href="/exam"><span class="nav-icon">📜</span>真题</a>
+    </nav>
+  </div>
 
   <script src="/js/main.js"></script>
 </body>
