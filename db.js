@@ -144,6 +144,7 @@ function initDb() {
     CREATE TABLE IF NOT EXISTS tutorials (
       id TEXT PRIMARY KEY,
       category_id TEXT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+      subcategory_id TEXT REFERENCES subcategories(id) ON DELETE CASCADE,
       title TEXT NOT NULL,
       proposition_analysis TEXT DEFAULT '',
       philosophy_guide TEXT DEFAULT '',
@@ -216,6 +217,7 @@ function initDb() {
 
     -- ========== 教程索引 ==========
     CREATE INDEX IF NOT EXISTS idx_tutorials_category ON tutorials(category_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorials_subcategory ON tutorials(subcategory_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_directions_tutorial ON tutorial_directions(tutorial_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_questions_tutorial ON tutorial_questions(tutorial_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_examples_tutorial ON tutorial_examples(tutorial_id);
@@ -226,6 +228,9 @@ function initDb() {
 
   // 新增 status 字段（兼容重复执行）
   try { db.exec(`ALTER TABLE materials ADD COLUMN status TEXT DEFAULT 'approved'`); } catch {}
+
+  // tutorials 表新增 subcategory_id 字段（兼容重复执行）
+  try { db.exec(`ALTER TABLE tutorials ADD COLUMN subcategory_id TEXT REFERENCES subcategories(id) ON DELETE CASCADE`); } catch {}
 
   return db;
 }

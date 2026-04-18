@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const db = getDb();
 
 // 教程推荐素材加载：优先用显式关联，不足时 fallback 到同分类已发布素材
-function loadTutorialMaterials(tutorialId, categoryId) {
+function loadTutorialMaterials(tutorialId, categoryId, subcategoryId = null) {
   const linkedIds = db.prepare(`
     SELECT material_id FROM tutorial_materials WHERE tutorial_id = ? ORDER BY sort_order LIMIT 6
   `).all(tutorialId);
@@ -51,13 +51,40 @@ function loadTutorialMaterials(tutorialId, categoryId) {
   // fallback：从同分类已发布素材中补充（排除已关联的）
   const existingIds = materials.map(m => m.id);
   const placeholders = existingIds.length ? ` AND m.id NOT IN (${existingIds.map(() => '?').join(',')})` : '';
-  const fallbackRows = db.prepare(`
-    SELECT m.id, m.title, m.content, m.type_id,
-           (SELECT tag FROM material_tags WHERE material_id = m.id LIMIT 1) as tag
-    FROM materials m
-    WHERE m.category_id = ? AND m.status = 'approved'${placeholders}
-    ORDER BY m.created_at DESC LIMIT ?
-  `).all(categoryId, ...existingIds, 6 - materials.length);
+
+  // 有 subcategoryId 时优先匹配子分类素材
+  let fallbackRows;
+  if (subcategoryId) {
+    fallbackRows = db.prepare(`
+      SELECT m.id, m.title, m.content, m.type_id,
+             (SELECT tag FROM material_tags WHERE material_id = m.id LIMIT 1) as tag
+      FROM materials m
+      WHERE m.category_id = ? AND m.subcategory_id = ? AND m.status = 'approved'${placeholders}
+      ORDER BY m.created_at DESC LIMIT ?
+    `).all(categoryId, subcategoryId, ...existingIds, 6 - materials.length);
+
+    // 子分类素材不足时继续从父分类补充
+    if (materials.length + fallbackRows.length < 6) {
+      const subIds = [...existingIds, ...fallbackRows.map(r => r.id)];
+      const subPlaceholders = subIds.length ? ` AND m.id NOT IN (${subIds.map(() => '?').join(',')})` : '';
+      const parentRows = db.prepare(`
+        SELECT m.id, m.title, m.content, m.type_id,
+               (SELECT tag FROM material_tags WHERE material_id = m.id LIMIT 1) as tag
+        FROM materials m
+        WHERE m.category_id = ? AND m.status = 'approved'${subPlaceholders}
+        ORDER BY m.created_at DESC LIMIT ?
+      `).all(categoryId, ...subIds, 6 - materials.length - fallbackRows.length);
+      fallbackRows = [...fallbackRows, ...parentRows];
+    }
+  } else {
+    fallbackRows = db.prepare(`
+      SELECT m.id, m.title, m.content, m.type_id,
+             (SELECT tag FROM material_tags WHERE material_id = m.id LIMIT 1) as tag
+      FROM materials m
+      WHERE m.category_id = ? AND m.status = 'approved'${placeholders}
+      ORDER BY m.created_at DESC LIMIT ?
+    `).all(categoryId, ...existingIds, 6 - materials.length);
+  }
 
   const fallback = fallbackRows.map(m => ({
     id: m.id, title: m.title, content: m.content, tag: m.tag || '', type: m.type_id
@@ -870,19 +897,26 @@ app.post('/api/ai/generate-classics', requireAuth, async (req, res) => {
 
 // 获取教程列表（全部或按分类）
 app.get('/api/tutorials', (req, res) => {
-  const { category } = req.query;
-  let whereClause = '';
+  const { category, subcategory } = req.query;
+  let whereClauses = [];
   let params = [];
 
   if (category) {
-    whereClause = 'WHERE t.category_id = ?';
+    whereClauses.push('t.category_id = ?');
     params.push(category);
   }
+  if (subcategory) {
+    whereClauses.push('t.subcategory_id = ?');
+    params.push(subcategory);
+  }
+
+  const whereClause = whereClauses.length ? 'WHERE ' + whereClauses.join(' AND ') : '';
 
   const tutorials = db.prepare(`
-    SELECT t.*, c.name as category_name
+    SELECT t.*, c.name as category_name, s.name as subcategory_name
     FROM tutorials t
     LEFT JOIN categories c ON t.category_id = c.id
+    LEFT JOIN subcategories s ON t.subcategory_id = s.id
     ${whereClause}
     ORDER BY t.created_at DESC
   `).all(...params);
@@ -899,6 +933,8 @@ app.get('/api/tutorials', (req, res) => {
       id: t.id,
       categoryId: t.category_id,
       categoryName: t.category_name,
+      subcategoryId: t.subcategory_id || null,
+      subcategoryName: t.subcategory_name || null,
       title: t.title,
       propositionAnalysis: t.proposition_analysis,
       philosophyGuide: t.philosophy_guide,
@@ -958,11 +994,12 @@ app.get('/api/tutorials/:id', (req, res) => {
   `).all(tutorial.id);
 
   // 推荐素材（带 fallback）
-  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id);
+  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, tutorial.subcategory_id);
 
   res.json({
     id: tutorial.id,
     categoryId: tutorial.category_id,
+    subcategoryId: tutorial.subcategory_id || null,
     title: tutorial.title,
     propositionAnalysis: tutorial.proposition_analysis,
     philosophyGuide: tutorial.philosophy_guide,
@@ -975,9 +1012,9 @@ app.get('/api/tutorials/:id', (req, res) => {
   });
 });
 
-// 按分类获取教程（便捷接口）
+// 按分类获取教程（便捷接口，仅匹配父分类教程即 subcategory_id IS NULL）
 app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
-  const tutorial = db.prepare('SELECT * FROM tutorials WHERE category_id = ?').get(req.params.categoryId);
+  const tutorial = db.prepare('SELECT * FROM tutorials WHERE category_id = ? AND subcategory_id IS NULL').get(req.params.categoryId);
   if (!tutorial) return res.status(404).json({ error: '该分类暂无教程' });
 
   // 复用上面的详情逻辑
@@ -1006,11 +1043,12 @@ app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
     FROM tutorial_essays WHERE tutorial_id = ? ORDER BY sort_order
   `).all(tutorial.id);
 
-  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id);
+  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, tutorial.subcategory_id);
 
   res.json({
     id: tutorial.id,
     categoryId: tutorial.category_id,
+    subcategoryId: tutorial.subcategory_id || null,
     title: tutorial.title,
     propositionAnalysis: tutorial.proposition_analysis,
     philosophyGuide: tutorial.philosophy_guide,
@@ -1023,19 +1061,86 @@ app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
   });
 });
 
+// 按子分类获取教程（带 fallback 到父分类教程）
+app.get('/api/tutorials/by-subcategory/:categoryId/:subcategoryId', (req, res) => {
+  const { categoryId, subcategoryId } = req.params;
+
+  // 优先查找子分类专属教程
+  let tutorial = db.prepare('SELECT * FROM tutorials WHERE category_id = ? AND subcategory_id = ?').get(categoryId, subcategoryId);
+  let isFallback = false;
+
+  // 子分类无教程 → fallback 到父分类教程
+  if (!tutorial) {
+    tutorial = db.prepare('SELECT * FROM tutorials WHERE category_id = ? AND subcategory_id IS NULL').get(categoryId);
+    isFallback = true;
+  }
+
+  if (!tutorial) return res.status(404).json({ error: '该分类暂无教程' });
+
+  const directions = db.prepare(`
+    SELECT title, description FROM tutorial_directions WHERE tutorial_id = ? ORDER BY sort_order
+  `).all(tutorial.id);
+
+  const questions = db.prepare(`
+    SELECT id, short_title, title, question_text, note, writing_approach
+    FROM tutorial_questions WHERE tutorial_id = ? ORDER BY sort_order
+  `).all(tutorial.id);
+
+  const examples = db.prepare(`
+    SELECT id, short_title, title, example_text, highlight, analysis
+    FROM tutorial_examples WHERE tutorial_id = ? ORDER BY sort_order
+  `).all(tutorial.id);
+
+  const tips = db.prepare(`
+    SELECT icon, title, content FROM tutorial_tips WHERE tutorial_id = ? ORDER BY sort_order
+  `).all(tutorial.id);
+
+  const essays = db.prepare(`
+    SELECT id, title, essay_text, score, highlight, analysis
+    FROM tutorial_essays WHERE tutorial_id = ? ORDER BY sort_order
+  `).all(tutorial.id);
+
+  // fallback 时仍然按子分类优先加载素材
+  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, isFallback ? subcategoryId : tutorial.subcategory_id);
+
+  res.json({
+    id: tutorial.id,
+    categoryId: tutorial.category_id,
+    subcategoryId: tutorial.subcategory_id || null,
+    title: tutorial.title,
+    propositionAnalysis: tutorial.proposition_analysis,
+    philosophyGuide: tutorial.philosophy_guide,
+    directions,
+    questions,
+    examples,
+    tips,
+    essays,
+    materials,
+    isFallback
+  });
+});
+
 // 创建教程（admin）
 app.post('/api/tutorials', requireAuth, requireRole('admin'), (req, res) => {
-  const { categoryId, title, propositionAnalysis, philosophyGuide, directions, questions, examples, tips, essays, materialIds } = req.body;
+  const { categoryId, subcategoryId, title, propositionAnalysis, philosophyGuide, directions, questions, examples, tips, essays, materialIds } = req.body;
 
   if (!categoryId || !title) {
     return res.status(400).json({ error: '分类ID和标题为必填项' });
   }
 
+  // 唯一性校验：同分类+同子分类只能有一个教程
+  const existing = subcategoryId
+    ? db.prepare('SELECT id FROM tutorials WHERE category_id = ? AND subcategory_id = ?').get(categoryId, subcategoryId)
+    : db.prepare('SELECT id FROM tutorials WHERE category_id = ? AND subcategory_id IS NULL').get(categoryId);
+  if (existing) {
+    return res.status(409).json({ error: '该分类/子分类已有教程' });
+  }
+
   const id = generateId('t');
 
   const insertTutorial = db.prepare(`
-    INSERT INTO tutorials (id, category_id, title, proposition_analysis, philosophy_guide)
-    VALUES (?, ?, ?, ?, ?)
+    INSERT INTO tutorials (id, category_id, subcategory_id, title, proposition_analysis, philosophy_guide)
+    VALUES (?, ?, ?, ?, ?, ?)
   `);
 
   const insertDirection = db.prepare(`
@@ -1069,7 +1174,7 @@ app.post('/api/tutorials', requireAuth, requireRole('admin'), (req, res) => {
   `);
 
   const doInsert = db.transaction(() => {
-    insertTutorial.run(id, categoryId, title, propositionAnalysis || '', philosophyGuide || '');
+    insertTutorial.run(id, categoryId, subcategoryId || null, title, propositionAnalysis || '', philosophyGuide || '');
 
     (directions || []).forEach((d, i) => {
       insertDirection.run(id, d.title, d.description || '', i);
@@ -1114,13 +1219,22 @@ app.post('/api/tutorials', requireAuth, requireRole('admin'), (req, res) => {
 
 // 更新教程（admin）
 app.put('/api/tutorials/:id', requireAuth, requireRole('admin'), (req, res) => {
-  const { title, propositionAnalysis, philosophyGuide, directions, questions, examples, tips, essays, materialIds } = req.body;
+  const { title, subcategoryId, propositionAnalysis, philosophyGuide, directions, questions, examples, tips, essays, materialIds } = req.body;
 
   const tutorial = db.prepare('SELECT * FROM tutorials WHERE id = ?').get(req.params.id);
   if (!tutorial) return res.status(404).json({ error: '教程不存在' });
 
+  // 唯一性校验（排除自身）
+  const effectiveSubId = subcategoryId !== undefined ? subcategoryId : tutorial.subcategory_id;
+  const existing = effectiveSubId
+    ? db.prepare('SELECT id FROM tutorials WHERE category_id = ? AND subcategory_id = ? AND id != ?').get(tutorial.category_id, effectiveSubId, req.params.id)
+    : db.prepare('SELECT id FROM tutorials WHERE category_id = ? AND subcategory_id IS NULL AND id != ?').get(tutorial.category_id, req.params.id);
+  if (existing) {
+    return res.status(409).json({ error: '该分类/子分类已有教程' });
+  }
+
   const updateTutorial = db.prepare(`
-    UPDATE tutorials SET title = ?, proposition_analysis = ?, philosophy_guide = ?, updated_at = datetime('now')
+    UPDATE tutorials SET title = ?, subcategory_id = ?, proposition_analysis = ?, philosophy_guide = ?, updated_at = datetime('now')
     WHERE id = ?
   `);
 
@@ -1139,7 +1253,7 @@ app.put('/api/tutorials/:id', requireAuth, requireRole('admin'), (req, res) => {
   const insertMaterial = db.prepare('INSERT INTO tutorial_materials (tutorial_id, material_id, sort_order) VALUES (?, ?, ?)');
 
   const doUpdate = db.transaction(() => {
-    updateTutorial.run(title || tutorial.title, propositionAnalysis || '', philosophyGuide || '', req.params.id);
+    updateTutorial.run(title || tutorial.title, subcategoryId !== undefined ? (subcategoryId || null) : tutorial.subcategory_id, propositionAnalysis || '', philosophyGuide || '', req.params.id);
 
     // 清除并重新插入关联数据
     deleteDirections.run(req.params.id);

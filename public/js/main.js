@@ -1,20 +1,13 @@
 // ========== 全局状态 ==========
 let categories = [];
-let allTags = [];
-let searchTimeout = null;
 
 // ========== 初始化 ==========
 async function init() {
   try {
-    const [catRes, tagRes] = await Promise.all([
-      fetch('/api/categories').then(r => r.json()),
-      fetch('/api/tags').then(r => r.json())
-    ]);
+    const catRes = await fetch('/api/categories').then(r => r.json());
     categories = catRes;
-    allTags = tagRes;
 
     renderCategoryFilter();
-    renderTagFilter();
     bindEvents();
   } catch (err) {
     showToast('卷帙浩繁，稍后再试');
@@ -22,17 +15,6 @@ async function init() {
 }
 
 function bindEvents() {
-  // 防抖搜索（跳转到素材页）
-  document.getElementById('searchInput').addEventListener('input', (e) => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-      const search = e.target.value.trim();
-      if (search) {
-        window.location.href = `/materials?search=${encodeURIComponent(search)}`;
-      }
-    }, 400);
-  });
-
   // Esc 关闭阅读器
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeReader();
@@ -83,53 +65,19 @@ function selectCategory(catId, subId, level, el) {
   document.querySelectorAll('.sub-filter-item').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.cat-group').forEach(g => g.classList.remove('expanded'));
 
-  // 清除标签选中
-  document.querySelectorAll('.tag-btn').forEach(p => p.classList.remove('active'));
-  const allTagBtn = document.querySelector('.tag-btn');
-  if (allTagBtn) allTagBtn.classList.add('active');
-
   if (level === 'sub') {
-    // 二级分类 → 跳转到素材页筛选
+    // 二级分类 → 加载子分类教程（有则显示，无则 fallback 到父分类教程）
     const group = el.closest('.cat-group');
     group.classList.add('expanded');
     group.querySelector('.filter-item').classList.add('active');
     el.classList.add('active');
-    window.location.href = `/materials?category=${catId}&subcategory=${subId}`;
+    loadTutorialData(catId, subId);
   } else {
     // 一级分类 → 显示教程
     el.classList.add('active');
     const hasSubs = currentGroup.querySelector('.sub-filter-list');
     if (hasSubs) currentGroup.classList.toggle('expanded', !wasExpanded);
     loadTutorialData(catId);
-  }
-
-  if (window.innerWidth <= 768) closeSidebar();
-}
-
-// ========== 渲染标签 ==========
-function renderTagFilter() {
-  const container = document.getElementById('tagFilter');
-  let html = `<button class="tag-btn active" onclick="selectTag('',this)">全部</button>`;
-  allTags.slice(0, 12).forEach(t => {
-    html += `<button class="tag-btn" onclick="selectTag('${t}',this)">${t}</button>`;
-  });
-  container.innerHTML = html;
-}
-
-function selectTag(tag, el) {
-  // 选标签时清除分类
-  document.querySelectorAll('.filter-item').forEach(p => p.classList.remove('active'));
-  const allFilterBtn = document.querySelector('.filter-item');
-  if (allFilterBtn) allFilterBtn.classList.add('active');
-  document.querySelectorAll('.cat-group').forEach(g => g.classList.remove('expanded'));
-  document.querySelectorAll('.sub-filter-item').forEach(p => p.classList.remove('active'));
-
-  document.querySelectorAll('.tag-btn').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-
-  // 跳转到素材浏览页
-  if (tag) {
-    window.location.href = `/materials?tag=${encodeURIComponent(tag)}`;
   }
 
   if (window.innerWidth <= 768) closeSidebar();
@@ -266,10 +214,16 @@ let currentExampleIndex = 0;
 let currentMiniType = '';
 
 // 从 API 加载教程数据
-async function loadTutorialData(categoryId) {
+async function loadTutorialData(categoryId, subcategoryId = null) {
   try {
-    // 先尝试按分类加载
-    const res = await fetch(`/api/tutorials/by-category/${categoryId}`);
+    let res;
+    if (subcategoryId) {
+      // 子分类 → 调用 by-subcategory 端点（带 fallback）
+      res = await fetch(`/api/tutorials/by-subcategory/${categoryId}/${subcategoryId}`);
+    } else {
+      // 父分类 → 调用 by-category 端点
+      res = await fetch(`/api/tutorials/by-category/${categoryId}`);
+    }
     if (!res.ok) {
       currentTutorialData = null;
       showEmptyTutorial('该分类暂无教程内容，敬请期待');
@@ -303,7 +257,8 @@ function showEmptyTutorial(message = '该分类暂无教程内容，敬请期待
 
 // 渲染教程内容
 function renderTutorial(tutorial) {
-  document.getElementById('tutorialTitle').textContent = `📖 写作教程 · ${tutorial.title}`;
+  const fallbackTag = tutorial.isFallback ? '（通用教程）' : '';
+  document.getElementById('tutorialTitle').textContent = `📖 写作教程 · ${tutorial.title}${fallbackTag}`;
   document.getElementById('tutorialProposition').textContent = tutorial.propositionAnalysis || '';
 
   const directions = tutorial.directions || [];
@@ -409,7 +364,10 @@ function goToMaterial(id) {
 
 function showMoreMaterials() {
   const catId = currentTutorialData?.categoryId || 'youth';
-  window.location.href = `/materials?category=${catId}`;
+  const subId = currentTutorialData?.subcategoryId;
+  let url = `/materials?category=${catId}`;
+  if (subId) url += `&subcategory=${subId}`;
+  window.location.href = url;
 }
 
 function renderTips(tips) {

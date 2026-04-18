@@ -1289,11 +1289,17 @@ function renderTutorialList() {
   container.innerHTML = tutorialsData.map(t => {
     const cat = categories.find(c => c.id === t.categoryId);
     const catName = cat ? `${cat.icon} ${cat.name}` : '未分类';
+    // 显示完整层级路径
+    let hierarchy = catName;
+    if (t.subcategoryId && cat) {
+      const sub = (cat.subcategories || []).find(s => s.id === t.subcategoryId);
+      if (sub) hierarchy += ` > ${sub.name}`;
+    }
     const preview = (t.propositionAnalysis || '').substring(0, 80);
     return `
       <div class="tutorial-card" onclick="openTutorialEditModal('${t.id}')">
         <div class="tutorial-card-header">
-          <span class="tutorial-card-cat">${catName}</span>
+          <span class="tutorial-card-cat">${hierarchy}</span>
           <span class="tutorial-card-date">${t.createdAt?.split('T')[0] || ''}</span>
         </div>
         <div class="tutorial-card-title">${escapeHtml(t.title)}</div>
@@ -1344,6 +1350,29 @@ function closeTutorialEditModal() {
 }
 
 // 渲染教程编辑表单
+// 生成子分类下拉选项 HTML
+function getSubcategoryOptions(categoryId, selectedId) {
+  if (!categoryId) return '<option value="">请先选择分类</option>';
+  const cat = categories.find(c => c.id === categoryId);
+  if (!cat || !cat.subcategories || cat.subcategories.length === 0) {
+    return '<option value="">无子分类</option>';
+  }
+  let html = '<option value="">（父分类教程）</option>';
+  cat.subcategories.forEach(s => {
+    html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${s.name}</option>`;
+  });
+  return html;
+}
+
+// 分类切换时联动更新子分类下拉
+function updateTutorialSubcategoryOptions() {
+  const catId = document.getElementById('tutCategoryId')?.value || '';
+  const subSelect = document.getElementById('tutSubcategoryId');
+  if (subSelect) {
+    subSelect.innerHTML = getSubcategoryOptions(catId, null);
+  }
+}
+
 function renderTutorialEditForm(tutorial) {
   const container = document.getElementById('tutorialModalBody');
   const isNew = !tutorial;
@@ -1368,9 +1397,15 @@ function renderTutorialEditForm(tutorial) {
       <div class="form-row">
         <div class="form-group" style="flex:1">
           <label>关联分类 *</label>
-          <select id="tutCategoryId" required>
+          <select id="tutCategoryId" required onchange="updateTutorialSubcategoryOptions()">
             <option value="">请选择分类</option>
             ${categories.map(c => `<option value="${c.id}" ${data.categoryId === c.id ? 'selected' : ''}>${c.icon} ${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>子分类（可选）</label>
+          <select id="tutSubcategoryId">
+            ${getSubcategoryOptions(data.categoryId, data.subcategoryId)}
           </select>
         </div>
         <div class="form-group" style="flex:2">
@@ -1804,6 +1839,7 @@ function closeMaterialPicker() {
 // 收集教程表单数据
 function collectTutorialFormData() {
   const categoryId = document.getElementById('tutCategoryId')?.value || '';
+  const subcategoryId = document.getElementById('tutSubcategoryId')?.value || null;
   const title = document.getElementById('tutTitle')?.value.trim() || '';
   const propositionAnalysis = document.getElementById('tutProposition')?.value.trim() || '';
   const philosophyGuide = document.getElementById('tutPhilosophy')?.value.trim() || '';
@@ -1873,6 +1909,7 @@ function collectTutorialFormData() {
 
   return {
     categoryId,
+    subcategoryId,
     title,
     propositionAnalysis,
     philosophyGuide,

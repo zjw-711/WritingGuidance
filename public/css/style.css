@@ -656,8 +656,8 @@ body {
 }
 
 .mini-materials {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
 }
 
@@ -1292,6 +1292,10 @@ body {
 
   .art-main {
     padding: 30px 20px;
+  }
+
+  .mini-materials {
+    grid-template-columns: 1fr;
   }
 
   .page-header { margin-bottom: 30px; }
