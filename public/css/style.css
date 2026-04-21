@@ -1611,6 +1611,7 @@ body {
   /* 隐藏非内容元素 */
   .noise-overlay,
   .mobile-header,
+  .global-nav-bar,
   .sidebar-overlay,
   .art-sidebar,
   .reader-overlay,
