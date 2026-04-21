@@ -41,7 +41,8 @@ function initDb() {
       subcategory_id TEXT REFERENCES subcategories(id),
       type_id TEXT REFERENCES types(id),
       source TEXT DEFAULT '',
-      created_at TEXT DEFAULT (date('now'))
+      created_at TEXT DEFAULT (date('now')),
+      status TEXT DEFAULT 'approved'
     );
 
     CREATE TABLE IF NOT EXISTS question_analysis (
@@ -238,10 +239,14 @@ function initDb() {
       const seedPath = path.join(__dirname, 'data', 'seed.sql');
       if (fs.existsSync(seedPath)) {
         const sql = fs.readFileSync(seedPath, 'utf8');
+        // 导入期间关闭外键约束，避免 INSERT 顺序导致的 FK 冲突
+        db.pragma('foreign_keys = OFF');
         db.exec(sql);
+        db.pragma('foreign_keys = ON');
         console.log('[DB] 已从 seed.sql 导入种子数据');
       }
     } catch (e) {
+      db.pragma('foreign_keys = ON');
       console.error('[DB] seed.sql 导入失败:', e.message);
     }
   }
