@@ -230,6 +230,22 @@ function initDb() {
     CREATE INDEX IF NOT EXISTS idx_tutorial_essays_tutorial ON tutorial_essays(tutorial_id);
   `);
 
+  // 自动导入种子数据：如果 categories 表为空，从 seed.sql 导入
+  const hasData = db.prepare('SELECT COUNT(*) as c FROM categories').get().c > 0;
+  if (!hasData) {
+    try {
+      const fs = require('fs');
+      const seedPath = path.join(__dirname, 'data', 'seed.sql');
+      if (fs.existsSync(seedPath)) {
+        const sql = fs.readFileSync(seedPath, 'utf8');
+        db.exec(sql);
+        console.log('[DB] 已从 seed.sql 导入种子数据');
+      }
+    } catch (e) {
+      console.error('[DB] seed.sql 导入失败:', e.message);
+    }
+  }
+
   return db;
 }
 
@@ -238,8 +254,32 @@ function getDb() {
   return db;
 }
 
+// 导出当前数据库为 seed.sql（供开发者使用）
+function exportSeed() {
+  const fs = require('fs');
+  const tables = ['categories','subcategories','types','materials','material_tags','material_topics','material_links','question_analysis','qa_materials','qa_angles','exam_questions','exam_keywords','exam_angles','exam_materials','users','tutorials','tutorial_directions','tutorial_questions','tutorial_examples','tutorial_tips','tutorial_materials','tutorial_essays'];
+  function sqlVal(v) {
+    if (v === null || v === undefined) return 'NULL';
+    return "'" + String(v).replace(/'/g, "''") + "'";
+  }
+  let sql = '';
+  for (const t of tables) {
+    try {
+      const rows = db.prepare('SELECT * FROM ' + t).all();
+      if (rows.length === 0) continue;
+      for (const r of rows) {
+        const cols = Object.keys(r);
+        const vals = cols.map(c => sqlVal(r[c]));
+        sql += 'INSERT OR IGNORE INTO ' + t + '(' + cols.join(',') + ') VALUES(' + vals.join(',') + ');\n';
+      }
+    } catch {}
+  }
+  fs.writeFileSync(path.join(__dirname, 'data', 'seed.sql'), sql);
+  console.log('[DB] seed.sql 已导出');
+}
+
 function generateId(prefix = 'm') {
   return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-module.exports = { initDb, getDb, generateId };
+module.exports = { initDb, getDb, generateId, exportSeed };

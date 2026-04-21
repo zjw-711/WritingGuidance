@@ -1,6 +1,7 @@
 node_modules/
 
-# SQLite 临时文件
+# SQLite 数据库（通过 seed.sql 自动导入，不跟踪二进制文件）
+*.db
 *.db-shm
 *.db-wal
 
