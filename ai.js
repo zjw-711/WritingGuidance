@@ -147,27 +147,6 @@ function inferThemes(text) {
   return themes.length ? themes.slice(0, 5) : ['现实议题'];
 }
 
-function fallbackCard(input, screening) {
-  const summary = truncateText((input.content || '').replace(/\s+/g, ' ').trim(), 90);
-  const story = truncateText((input.content || '').trim(), 220);
-  return {
-    title: input.title || '未命名素材',
-    summary: summary || '待补充摘要',
-    story: story || '待补充正文',
-    themes: screening.themes,
-    angles: ['分论点论据', '开头引入'],
-    expressions: [
-      '真正有价值的素材，不在于响亮的标签，而在于真实的细节与可迁移的思考。',
-      '与其堆砌赞美，不如写清人物在具体处境中的选择。'
-    ],
-    pitfalls: [
-      '不要写成空泛励志故事，应突出具体处境、行动与结果。'
-    ],
-    tags: screening.themes.slice(0, 4),
-    applicableTopics: screening.themes.slice(0, 4),
-    source: input.source || ''
-  };
-}
 
 async function screenCandidate(input) {
   const prompt = {
@@ -187,26 +166,6 @@ async function screenCandidate(input) {
   return result || fallbackScreening(input);
 }
 
-async function buildCandidateCard(input, screening) {
-  const prompt = {
-    role: 'system',
-    content: '你是中国高三作文素材编辑。请把输入原文整理成适合网站入库的作文素材卡。不要捏造事实，不要补充原文没有的细节。只返回 JSON，字段：title,summary,story,themes,angles,expressions,pitfalls,tags,applicableTopics,source。'
-  };
-  const user = {
-    role: 'user',
-    content: JSON.stringify({
-      sourceInput: {
-        title: input.title || '',
-        source: input.source || '',
-        content: truncateText(input.content || '', 3500)
-      },
-      screening
-    })
-  };
-
-  const result = await chatCompletion([prompt, user]);
-  return result || fallbackCard(input, screening);
-}
 
 /**
  * 按话题/分类批量生成高考作文素材
@@ -377,7 +336,6 @@ module.exports = {
   saveAiConfig,
   chatCompletion,
   screenCandidate,
-  buildCandidateCard,
   generateMaterialsByTopic,
   generateClassicsMaterials
 };

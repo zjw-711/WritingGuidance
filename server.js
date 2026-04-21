@@ -680,7 +680,6 @@ app.post('/api/import', requireAuth, requireRole('admin'), (req, res) => {
 
   let imported_count = 0;
   const skipped = [];
-  const errors = [];
 
   const doImport = db.transaction(() => {
     for (let i = 0; i < imported.materials.length; i++) {
@@ -948,78 +947,8 @@ app.get('/api/tutorials', (req, res) => {
   }));
 });
 
-// 获取单个教程详情（含所有关联数据）
-app.get('/api/tutorials/:id', (req, res) => {
-  const tutorial = db.prepare('SELECT * FROM tutorials WHERE id = ?').get(req.params.id);
-  if (!tutorial) return res.status(404).json({ error: '教程不存在' });
-
-  // 出题方向
-  const directions = db.prepare(`
-    SELECT title, description
-    FROM tutorial_directions
-    WHERE tutorial_id = ?
-    ORDER BY sort_order
-  `).all(tutorial.id);
-
-  // 出题示例
-  const questions = db.prepare(`
-    SELECT id, short_title, title, question_text, note, writing_approach
-    FROM tutorial_questions
-    WHERE tutorial_id = ?
-    ORDER BY sort_order
-  `).all(tutorial.id);
-
-  // 写作示例
-  const examples = db.prepare(`
-    SELECT id, short_title, title, example_text, highlight, analysis
-    FROM tutorial_examples
-    WHERE tutorial_id = ?
-    ORDER BY sort_order
-  `).all(tutorial.id);
-
-  // 写作锦囊
-  const tips = db.prepare(`
-    SELECT icon, title, content
-    FROM tutorial_tips
-    WHERE tutorial_id = ?
-    ORDER BY sort_order
-  `).all(tutorial.id);
-
-  // 范文
-  const essays = db.prepare(`
-    SELECT id, title, essay_text, score, highlight, analysis
-    FROM tutorial_essays
-    WHERE tutorial_id = ?
-    ORDER BY sort_order
-  `).all(tutorial.id);
-
-  // 推荐素材（带 fallback）
-  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, tutorial.subcategory_id);
-
-  res.json({
-    id: tutorial.id,
-    categoryId: tutorial.category_id,
-    subcategoryId: tutorial.subcategory_id || null,
-    title: tutorial.title,
-    propositionAnalysis: tutorial.proposition_analysis,
-    philosophyGuide: tutorial.philosophy_guide,
-    directions,
-    questions,
-    examples,
-    tips,
-    essays,
-    materials
-  });
-});
-
-// 按分类获取教程（便捷接口，仅匹配父分类教程即 subcategory_id IS NULL）
-app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
-  const tutorial = db.prepare('SELECT * FROM tutorials WHERE category_id = ? AND subcategory_id IS NULL').get(req.params.categoryId);
-  if (!tutorial) return res.status(404).json({ error: '该分类暂无教程' });
-
-  // 复用上面的详情逻辑
-  req.params.id = tutorial.id;
-  // 直接返回详情
+// 组装教程详情（复用于多个路由）
+function buildTutorialDetail(tutorial, overrideSubcategoryId) {
   const directions = db.prepare(`
     SELECT title, description FROM tutorial_directions WHERE tutorial_id = ? ORDER BY sort_order
   `).all(tutorial.id);
@@ -1043,9 +972,9 @@ app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
     FROM tutorial_essays WHERE tutorial_id = ? ORDER BY sort_order
   `).all(tutorial.id);
 
-  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, tutorial.subcategory_id);
+  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, overrideSubcategoryId !== undefined ? overrideSubcategoryId : tutorial.subcategory_id);
 
-  res.json({
+  return {
     id: tutorial.id,
     categoryId: tutorial.category_id,
     subcategoryId: tutorial.subcategory_id || null,
@@ -1058,7 +987,23 @@ app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
     tips,
     essays,
     materials
-  });
+  };
+}
+
+// 获取单个教程详情（含所有关联数据）
+app.get('/api/tutorials/:id', (req, res) => {
+  const tutorial = db.prepare('SELECT * FROM tutorials WHERE id = ?').get(req.params.id);
+  if (!tutorial) return res.status(404).json({ error: '教程不存在' });
+
+  res.json(buildTutorialDetail(tutorial));
+});
+
+// 按分类获取教程（便捷接口，仅匹配父分类教程即 subcategory_id IS NULL）
+app.get('/api/tutorials/by-category/:categoryId', (req, res) => {
+  const tutorial = db.prepare('SELECT * FROM tutorials WHERE category_id = ? AND subcategory_id IS NULL').get(req.params.categoryId);
+  if (!tutorial) return res.status(404).json({ error: '该分类暂无教程' });
+
+  res.json(buildTutorialDetail(tutorial));
 });
 
 // 按子分类获取教程（带 fallback 到父分类教程）
@@ -1077,47 +1022,9 @@ app.get('/api/tutorials/by-subcategory/:categoryId/:subcategoryId', (req, res) =
 
   if (!tutorial) return res.status(404).json({ error: '该分类暂无教程' });
 
-  const directions = db.prepare(`
-    SELECT title, description FROM tutorial_directions WHERE tutorial_id = ? ORDER BY sort_order
-  `).all(tutorial.id);
-
-  const questions = db.prepare(`
-    SELECT id, short_title, title, question_text, note, writing_approach
-    FROM tutorial_questions WHERE tutorial_id = ? ORDER BY sort_order
-  `).all(tutorial.id);
-
-  const examples = db.prepare(`
-    SELECT id, short_title, title, example_text, highlight, analysis
-    FROM tutorial_examples WHERE tutorial_id = ? ORDER BY sort_order
-  `).all(tutorial.id);
-
-  const tips = db.prepare(`
-    SELECT icon, title, content FROM tutorial_tips WHERE tutorial_id = ? ORDER BY sort_order
-  `).all(tutorial.id);
-
-  const essays = db.prepare(`
-    SELECT id, title, essay_text, score, highlight, analysis
-    FROM tutorial_essays WHERE tutorial_id = ? ORDER BY sort_order
-  `).all(tutorial.id);
-
   // fallback 时仍然按子分类优先加载素材
-  const materials = loadTutorialMaterials(tutorial.id, tutorial.category_id, isFallback ? subcategoryId : tutorial.subcategory_id);
-
-  res.json({
-    id: tutorial.id,
-    categoryId: tutorial.category_id,
-    subcategoryId: tutorial.subcategory_id || null,
-    title: tutorial.title,
-    propositionAnalysis: tutorial.proposition_analysis,
-    philosophyGuide: tutorial.philosophy_guide,
-    directions,
-    questions,
-    examples,
-    tips,
-    essays,
-    materials,
-    isFallback
-  });
+  const detail = buildTutorialDetail(tutorial, isFallback ? subcategoryId : undefined);
+  res.json({ ...detail, isFallback });
 });
 
 // 创建教程（admin）
