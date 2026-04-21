@@ -282,7 +282,7 @@ INSERT OR IGNORE INTO materials(id,title,content,category_id,subcategory_id,type
 角度二"传统文化的危机与重生"——一门传承千年的艺术差点消失，又在新时代找到新的舞台，命运引人深思。适用于"传承与创新""文化保护"等话题。
 角度三"越是民族的越是世界的"——老腔从黄河岸边走到春晚舞台，证明传统文化的力量不会因时代变迁而消退。适用于"文化自信""民族与世界"等话题。
 角度四"艺术的生命力在于人民"——老腔出自船工号子，根植于民间生活，艺术最高的境界是与人民同呼吸。适用于"人民性""生活与艺术"等话题。','culture','culture-heritage','story','2016年北京卷高考作文题','2026-04-21','approved');
-INSERT OR IGNORE INTO materials(id,title,content,category_id,subcategory_id,type_id,source,created_at,status) VALUES('mmo88xb7o3knu','寻找"中国味"：在异域中重新发现自我','"倾听了不同国家的音乐，接触了不同风格的异域音调，由此我对音乐的'中国味'有了更深刻的感受，从而更有意识地去寻找'中国味'。"这段耐人寻味的文字，揭示了一个深刻的认知规律。
+INSERT OR IGNORE INTO materials(id,title,content,category_id,subcategory_id,type_id,source,created_at,status) VALUES('mmo88xb7o3knu','寻找"中国味"：在异域中重新发现自我','"倾听了不同国家的音乐，接触了不同风格的异域音调，由此我对音乐的''中国味''有了更深刻的感受，从而更有意识地去寻找''中国味''。"这段耐人寻味的文字，揭示了一个深刻的认知规律。
 
 这段话蕴含着一个深刻的认知规律：我们往往需要先走出"自己"，才能看清"自己"。就像一个人从小吃中餐不觉得特别，但当他品尝了法国大餐、日本料理、意大利面之后，才会真正理解什么是"中国味道"。不仅是食物，文化也是如此。只有了解世界的多样性，才能更深刻地认识中华文化的独特价值。
 
@@ -1243,95 +1243,95 @@ INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirem
 
 如果有一天，我们能够将梦赠予他人……
 
-以上材料引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以古诗词中的'梦'意象为引子，从文学想象延伸到个人理想与社会愿景。'将梦赠予他人'的假设富有想象力，引导学生思考梦想的共享与传递。命题兼具文学素养和哲学思辨的双重考查。','2026-04-13');
+以上材料引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以古诗词中的''梦''意象为引子，从文学想象延伸到个人理想与社会愿景。''将梦赠予他人''的假设富有想象力，引导学生思考梦想的共享与传递。命题兼具文学素养和哲学思辨的双重考查。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq003','2025','北京卷','independent','议论文：运动员在中长跑时会出现"极点"反应：呼吸艰难，四肢乏力。但通过调整节奏、激发斗志，越过极点后，身体会重获活力，奔跑会进入新阶段。这样的现象被称为"第二次呼吸"。其实，很多领域都存在类似现象。
 
-请以"由'第二次呼吸'说开去"为题，写一篇议论文。
+请以"由''第二次呼吸''说开去"为题，写一篇议论文。
 
 记叙文：生活中，到处都有数字在闪耀，如比赛记分牌、新年倒计时、车站电子时刻表、智能家电显示屏等。数字闪耀之时，可能是激动的时刻，可能是收获的见证，也可能是幸福的日常……
 
-请以"当数字闪耀时"为题，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容充实、合理，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷延续了二选一传统。议论文以体育生理现象为喻，引导考生将专业概念迁移到更广泛的人生领域，考查类比思维和论证能力。记叙文以'数字闪耀'为题，贴近日常生活，考查观察力和叙事能力。','2026-04-13');
-INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq004','2025','天津卷','independent','车轮的辐条一根一根，向心辏集，连接起居于中心的轮毂。辐集而轮运，劲直的辐条汇聚于轮毂，车轮支撑起载重的车辆，滚滚向前。你对这段话有怎样的联想与思考？请结合自身体验，写一篇文章。','自选角度，自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以车轮结构为喻，生动阐释了'汇聚'与'前行'的关系。辐条向心辏集暗示团结凝聚，车轮载重前行暗示使命担当。命题意象鲜明，哲理深刻，开放性强。','2026-04-13');
+请以"当数字闪耀时"为题，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容充实、合理，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷延续了二选一传统。议论文以体育生理现象为喻，引导考生将专业概念迁移到更广泛的人生领域，考查类比思维和论证能力。记叙文以''数字闪耀''为题，贴近日常生活，考查观察力和叙事能力。','2026-04-13');
+INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq004','2025','天津卷','independent','车轮的辐条一根一根，向心辏集，连接起居于中心的轮毂。辐集而轮运，劲直的辐条汇聚于轮毂，车轮支撑起载重的车辆，滚滚向前。你对这段话有怎样的联想与思考？请结合自身体验，写一篇文章。','自选角度，自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以车轮结构为喻，生动阐释了''汇聚''与''前行''的关系。辐条向心辏集暗示团结凝聚，车轮载重前行暗示使命担当。命题意象鲜明，哲理深刻，开放性强。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq005','2025','上海卷','independent','有学者用"专""转""传"概括当下三类文章："专"指专业文章；"转"指被转发的通俗文章；"传"指获得广泛传播的佳作，甚至是传世文章。他提出，专业文章可以变成被转发的通俗文章，而面对大量"转"文，读者又不免期待可传世的文章。
 
-由"专"到"传"，必定要经过"转"吗？请联系社会生活，写一篇文章，谈谈你的认识与思考。','自拟题目；不少于800字。','上海卷延续了其一贯的哲学思辨风格。'专转传'三字概括了当代内容传播的三个层次，核心问题是专业价值与传播路径的关系。命题既贴近信息时代现实，又具有深层思辨空间。','2026-04-13');
+由"专"到"传"，必定要经过"转"吗？请联系社会生活，写一篇文章，谈谈你的认识与思考。','自拟题目；不少于800字。','上海卷延续了其一贯的哲学思辨风格。''专转传''三字概括了当代内容传播的三个层次，核心问题是专业价值与传播路径的关系。命题既贴近信息时代现实，又具有深层思辨空间。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq006','2024','全国甲卷','national','每个人都要学习与他人相处。有时，我们为避免冲突而不愿表达自己的想法。其实，坦诚交流才有可能迎来真正的相遇。
 
 这引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题聚焦人际交往中最朴素也最深刻的道理：坦诚。命题简洁明了，但内涵丰富，可从心理学、社会学、哲学等多角度展开。引导学生关注日常生活中的沟通智慧。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq007','2024','新课标I卷','new','随着互联网的普及、人工智能的应用，越来越多的问题能很快得到答案。那么，我们的问题是否会越来越少？
 
-以上材料引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题紧扣AI时代热点，以一个看似简单的设问触发深层思考。'问题是否会越来越少'看似技术问题，实则涉及认知论和哲学思考。命题既贴近学生生活体验，又具有思辨深度。','2026-04-13');
+以上材料引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题紧扣AI时代热点，以一个看似简单的设问触发深层思考。''问题是否会越来越少''看似技术问题，实则涉及认知论和哲学思考。命题既贴近学生生活体验，又具有思辨深度。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq008','2024','新课标II卷','new','本试卷现代文阅读I提到，长久以来，人们只能看到月球固定朝向地球的一面，"嫦娥四号"探月任务揭开了月背的神秘面纱；随着"天问一号"飞离地球，航天人的目光又投向遥远的深空……
 
 正如人类的太空之旅，我们每个人也都在不断抵达未知之境。
 
-这引发了你怎样的联想与思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以中国航天成就为背景材料，从'嫦娥四号'到'天问一号'，将国家科技成就与个人成长体验关联起来。'不断抵达未知之境'既是航天探索的写照，也是人生历程的隐喻。','2026-04-13');
+这引发了你怎样的联想与思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以中国航天成就为背景材料，从''嫦娥四号''到''天问一号''，将国家科技成就与个人成长体验关联起来。''不断抵达未知之境''既是航天探索的写照，也是人生历程的隐喻。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq009','2024','北京卷','independent','议论文：几千年来，古老的经典常读常新，杰出的思想常用常新，中华民族的伟大精神亘古常新……很多事物，在时间的淬炼中，愈显活力和价值。
 
 请以"历久弥新"为题目，写一篇议论文。
 
 记叙文：个人成长需要打开视野，人际交往需要打开心扉，科技创新需要打开思路……打开，发现新的自己；打开，带来新的气象。每一次"打开"，都有一段故事。
 
-请以"打开"为题目，写一篇记叙文。','议论文：论点明确，论据充分，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容充实、合理，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷二选一，议论文题目'历久弥新'聚焦传统文化与时代精神的结合，考查对文化传承的理解。记叙文题目'打开'简洁有力，给考生广阔的叙事空间。','2026-04-13');
+请以"打开"为题目，写一篇记叙文。','议论文：论点明确，论据充分，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容充实、合理，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷二选一，议论文题目''历久弥新''聚焦传统文化与时代精神的结合，考查对文化传承的理解。记叙文题目''打开''简洁有力，给考生广阔的叙事空间。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq010','2024','天津卷','independent','在缤纷的世界中，无论是个人、群体还是国家，都会面对别人对我们的定义。我们要认真对待"被定义"，明辨是非，去芜存真，为自己的提升助力；也要勇于通过"自定义"来塑造自我，彰显风华，用自己的方式前进。
 
-以上材料能引发你怎样的联想与思考？请结合你的体验和感悟，写一篇文章。','自选角度，自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以'被定义'与'自定义'为核心概念，探讨自我认知与外部评价的关系。既适用于个人成长，也适用于国家民族的发展定位，具有很强的开放性和现实意义。','2026-04-13');
-INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq011','2024','上海卷','independent','生活中，人们常用认可度判别事物，区分高下。请写一篇文章，谈谈你对"认可度"的认识和思考。','自拟题目；不少于800字。','上海卷以'认可度'为题，简洁而富有思辨性。认可度是当代社会中普遍使用的评价标准，但其合理性和局限性值得深入探讨。命题考查学生的独立思考能力和批判性思维。','2026-04-13');
+以上材料能引发你怎样的联想与思考？请结合你的体验和感悟，写一篇文章。','自选角度，自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以''被定义''与''自定义''为核心概念，探讨自我认知与外部评价的关系。既适用于个人成长，也适用于国家民族的发展定位，具有很强的开放性和现实意义。','2026-04-13');
+INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq011','2024','上海卷','independent','生活中，人们常用认可度判别事物，区分高下。请写一篇文章，谈谈你对"认可度"的认识和思考。','自拟题目；不少于800字。','上海卷以''认可度''为题，简洁而富有思辨性。认可度是当代社会中普遍使用的评价标准，但其合理性和局限性值得深入探讨。命题考查学生的独立思考能力和批判性思维。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq012','2023','全国甲卷','national','人们因技术发展得以更好地掌控时间，但也有人因此成了时间的仆人。
 
-这句话引发了你怎样的联想与思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以一句话为材料，简洁而深刻。'掌控时间'与'时间的仆人'形成鲜明对比，引导学生反思技术发展与生活质量的关系。命题贴近当代生活，具有普遍的共鸣性。','2026-04-13');
+这句话引发了你怎样的联想与思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以一句话为材料，简洁而深刻。''掌控时间''与''时间的仆人''形成鲜明对比，引导学生反思技术发展与生活质量的关系。命题贴近当代生活，具有普遍的共鸣性。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq013','2023','全国乙卷','national','吹灭别人的灯，并不会让自己更加光明；阻挡别人的路，也不会让自己行得更远。
 
 "一花独放不是春，百花齐放春满园。"如果世界上只有一种花朵，就算这种花朵再美，那也是单调的。
 
-以上两则材料以生动形象的语言说出了普遍的道理。请据此写一篇文章，体现你的认识与思考。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以两则生动比喻阐述共赢与包容的道理。'吹灭别人的灯'和'一花独放'形成双重论证，引导学生理解合作共赢、多元包容的价值观。命题具有鲜明的时代导向性。','2026-04-13');
+以上两则材料以生动形象的语言说出了普遍的道理。请据此写一篇文章，体现你的认识与思考。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以两则生动比喻阐述共赢与包容的道理。''吹灭别人的灯''和''一花独放''形成双重论证，引导学生理解合作共赢、多元包容的价值观。命题具有鲜明的时代导向性。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq014','2023','新课标I卷','new','好的故事，可以帮我们更好地表达和沟通，可以触动心灵、启迪智慧；好的故事，可以改变一个人的命运，可以展现一个民族的形象……故事是有力量的。
 
-以上材料引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以'故事的力量'为主题，从个人沟通到民族形象层层递进。命题具有很强的现实意义，引导学生认识叙事能力的重要性，思考如何通过故事传递价值和力量。','2026-04-13');
+以上材料引发了你怎样的联想和思考？请写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以''故事的力量''为主题，从个人沟通到民族形象层层递进。命题具有很强的现实意义，引导学生认识叙事能力的重要性，思考如何通过故事传递价值和力量。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq015','2023','新课标II卷','new','本试卷语言文字运用II提到的"安静一下不被打扰"的想法，在当代青少年中也不鲜见。青少年在学习、生活中，有时希望有一个自己的空间，放松，沉淀，成长。
 
-请结合以上材料写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题聚焦青少年的内心需求，以'安静不被打扰'为切入点，关注当代青年的心理健康和成长空间。命题贴近学生真实体验，具有很强的共情力和现实关怀。','2026-04-13');
+请结合以上材料写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题聚焦青少年的内心需求，以''安静不被打扰''为切入点，关注当代青年的心理健康和成长空间。命题贴近学生真实体验，具有很强的共情力和现实关怀。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq016','2023','北京卷','independent','议论文："续航"一词，原指连续航行，今天在使用中被赋予了新的含义，如为青春续航、科技为经济发展续航等。
 
 请以"续航"为题目，写一篇议论文。
 
 记叙文：舞台上，戏曲演员有登场亮相的瞬间。生活中也有许多亮相时刻：国旗下的讲话，研学成果的汇报，新产品的发布……每一次亮相，都受到众人关注；每一次亮相，也会有一段故事。
 
-请以"亮相"为题目，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康，内容充实、合理，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷延续二选一模式。'续航'考查对词语新意的理解和社会现象的思考，'亮相'考查叙事能力和对生活细节的捕捉。两个题目都贴近生活，开放性强。','2026-04-13');
+请以"亮相"为题目，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康，内容充实、合理，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷延续二选一模式。''续航''考查对词语新意的理解和社会现象的思考，''亮相''考查叙事能力和对生活细节的捕捉。两个题目都贴近生活，开放性强。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq017','2023','天津卷','independent','与有肝胆人共事，从无字句处读书。
 
-一代人有一代人的使命与挑战，一代人有一代人的责任和担当。一个世纪前，在津求学的青年周恩来撰写了这副对联，在交友处事与读书求知方面警勉自己。品读此联，你有怎样的联想和思考？请任选角度，结合自己的体验与感悟，写一篇文章。','自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以周恩来青年时代的对联为材料，将历史人物的精神追求与当代青年的成长联系起来。对联中的'肝胆'和'无字句'均有深意，考查学生对传统文化和人生哲理的理解。','2026-04-13');
+一代人有一代人的使命与挑战，一代人有一代人的责任和担当。一个世纪前，在津求学的青年周恩来撰写了这副对联，在交友处事与读书求知方面警勉自己。品读此联，你有怎样的联想和思考？请任选角度，结合自己的体验与感悟，写一篇文章。','自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以周恩来青年时代的对联为材料，将历史人物的精神追求与当代青年的成长联系起来。对联中的''肝胆''和''无字句''均有深意，考查学生对传统文化和人生哲理的理解。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq018','2023','上海卷','independent','一个人乐意去探索陌生世界，仅仅是因为好奇心吗？请写一篇文章，谈谈你对这个问题的认识和思考。','自拟题目；不少于800字。','上海卷以一个设问开启思辨：探索陌生世界仅仅因为好奇心吗？题目看似简单，实则引导学生思考人类探索行为的多元动机，考查逻辑分析和多角度思考能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq019','2022','全国甲卷','national','《红楼梦》写到"大观园试才题对额"时有一个情节，为元妃省亲修建的大观园竣工后，众人给园中桥上亭子的匾额题名。有人主张从欧阳修《醉翁亭记》"有亭翼然"一句中取"翼然"二字；贾政认为"此亭压水而成"，主张从"泻出于两峰之间"中拈出一个"泻"字，有人即附和题为"泻玉"；贾宝玉则觉得用"沁芳"更为新雅。
 
 以上材料中，众人给匾额题名，或直接移用，或借鉴化用，或根据情境独创，产生了不同的艺术效果。这个现象也能在更广泛的领域给人以启示。请你结合自己的学习和生活经验，写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以《红楼梦》经典情节为材料，将文学鉴赏与创新思维结合起来。三种题名方式（移用、化用、独创）暗喻了知识传承的三个层次。命题既考查文学素养，又考查思辨能力，是文学与哲学的完美融合。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq020','2022','全国乙卷','national','双奥之城，闪耀世界。两次奥运会，都显示了中国体育发展的新高度，展示了中国综合国力的跨越式发展，也见证了你从懵懂儿童向有为青年的跨越。
 
-请结合以上材料，以"跨越，再跨越"为主题写一篇文章，体现你的感受与思考。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以北京双奥为背景，将国家发展成就与个人成长经历联系起来。'跨越，再跨越'既是主题也是精神，考查学生的家国情怀和对时代发展的理解。','2026-04-13');
+请结合以上材料，以"跨越，再跨越"为主题写一篇文章，体现你的感受与思考。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以北京双奥为背景，将国家发展成就与个人成长经历联系起来。''跨越，再跨越''既是主题也是精神，考查学生的家国情怀和对时代发展的理解。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq021','2022','新高考I卷','new','"本手、妙手、俗手"是围棋的三个术语。本手是指合乎棋理的正规下法；妙手是指出人意料的精妙下法；俗手是指貌似合理，而从全局看通常会受损的下法。
 
 本手是基础，妙手是创造。一般来说，对本手理解深刻，才可能出现妙手；否则，难免下出俗手，水平也不易提升。
 
-以上材料对我们颇具启示意义。请结合材料写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以围棋术语为材料，'本手''妙手''俗手'三者的关系暗喻了基础与创新的辩证关系。命题精巧，将专业领域知识转化为普适性的人生哲理，考查学生的类比思维和论证能力。','2026-04-13');
+以上材料对我们颇具启示意义。请结合材料写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以围棋术语为材料，''本手''''妙手''''俗手''三者的关系暗喻了基础与创新的辩证关系。命题精巧，将专业领域知识转化为普适性的人生哲理，考查学生的类比思维和论证能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq022','2022','新高考II卷','new','中国共产主义青年团成立100周年之际，中央广播电视总台推出微纪录片，介绍一组在不同行业奋发有为的人物。他们选择了自己热爱的行业，也选择了事业创新发展的方向，展示出开启未来的力量。
 
-复兴中学团委将组织以"选择·创造·未来"为主题的征文活动，请结合以上材料写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以建团百年为背景，围绕'选择·创造·未来'三个关键词展开。材料中的科学家、摄影家、建筑家代表了不同领域的选择与创造，引导学生思考个人发展与时代使命的关系。','2026-04-13');
+复兴中学团委将组织以"选择·创造·未来"为主题的征文活动，请结合以上材料写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以建团百年为背景，围绕''选择·创造·未来''三个关键词展开。材料中的科学家、摄影家、建筑家代表了不同领域的选择与创造，引导学生思考个人发展与时代使命的关系。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq023','2022','北京卷','independent','议论文：古人说，"学不可以已"，重视学习是中华民族的优良传统。在当代中国，人们对学习的理解与古人有相同之处，也有不一样的地方。
 
 请以"学习今说"为题目，写一篇议论文。
 
 记叙文：网络时代、疫情期间，很多活动转向"线上"，你一定有不少关于"在线"的经历、见闻和感受。
 
-请以"在线"为题目，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容合理、充实，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷二选一。'学习今说'以古论今，考查学生对学习这一传统话题的当代理解。'在线'紧扣疫情背景，考查学生对特殊时期生活体验的叙事能力。','2026-04-13');
+请以"在线"为题目，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容合理、充实，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷二选一。''学习今说''以古论今，考查学生对学习这一传统话题的当代理解。''在线''紧扣疫情背景，考查学生对特殊时期生活体验的叙事能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq024','2022','天津卷','independent','烟火气是家人团坐，灯火可亲；烟火气是国泰民丰，岁月安好；烟火气是温情，是祥和，需要珍惜和守护，也需要奉献和担当。寻常烟火，就是最美的风景。
 
-你对这段话有怎样的思考和感悟？请结合自身体验，写一篇文章。','自选角度，自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以'烟火气'为核心意象，从家庭温馨到国家安宁层层递进。命题语言优美，情感真挚，引导学生关注日常生活中的美好，思考个人与社会的和谐关系。','2026-04-13');
+你对这段话有怎样的思考和感悟？请结合自身体验，写一篇文章。','自选角度，自拟标题；文体不限（诗歌除外），文体特征明显；不少于800字；不得抄袭，不得套作。','本题以''烟火气''为核心意象，从家庭温馨到国家安宁层层递进。命题语言优美，情感真挚，引导学生关注日常生活中的美好，思考个人与社会的和谐关系。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq025','2022','浙江卷','independent','近年来，浙江省着力强化创新驱动，深入实施人才强省、创新强省首位战略。新时代浙江青年，在各行各业、不同领域开拓创新。
 
 以上材料对你未来发展有什么启示？请写一篇文章。','角度自选，立意自定，题目自拟；明确文体，不得写成诗歌；不得少于800字；不得抄袭、套作。','本题以浙江省的创新实践为背景，关注地方发展与青年成长的关系。材料中的具体人物事迹为考生提供了丰富的写作素材，命题具有较强的地域特色和时代感。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq026','2021','全国甲卷','national','中国共产党走过百年历程。在党团结带领人民进行的伟大斗争中孕育的革命文化和社会主义先进文化，已经深深融入我们的血脉和灵魂。我们心中有阳光，我们脚下有力量。我们的未来将融汇于中华民族伟大复兴的新征程，我们处在一个大有可为的时代……
 
-请结合材料，以"可为与有为"为主题，写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以建党百年为时代背景，围绕'可为与有为'展开。'可为'指时代机遇，'有为'指个人作为，二者的结合体现了时代与个人的辩证统一。命题具有鲜明的政治导向和价值引领意义。','2026-04-13');
+请结合材料，以"可为与有为"为主题，写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以建党百年为时代背景，围绕''可为与有为''展开。''可为''指时代机遇，''有为''指个人作为，二者的结合体现了时代与个人的辩证统一。命题具有鲜明的政治导向和价值引领意义。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq027','2021','全国乙卷','national','古人常以比喻说明对理想的追求。如汉代扬雄就曾以射箭为喻："修身以为弓，矫思以为矢，立义以为的，奠而后发，发必中矣。"大意是，只要不断加强修养，端正思想，并将"义"作为确定的目标，再付诸行动，就能实现理想。
 
 上述材料能给追求理想的当代青年以启示，请结合你对自身发展的思考写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以扬雄的射箭之喻为材料，将古代哲学智慧与当代青年的理想追求联系起来。弓、矢、的、发分别对应修养、思想、目标、行动，结构清晰，寓意深刻。','2026-04-13');
@@ -1344,20 +1344,20 @@ INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirem
 
 记叙文：瓜熟蒂落、羽翼丰满，这是草木鸟兽成熟的模样；但对我们而言，真正的成熟却不仅仅指身体的长成……
 
-请以"这，才是成熟的模样"为题目，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容充实，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷二选一。'论生逢其时'考查学生对个人与时代关系的思考，'这，才是成熟的模样'考查学生对成长的理解和叙事能力。两个题目都关注青年与时代的关系。','2026-04-13');
+请以"这，才是成熟的模样"为题目，写一篇记叙文。','议论文：论点明确，论据充实，论证合理；语言流畅，书写清晰。记叙文：思想健康；内容充实，有细节描写；语言流畅，书写清晰。不少于700字。','北京卷二选一。''论生逢其时''考查学生对个人与时代关系的思考，''这，才是成熟的模样''考查学生对成长的理解和叙事能力。两个题目都关注青年与时代的关系。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq030','2020','全国I卷','national','春秋时期，齐国的公子纠与公子小白争夺君位，管仲和鲍叔分别辅佐他们。管仲带兵阻击小白，用箭射中他的衣带钩，小白装死逃脱。后来小白即位为君，史称齐桓公。鲍叔对桓公说，要想成就霸王之业，非管仲不可。于是桓公重用管仲，鲍叔甘居其下，终成一代霸业。
 
-班级计划举行读书会，围绕上述材料展开讨论。齐桓公、管仲和鲍叔三人，你对哪个感触最深？请结合你的感受和思考写一篇发言稿。','结合材料，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以历史典故为材料，要求从三个角色中选择一个感触最深的来写发言稿。命题巧妙地设置了'说理交际语境'（班级读书会发言），考查学生的历史理解力和应用文写作能力。','2026-04-13');
+班级计划举行读书会，围绕上述材料展开讨论。齐桓公、管仲和鲍叔三人，你对哪个感触最深？请结合你的感受和思考写一篇发言稿。','结合材料，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以历史典故为材料，要求从三个角色中选择一个感触最深的来写发言稿。命题巧妙地设置了''说理交际语境''（班级读书会发言），考查学生的历史理解力和应用文写作能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq031','2020','全国II卷','national','墨子说："视人之国，若视其国；视人之家，若视其家；视人之身，若视其身。"英国诗人约翰·多恩说："没有人是自成一体、与世隔绝的孤岛。"
 
 2020年的春天，国际社会援助中国的物资上印着"青山一道同云雨，明月何曾是两乡"；中国援助其他国家的物资上印着"山和山不相遇，人和人要相逢"。
 
-"世界青年与社会发展论坛"邀请你作为中国青年代表参会，发表以"携手同一世界，青年共创未来"为主题的中文演讲。请完成一篇演讲稿。','结合材料内容及含意完成写作任务；选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题紧扣2020年疫情背景，以国际援助为切入点，考查学生对'人类命运共同体'理念的理解。命题要求写演讲稿，考查应用文写作和公共表达能力。','2026-04-13');
+"世界青年与社会发展论坛"邀请你作为中国青年代表参会，发表以"携手同一世界，青年共创未来"为主题的中文演讲。请完成一篇演讲稿。','结合材料内容及含意完成写作任务；选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题紧扣2020年疫情背景，以国际援助为切入点，考查学生对''人类命运共同体''理念的理解。命题要求写演讲稿，考查应用文写作和公共表达能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq032','2020','新高考I卷','new','面对突发的新冠肺炎疫情，国家坚持人民至上、生命至上，果断采取防控措施。
 
 人们居家隔离，取消出访和聚会；防疫拉开了人们的距离。城乡社区干部、志愿者站岗值守，医学专家实时在线，快递员顶风冒雨，教师坚守岗位……抗疫密切了人们的联系。
 
-请综合以上材料，以"疫情中的距离与联系"为主题写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以2020年疫情为背景，聚焦'距离与联系'这对看似矛盾的概念。物理上的距离拉开了，但人与人之间的联系反而更加紧密。命题贴近生活体验，考查辩证思维能力。','2026-04-13');
+请综合以上材料，以"疫情中的距离与联系"为主题写一篇文章。','选准角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以2020年疫情为背景，聚焦''距离与联系''这对看似矛盾的概念。物理上的距离拉开了，但人与人之间的联系反而更加紧密。命题贴近生活体验，考查辩证思维能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq033','2019','全国I卷','national','"民生在勤，勤则不匮"，劳动是财富的源泉，也是幸福的源泉。可是现实生活中，也有一些同学不理解劳动，不愿意劳动。
 
 请结合材料内容，面向本校（统称"复兴中学"）同学写一篇演讲稿，倡议大家"热爱劳动，从我做起"。','自拟标题，自选角度，确定立意；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以劳动教育为主题，要求写演讲稿，考查应用文写作能力。材料中列出了不重视劳动的三种典型观点，为论证提供了靶子。命题回应了当时社会对劳动教育的关注。','2026-04-13');
@@ -1370,14 +1370,14 @@ INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirem
 
 记叙文：色彩，指颜色；不同的色彩常被赋予不同的意义。2019年，五四运动100周年，共和国70华诞。作为在这个特殊年份参加高考的学生，你会赋予2019年哪一种色彩？
 
-请以"2019的色彩"为题，写一篇记叙文。','议论文：观点明确，论据充分，论证合理。记叙文：思想健康，内容充实，感情真挚，运用多种表达方式。不少于700字。','北京卷二选一。'文明的韧性'以物理属性喻文明特质，考查宏观思维能力。'2019的色彩'将时代记忆与个人感受融合，考查叙事与抒情能力。两个题目都与2019年的特殊历史节点相关。','2026-04-13');
+请以"2019的色彩"为题，写一篇记叙文。','议论文：观点明确，论据充分，论证合理。记叙文：思想健康，内容充实，感情真挚，运用多种表达方式。不少于700字。','北京卷二选一。''文明的韧性''以物理属性喻文明特质，考查宏观思维能力。''2019的色彩''将时代记忆与个人感受融合，考查叙事与抒情能力。两个题目都与2019年的特殊历史节点相关。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq036','2019','上海卷','independent','倾听了不同国家的音乐，接触了不同风格的异域音调，我由此对音乐的"中国味"有了更深刻的感受，从而更有意识地去寻找"中国味"。
 
-这段话可以启发人们如何去认识事物。请写一篇文章，谈谈你对上述材料的思考和感悟。','自拟题目；不少于800字。','上海卷以音乐体验为喻，探讨了'通过他者认识自我'的认知方法。命题简洁而富有哲学深度，体现了上海卷一贯的思辨风格。','2026-04-13');
+这段话可以启发人们如何去认识事物。请写一篇文章，谈谈你对上述材料的思考和感悟。','自拟题目；不少于800字。','上海卷以音乐体验为喻，探讨了''通过他者认识自我''的认知方法。命题简洁而富有哲学深度，体现了上海卷一贯的思辨风格。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq037','2018','全国I卷','national','2000年，人类迈进新千年，中国千万"世纪宝宝"出生。2008年，汶川大地震，北京奥运会。2013年，"天宫一号"首次太空授课。2018年，世纪宝宝一代长大成人。2035年，基本实现社会主义现代化。
 
-一代人有一代人的际遇和机缘、使命和挑战。请据此写一篇文章，想象它装进"时光瓶"留待2035年开启，给那时18岁的一代人阅读。','选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以'时光瓶'的形式要求考生写给2035年的青年，将个人成长与国家发展交织在一起。命题设计新颖，考查想象力、时代感和跨时空表达能力。','2026-04-13');
-INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq038','2018','全国II卷','national','二战期间，为了加强对战机的防护，英美军方调查了作战后幸存飞机上的弹痕分布，决定哪里弹痕多就加强哪里。然而统计学家沃德力排众议，指出更应该注意弹痕少的部位，因为这些部位受到重创的战机很难返航。事实证明，沃德是正确的。','综合材料内容及含意，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以统计学中著名的'幸存者偏差'案例为材料，考查学生的逆向思维和独立分析能力。材料简单明了但寓意深远，是一个经典的思维训练命题。','2026-04-13');
+一代人有一代人的际遇和机缘、使命和挑战。请据此写一篇文章，想象它装进"时光瓶"留待2035年开启，给那时18岁的一代人阅读。','选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息；不少于800字。','本题以''时光瓶''的形式要求考生写给2035年的青年，将个人成长与国家发展交织在一起。命题设计新颖，考查想象力、时代感和跨时空表达能力。','2026-04-13');
+INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq038','2018','全国II卷','national','二战期间，为了加强对战机的防护，英美军方调查了作战后幸存飞机上的弹痕分布，决定哪里弹痕多就加强哪里。然而统计学家沃德力排众议，指出更应该注意弹痕少的部位，因为这些部位受到重创的战机很难返航。事实证明，沃德是正确的。','综合材料内容及含意，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以统计学中著名的''幸存者偏差''案例为材料，考查学生的逆向思维和独立分析能力。材料简单明了但寓意深远，是一个经典的思维训练命题。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq039','2018','全国III卷','national','时间就是金钱，效率就是生命——深圳，1981
 
 绿水青山也是金山银山——浙江，2005
@@ -1391,36 +1391,36 @@ INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirem
 
 记叙文：生态文明建设关乎中华民族的永续发展。
 
-请以"绿水青山图"为题，写一篇记叙文。','议论文：观点明确，论据恰当充实，论证合理。记叙文：立意积极向上，叙事符合逻辑；有细节，有描写。不少于700字。','北京卷二选一。'新时代新青年'紧扣时代主题，考查家国情怀与青年担当。'绿水青山图'以生态文明为题，考查想象力和叙事能力。两个题目都体现了鲜明的时代特色。','2026-04-13');
+请以"绿水青山图"为题，写一篇记叙文。','议论文：观点明确，论据恰当充实，论证合理。记叙文：立意积极向上，叙事符合逻辑；有细节，有描写。不少于700字。','北京卷二选一。''新时代新青年''紧扣时代主题，考查家国情怀与青年担当。''绿水青山图''以生态文明为题，考查想象力和叙事能力。两个题目都体现了鲜明的时代特色。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq041','2017','全国I卷','national','据近期一项对来华留学生的调查，他们较为关注的"中国关键词"有：一带一路、大熊猫、广场舞、中华美食、长城、共享单车、京剧、空气污染、美丽乡村、食品安全、高铁、移动支付。
 
-请从中选择两三个关键词来呈现你所认识的中国，写一篇文章帮助外国青年读懂中国。','选好关键词，使之形成有机的关联；选好角度，明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以12个'中国关键词'为材料，要求选择两三个组合写作，帮助外国青年读懂中国。命题设计开放而有序，考查学生的选择能力、组合逻辑和对外表达能力。','2026-04-13');
+请从中选择两三个关键词来呈现你所认识的中国，写一篇文章帮助外国青年读懂中国。','选好关键词，使之形成有机的关联；选好角度，明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以12个''中国关键词''为材料，要求选择两三个组合写作，帮助外国青年读懂中国。命题设计开放而有序，考查学生的选择能力、组合逻辑和对外表达能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq042','2017','全国II卷','national','1、天行健，君子以自强不息（《周易》）；2、露从今夜白，月是故乡明（杜甫）；3、何须浅碧深红色，自是花中第一流（李清照）；4、受光于庭户见一堂，受光于天下照四方（魏源）；5、必须敢于正视，这才可望敢想，敢说，敢作，敢当（鲁迅）；6、数风流人物，还看今朝（毛泽东）。
 
 读了上面六句，你有怎样的感触与思考？请以其中两三句为基础确定立意，并合理引用，写一篇文章。','自选角度，明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以六句经典名句为材料，要求选择两三句组合立意。六句涵盖了自强、思乡、独立、格局、勇气、自信等主题，组合空间丰富。命题考查文化素养和逻辑组织能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq043','2017','全国III卷','national','今年是我国恢复高考40周年。40年来，高考为国选材，推动了教育改革与社会进步，取得了举世瞩目的成就。
 
-请以"我看高考"或"我的高考"为副标题，写一篇文章。','选好角度，确定立意；明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以恢复高考40周年为背景，给予考生很大的写作自由。'我看高考'偏议论，'我的高考'偏叙事抒情。命题将宏大主题与个人体验结合，具有很强的时代感和代入感。','2026-04-13');
+请以"我看高考"或"我的高考"为副标题，写一篇文章。','选好角度，确定立意；明确文体，自拟标题；不要套作，不得抄袭；不少于800字。','本题以恢复高考40周年为背景，给予考生很大的写作自由。''我看高考''偏议论，''我的高考''偏叙事抒情。命题将宏大主题与个人体验结合，具有很强的时代感和代入感。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq044','2017','北京卷','independent','议论文：纽带是能够起联系作用的人或事物。当今时代，经济全球化的发展、文化的交流、历史的传承、社会的安宁等都需要纽带。
 
 请以"说纽带"为题，写一篇议论文。
 
 记叙文：2049年，共和国将迎来百年华诞。假如请你拍摄照片来展示中华民族伟大复兴的辉煌成就，你将选择怎样的画面？
 
-请以"共和国，我为你拍照"为题，写一篇记叙文。','议论文：观点明确，论据充分，论证合理。记叙文：想象合理，有叙述，有描写。不少于700字。','北京卷二选一。'说纽带'考查抽象概念的具象论证能力，'共和国，我为你拍照'考查想象力和叙事能力。两个题目都体现了对宏大主题的关照。','2026-04-13');
+请以"共和国，我为你拍照"为题，写一篇记叙文。','议论文：观点明确，论据充分，论证合理。记叙文：想象合理，有叙述，有描写。不少于700字。','北京卷二选一。''说纽带''考查抽象概念的具象论证能力，''共和国，我为你拍照''考查想象力和叙事能力。两个题目都体现了对宏大主题的关照。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq045','2016','全国I卷','national','阅读漫画材料，根据要求写一篇不少于800字的文章。漫画内容为：一个孩子考了100分受到表扬，考了98分受到惩罚；另一个孩子考了55分受到惩罚，考了61分受到表扬。
 
 要求结合材料的内容和寓意，选好角度，确定立意，明确文体，自拟标题。','结合材料的内容和寓意，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭。','本题以漫画为材料，通过分数与奖惩的反差关系，揭示教育评价中的片面性问题。命题直观形象，寓意明确，考查学生的观察分析能力和教育批判意识。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq046','2016','全国II卷','national','语文学习关系到一个人的终身发展，社会整体的语文素养关系到国家的软实力和文化自信。对于中学生来说，语文素养的提升主要有三条途径：课堂有效教学、课外大量阅读、社会生活实践。
 
-请根据材料，从自己语文学习的体会出发，比较上述三条途径，阐述你的看法和理由。','选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息。','本题直接以'语文学习'为主题，要求考生结合自身经历比较三条途径。命题贴近学生实际体验，考查元认知能力和比较论证能力。','2026-04-13');
-INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq047','2016','全国III卷','national','历经几年试验，小羽在传统工艺的基础上推陈出新，研发出一种新式花茶并获得专利。可是批量生产不久，大量假冒伪劣产品充斥市场。小羽将工艺流程公之于众，还牵头拟定了地方标准。这些努力逐渐见效，小羽最终成为致富带头人。','综合材料内容及含意，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭。','本题以创业故事为材料，展示了一个创业者面对仿冒时的智慧选择。小羽的'公开+标准化'策略体现了从零和博弈到合作共赢的思维转变。命题考查商业智慧和社会责任感。','2026-04-13');
-INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq048','2016','北京卷','independent','议论文：《白鹿原上奏响一支老腔》记述老腔的演出每每"撼人胸腑"，令人有一种"酣畅淋漓"的感觉。请以"'老腔'何以令人震撼"为题，写一篇议论文。
+请根据材料，从自己语文学习的体会出发，比较上述三条途径，阐述你的看法和理由。','选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭；不得泄露个人信息。','本题直接以''语文学习''为主题，要求考生结合自身经历比较三条途径。命题贴近学生实际体验，考查元认知能力和比较论证能力。','2026-04-13');
+INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq047','2016','全国III卷','national','历经几年试验，小羽在传统工艺的基础上推陈出新，研发出一种新式花茶并获得专利。可是批量生产不久，大量假冒伪劣产品充斥市场。小羽将工艺流程公之于众，还牵头拟定了地方标准。这些努力逐渐见效，小羽最终成为致富带头人。','综合材料内容及含意，选好角度，确定立意，明确文体，自拟标题；不要套作，不得抄袭。','本题以创业故事为材料，展示了一个创业者面对仿冒时的智慧选择。小羽的''公开+标准化''策略体现了从零和博弈到合作共赢的思维转变。命题考查商业智慧和社会责任感。','2026-04-13');
+INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq048','2016','北京卷','independent','议论文：《白鹿原上奏响一支老腔》记述老腔的演出每每"撼人胸腑"，令人有一种"酣畅淋漓"的感觉。请以"''老腔''何以令人震撼"为题，写一篇议论文。
 
-记叙文：设想你有这样一枚神奇的书签，它能与你交流，还能助你实现读书的愿望……请以"神奇的书签"为题，写一篇记叙文。','议论文：从老腔的魅力说开去，观点明确，论据充分，论证合理。记叙文：表现爱读书、读好书的主题；有细节，有描写。不少于700字。','北京卷二选一。'老腔'以具体艺术形式切入，考查对传统文化的理解和论证能力。'神奇的书签'以想象力驱动叙事，考查创意写作能力。','2026-04-13');
+记叙文：设想你有这样一枚神奇的书签，它能与你交流，还能助你实现读书的愿望……请以"神奇的书签"为题，写一篇记叙文。','议论文：从老腔的魅力说开去，观点明确，论据充分，论证合理。记叙文：表现爱读书、读好书的主题；有细节，有描写。不少于700字。','北京卷二选一。''老腔''以具体艺术形式切入，考查对传统文化的理解和论证能力。''神奇的书签''以想象力驱动叙事，考查创意写作能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq049','2016','上海卷','independent','随着现代社会的发展，人们的生活更容易进入大众视野，评价他人的生活变得越来越常见。人们对"评价他人的生活"这种现象的看法不尽相同。
 
-请写一篇文章，谈谈你对这种现象的思考。','自拟题目；不少于800字。','上海卷以'评价他人生活'为题，聚焦社交媒体时代的隐私与公共讨论。命题具有强烈的现实关怀，考查学生的社会观察力和思辨能力。','2026-04-13');
+请写一篇文章，谈谈你对这种现象的思考。','自拟题目；不少于800字。','上海卷以''评价他人生活''为题，聚焦社交媒体时代的隐私与公共讨论。命题具有强烈的现实关怀，考查学生的社会观察力和思辨能力。','2026-04-13');
 INSERT OR IGNORE INTO exam_questions(id,year,region,region_type,content,requirement,analysis,created_at) VALUES('eq050','2016','浙江卷','independent','网上购物，视频聊天，线上娱乐，已成为当下很多人生活中不可或缺的一部分。不远的将来，我们只需安装VR设备，便可以足不出户地穿梭于各个虚拟场景。
 
 当虚拟世界中的"虚拟"越来越成为现实世界中的"现实"时，是选择拥抱这个新世界，还是刻意远离，或者与它保持适当距离？','角度自选，立意自定；标题自拟；不少于800字；不得抄袭、套作。','本题以VR技术为切入点，探讨虚拟与现实的边界问题。命题具有前瞻性，在2016年VR刚刚兴起时就引导学生思考科技与生活的关系。','2026-04-13');
@@ -1630,18 +1630,18 @@ INSERT OR IGNORE INTO exam_keywords(exam_id,keyword) VALUES('eq050','VR');
 INSERT OR IGNORE INTO exam_keywords(exam_id,keyword) VALUES('eq050','科技与生活');
 INSERT OR IGNORE INTO exam_keywords(exam_id,keyword) VALUES('eq050','选择');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq001','以诗文中的家国情怀为核心，探讨民族精神与个人表达的关系');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq001','从'开不了口'到'嘶哑的喉咙歌唱'，探讨情感表达的困境与突破');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq001','从''开不了口''到''嘶哑的喉咙歌唱''，探讨情感表达的困境与突破');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq001','结合三段材料的时代背景，论述民族觉醒与文化传承');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq002','从古典诗词中的'梦'出发，探讨理想与现实的辩证关系');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq002','以'将梦赠予他人'为切入点，论述分享理想、传递希望的价值');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq002','从古典诗词中的''梦''出发，探讨理想与现实的辩证关系');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq002','以''将梦赠予他人''为切入点，论述分享理想、传递希望的价值');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq002','从个人梦想到民族梦想，论述梦想的力量与传承');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq003','议论文：以'第二次呼吸'隐喻人生困境中的突破与成长');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq003','议论文：从体育领域延伸到学习、事业、社会等领域的'极点'现象');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq003','记叙文：以某个'数字闪耀'的具体时刻为线索展开叙事');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq003','议论文：以''第二次呼吸''隐喻人生困境中的突破与成长');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq003','议论文：从体育领域延伸到学习、事业、社会等领域的''极点''现象');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq003','记叙文：以某个''数字闪耀''的具体时刻为线索展开叙事');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq004','从辐条汇聚轮毂的意象，论述团结与向心力的力量');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq004','探讨个体与集体的关系——每根辐条缺一不可');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq004','从车轮'滚滚向前'延伸到社会发展的动力来源');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq005','论述'专'到'传'不一定经过'转'，真正的经典可以跨越传播层次');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq004','从车轮''滚滚向前''延伸到社会发展的动力来源');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq005','论述''专''到''传''不一定经过''转''，真正的经典可以跨越传播层次');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq005','从信息传播的角度分析专业内容、流量内容和传世之作的关系');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq005','以具体文化现象为例，探讨信息时代的传播规律与价值判断');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq006','坦诚交流是建立真实人际关系的基础');
@@ -1653,20 +1653,20 @@ INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq007','科技发展与
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq008','从航天探索到个人成长，论述勇于迈向未知的重要性');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq008','未知之境是挑战也是机遇——探索精神的当代价值');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq008','以航天成就为引，探讨人类文明进步的驱动力');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq009','议论文：以经典文化为例，论证'历久弥新'的时代意义');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq009','议论文：以经典文化为例，论证''历久弥新''的时代意义');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq009','议论文：从时间淬炼的角度分析事物价值的增值规律');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq009','记叙文：以一次'打开'的经历为线索，讲述成长故事');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq010',''被定义'与'自定义'的辩证关系——在外部评价中坚守自我');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq010','从个人到国家，论述'自定义'的勇气与智慧');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq009','记叙文：以一次''打开''的经历为线索，讲述成长故事');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq010','''被定义''与''自定义''的辩证关系——在外部评价中坚守自我');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq010','从个人到国家，论述''自定义''的勇气与智慧');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq010','在多元社会中寻找真实的自我定位');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq011','认可度是否等同于真实价值？——论社会评价的局限性');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq011','从认可度的形成机制看群体心理与从众效应');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq011','在追求认可与坚持自我之间的平衡');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq012','技术让人掌控时间，也让人被时间裹挟——论科技的双面性');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq012','在快节奏时代寻找属于自己的时间节奏');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq012','从'时间的主人'到'时间的仆人'，反思现代人的时间焦虑');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq012','从''时间的主人''到''时间的仆人''，反思现代人的时间焦虑');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq013','互利共赢才是真正的成功——论竞争与合作的关系');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq013','从'百花齐放'看多元共存的价值');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq013','从''百花齐放''看多元共存的价值');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq013','损人未必利己，合作方能共赢');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq014','故事的力量——从个人成长到民族叙事');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq014','好故事如何改变世界：叙事的力量与价值');
@@ -1674,37 +1674,37 @@ INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq014','讲好中国故
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq015','青少年需要独处空间——论自我调节与健康成长');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq015','在喧嚣中寻找宁静：个人空间的意义');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq015','放松、沉淀、成长——独处不是逃避而是蓄力');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq016','议论文：从词语新用看社会发展，论述'续航'的时代内涵');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq016','议论文：从词语新用看社会发展，论述''续航''的时代内涵');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq016','议论文：为青春续航——论持续学习与自我更新的重要性');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq016','记叙文：以一次难忘的'亮相'经历展开叙事');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq016','记叙文：以一次难忘的''亮相''经历展开叙事');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq017','从周恩来对联看青年的交友观与读书观');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq017',''与有肝胆人共事'——论择友与品行修养');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq017',''从无字句处读书'——论实践出真知的学习方法');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq017','''与有肝胆人共事''——论择友与品行修养');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq017','''从无字句处读书''——论实践出真知的学习方法');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq018','好奇心是探索的起点，但不是唯一动力');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq018','从好奇心到使命感：探索精神的深层驱动力');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq018','探索陌生世界的多重原因：好奇、责任、理想与热爱');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq019','从'翼然'到'沁芳'：论继承与创新的层次');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq019','从''翼然''到''沁芳''：论继承与创新的层次');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq019','直接移用、借鉴化用与情境独创——创新的三个境界');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq019','以红楼梦题名为例，探讨文化传承中的创造性转化');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq020','从双奥之城看国家发展的跨越式前进');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq020','个人成长与国家跨越的同步共鸣');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq020','跨越永不停歇——论追求卓越的精神');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq021','夯实基础才能创新——从'本手'到'妙手'的进阶之路');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq021','急功近利易成'俗手'——论基础与创新的关系');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq021','夯实基础才能创新——从''本手''到''妙手''的进阶之路');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq021','急功近利易成''俗手''——论基础与创新的关系');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq021','以围棋之道论人生之理：厚积方能薄发');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq022','以'选择·创造·未来'为线索，论述青年的人生抉择');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq022','以''选择·创造·未来''为线索，论述青年的人生抉择');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq022','从不同行业人物的共同特质看选择与创造的关系');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq022','青年的选择决定未来——论个人理想与时代使命');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq023','议论文：古今学习观之比较——论当代学习的内涵拓展');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq023','议论文：从'学不可以已'看终身学习的时代意义');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq023','记叙文：以疫情期间的'在线'经历为线索展开叙事');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq023','议论文：从''学不可以已''看终身学习的时代意义');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq023','记叙文：以疫情期间的''在线''经历为线索展开叙事');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq024','烟火气中的温情——论平凡生活的珍贵');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq024','从'国泰民丰'看烟火气背后的时代安宁');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq024','从''国泰民丰''看烟火气背后的时代安宁');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq024','守护寻常烟火：个人奉献与社会和谐的关系');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq025','以浙江青年为例，论创新精神与个人发展');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq025','从地方实践看青年奋斗的时代价值');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq025','创新驱动发展——青年如何在新时期有所作为');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq026','在'可为'的时代做'有为'的青年');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq026','在''可为''的时代做''有为''的青年');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq026','从革命文化到当代实践：可为的时代呼唤有为的青年');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq026','大有可为的时代与青年的人生选择');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq027','以扬雄射箭之喻论理想追求的路径：修身、正思、立义、行动');
@@ -1715,7 +1715,7 @@ INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq028','从体育之效
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq028','滥用其强必转弱，勤于自省方持久');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq029','议论文：论生逢其时——在新时代中把握机遇');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq029','议论文：不同的人对同一时代有不同感受——论主观能动性');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq029','记叙文：以成长经历阐释'真正的成熟'');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq029','记叙文：以成长经历阐释''真正的成熟''');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq030','鲍叔的知人之明——论识才与让贤的格局');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq030','齐桓公不计前嫌的胸襟——论领导者的大度与远见');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq030','管仲的经世之才——论才能与机遇的关系');
@@ -1726,21 +1726,21 @@ INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq032','物理距离远
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq032','距离与联系的辩证：防疫中的社会温情');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq032','在隔离中感受社会的温度');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq033','劳动教育的当代意义——论劳动精神的传承');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq033','从'不愿意劳动'的现象看青年价值观的塑造');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq033','从''不愿意劳动''的现象看青年价值观的塑造');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq033','热爱劳动，从我做起——倡议书式的论证');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq034','以五四精神为红线，串联百年青年奋斗史');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq034','站在特定历史节点，以青年视角表达时代担当');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq034','从1919到2049，一代代青年的使命传承');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq035','议论文：以中华文明为例，论证'韧性'是文明延续的内在力量');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq035','议论文：以中华文明为例，论证''韧性''是文明延续的内在力量');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq035','议论文：从历史变迁看中华文明的韧性基因');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq035','记叙文：以个人经历为线索，用一种色彩象征2019年的感受');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq036','通过比较认识自我——从音乐之喻看认知方法');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq036','从异域视角反观自身：文化自觉的觉醒之路');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq036','认识事物的规律：在比较中深化理解');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq037','以'世纪宝宝'视角写给未来的信：一代人的成长与国家的跨越');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq037','以''世纪宝宝''视角写给未来的信：一代人的成长与国家的跨越');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq037','时光瓶中的时代记忆——从2000到2035的中国故事');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq037','代际对话：我这一代人的使命与期许');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq038','幸存者偏差——看到'不可见'的数据才是真正的洞察');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq038','幸存者偏差——看到''不可见''的数据才是真正的洞察');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq038','逆向思维的力量：质疑常识的勇气与智慧');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq038','数据背后的真相——论全面思考的重要性');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq039','三条标语折射中国改革开放40年的发展理念变迁');
@@ -1749,21 +1749,21 @@ INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq039','标语背后的
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq040','议论文：在祖国发展中成长的新时代青年');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq040','议论文：个人命运与国家发展的同频共振');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq040','记叙文：以人与自然和谐共处的场景展开叙事');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq041','选择'高铁+移动支付'论述中国科技便利生活');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq041','选择'长城+京剧'呈现中国传统文化的魅力');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq041','选择'一带一路+美丽乡村'展示中国的发展理念');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq041','选择''高铁+移动支付''论述中国科技便利生活');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq041','选择''长城+京剧''呈现中国传统文化的魅力');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq041','选择''一带一路+美丽乡村''展示中国的发展理念');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq042','选1和5：自强不息与敢于正视的品格修养');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq042','选4和6：从魏源到毛泽东，论胸怀天下与开创未来');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq042','选2和3：从故乡之思到独立品格的文化意蕴');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq043','以'我看高考'为视角，论述高考制度的改革与进步');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq043','以'我的高考'为视角，表达个人对高考的理解与感悟');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq043','以''我看高考''为视角，论述高考制度的改革与进步');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq043','以''我的高考''为视角，表达个人对高考的理解与感悟');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq043','从恢复高考40年看教育公平与社会流动');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq044','议论文：论纽带在经济、文化、社会中的连接作用');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq044','议论文：纽带的力量——从人际关系到国家治理');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq044','记叙文：以摄影师视角展现共和国的辉煌成就');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq045','唯分数论的教育评价体系需要反思');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq045','进步与退步的相对性——评价标准应更全面');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq045','从漫画看教育中的'双标'现象');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq045','从漫画看教育中的''双标''现象');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq046','课外阅读是提升语文素养最重要的途径');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq046','三条途径相辅相成，缺一不可');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq046','社会生活实践——语文学习的源头活水');
@@ -1775,7 +1775,7 @@ INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq048','议论文：传
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq048','记叙文：以神奇书签为线索，讲述阅读改变人生的故事');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq049','社交媒体时代，评价他人生活的边界在哪里？');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq049','评价的自由与被评价的权利——论网络公共空间的伦理');
-INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq049','从'评价他人'看当代社会的隐私困境');
+INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq049','从''评价他人''看当代社会的隐私困境');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq050','拥抱虚拟但不忘现实——论科技与生活的平衡');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq050','虚拟世界不能替代真实体验');
 INSERT OR IGNORE INTO exam_angles(exam_id,angle) VALUES('eq050','保持适当距离：在虚拟与现实之间寻找最优解');
