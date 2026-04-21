@@ -10,6 +10,10 @@ function initDb() {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
 
+  // 迁移：在 exec 之前补列，避免索引引用不存在的列
+  try { db.exec(`ALTER TABLE materials ADD COLUMN status TEXT DEFAULT 'approved'`); } catch {}
+  try { db.exec(`ALTER TABLE tutorials ADD COLUMN subcategory_id TEXT REFERENCES subcategories(id) ON DELETE CASCADE`); } catch {}
+
   db.exec(`
     -- ========== 主表 ==========
     CREATE TABLE IF NOT EXISTS categories (
@@ -225,12 +229,6 @@ function initDb() {
     CREATE INDEX IF NOT EXISTS idx_tutorial_materials_tutorial ON tutorial_materials(tutorial_id);
     CREATE INDEX IF NOT EXISTS idx_tutorial_essays_tutorial ON tutorial_essays(tutorial_id);
   `);
-
-  // 新增 status 字段（兼容重复执行）
-  try { db.exec(`ALTER TABLE materials ADD COLUMN status TEXT DEFAULT 'approved'`); } catch {}
-
-  // tutorials 表新增 subcategory_id 字段（兼容重复执行）
-  try { db.exec(`ALTER TABLE tutorials ADD COLUMN subcategory_id TEXT REFERENCES subcategories(id) ON DELETE CASCADE`); } catch {}
 
   return db;
 }
