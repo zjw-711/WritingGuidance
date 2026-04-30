@@ -1,9 +1,9 @@
 /* ========== 考试页面独立变量 ========== */
 :root {
-  --primary: #4f46e5;
-  --primary-light: #818cf8;
-  --primary-bg: #eef2ff;
-  --primary-dark: #4338ca;
+  --primary: #b5493b;
+  --primary-light: #d4715f;
+  --primary-bg: #fdf2ef;
+  --primary-dark: #8f3a2f;
   --card-bg: #ffffff;
   --text: #1e293b;
   --text-light: #64748b;
@@ -493,12 +493,58 @@ body {
 }
 
 /* ========== 响应式 ========== */
+
+/* 全局底栏 Tab 导航（移动端） */
+.global-nav-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  color: var(--text);
+  z-index: 200;
+  padding: 8px 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+.global-nav-bar nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.global-nav-bar a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--text-light);
+  font-size: 0.7rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  padding: 4px 0;
+  transition: color 0.2s;
+}
+.global-nav-bar a .nav-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.global-nav-bar a.active {
+  color: var(--primary);
+}
+
 @media (max-width: 1100px) {
   .exam-grid {
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   }
 }
 @media (max-width: 768px) {
+  .global-nav-bar { display: block; }
+  body { padding-bottom: 70px; }
+
   .exam-header-inner {
     flex-wrap: wrap;
     gap: 8px;

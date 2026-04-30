@@ -93,6 +93,7 @@ function showSection(name) {
   if (name === 'stats') loadStats();
   if (name === 'list') loadAdminMaterials();
   if (name === 'categories') loadCatMgmt();
+  if (name === 'tutorials') { populateTutorialCategoryFilter(); loadTutorials(); }
   if (name === 'ai') loadPendingMaterials();
 }
 
@@ -204,8 +205,13 @@ async function loadAdminMaterials() {
   const search = document.getElementById('adminSearch').value.trim();
   const category = document.getElementById('adminCategoryFilter').value;
   const type = document.getElementById('adminTypeFilter').value;
+  const status = document.getElementById('adminStatusFilter').value;
 
   const params = new URLSearchParams({ search, category, type, page: adminPage, pageSize: adminPageSize });
+  // 管理后台传 status 参数：指定状态则只看对应状态，不指定则看全部
+  if (status) {
+    params.set('status', status);
+  }
   const res = await fetch('/api/materials?' + params).then(r => r.json());
 
   renderAdminTable(res.data);
@@ -219,15 +225,19 @@ function adminSearchMaterials() {
 
 function renderAdminTable(materials) {
   const tbody = document.getElementById('adminTableBody');
+  const statusLabels = { 'approved': '已发布', 'pending': '待审核', 'rejected': '已拒绝' };
+  const statusClasses = { 'approved': 'status-approved', 'pending': 'status-pending', 'rejected': 'status-rejected' };
   tbody.innerHTML = materials.map(m => {
     const cat = categories.find(c => c.id === m.category);
     const type = types.find(t => t.id === m.type);
+    const status = m.status || 'approved';
     return `
       <tr>
         <td><input type="checkbox" class="row-check" data-id="${escapeAttr(m.id)}"></td>
         <td title="${escapeHtml(m.title)}">${escapeHtml(m.title)}</td>
         <td>${cat ? cat.icon + ' ' + cat.name : '-'}</td>
         <td>${type ? type.name : '-'}</td>
+        <td><span class="table-status ${statusClasses[status] || ''}">${statusLabels[status] || status}</span></td>
         <td>${(m.tags || []).map(t => `<span class="table-tag">${escapeHtml(t)}</span>`).join('')}</td>
         <td>${m.createdAt || '-'}</td>
         <td>
@@ -609,16 +619,41 @@ async function loadStats() {
   const grid = document.getElementById('statsGrid');
 
   let html = `
+    <div class="stat-card stat-highlight">
+      <div class="stat-number">${stats.approvedCount || 0}</div>
+      <div class="stat-label">已发布素材</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.pendingCount || 0}</div>
+      <div class="stat-label">待审核</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.rejectedCount || 0}</div>
+      <div class="stat-label">已拒绝</div>
+    </div>
     <div class="stat-card">
       <div class="stat-number">${stats.totalMaterials}</div>
-      <div class="stat-label">素材总数</div>
+      <div class="stat-label">素材总计</div>
     </div>
     <div class="stat-card">
       <div class="stat-number">${stats.totalCategories}</div>
       <div class="stat-label">分类数</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.totalTutorials || 0}</div>
+      <div class="stat-label">写作教程</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">${stats.totalExamQuestions || 0}</div>
+      <div class="stat-label">历年真题</div>
+    </div>
   `;
 
+  // 分类统计标题
+  html += `<div class="stat-section-title">各分类素材数（已发布）</div>`;
+  // 统计已分类的总数，计算未分类数量
+  const classifiedCount = categories.reduce((sum, c) => sum + (stats.categoryStats[c.id] || 0), 0);
+  const unclassifiedCount = (stats.approvedCount || 0) - classifiedCount;
   categories.forEach(c => {
     html += `
       <div class="stat-card">
@@ -627,7 +662,19 @@ async function loadStats() {
       </div>
     `;
   });
+  if (unclassifiedCount > 0) {
+    html += `
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--warning)">${unclassifiedCount}</div>
+        <div class="stat-label">未分类</div>
+      </div>
+    `;
+  }
 
+  // 类型统计标题
+  html += `<div class="stat-section-title">各类型素材数（已发布）</div>`;
+  const typedCount = types.reduce((sum, t) => sum + (stats.typeStats[t.id] || 0), 0);
+  const untypedCount = (stats.approvedCount || 0) - typedCount;
   types.forEach(t => {
     html += `
       <div class="stat-card">
@@ -636,6 +683,14 @@ async function loadStats() {
       </div>
     `;
   });
+  if (untypedCount > 0) {
+    html += `
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--warning)">${untypedCount}</div>
+        <div class="stat-label">未设类型</div>
+      </div>
+    `;
+  }
 
   grid.innerHTML = html;
 }
@@ -1191,3 +1246,735 @@ async function generateClassicsMaterials() {
 
 // 初始化时加载名著列表
 loadClassicsList();
+
+// ========== 教程管理 ==========
+
+let tutorialsData = [];
+let currentEditTutorialId = null;
+
+// 填充教程分类筛选下拉
+function populateTutorialCategoryFilter() {
+  const sel = document.getElementById('tutorialCategoryFilter');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">全部分类</option>';
+  categories.forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${c.icon} ${c.name}</option>`;
+  });
+}
+
+// 加载教程列表
+async function loadTutorials() {
+  const catFilter = document.getElementById('tutorialCategoryFilter')?.value || '';
+  try {
+    const params = catFilter ? `?category=${catFilter}` : '';
+    const res = await authFetch(`/api/tutorials${params}`).then(r => r.json());
+    tutorialsData = res;
+    renderTutorialList();
+  } catch (err) {
+    console.error('加载教程失败:', err);
+    showToast('加载教程失败', 'error');
+  }
+}
+
+// 渲染教程列表
+function renderTutorialList() {
+  const container = document.getElementById('tutorialList');
+  if (!container) return;
+
+  if (!tutorialsData.length) {
+    container.innerHTML = '<div class="tutorial-empty">暂无教程，点击上方按钮新建</div>';
+    return;
+  }
+
+  container.innerHTML = tutorialsData.map(t => {
+    const cat = categories.find(c => c.id === t.categoryId);
+    const catName = cat ? `${cat.icon} ${cat.name}` : '未分类';
+    // 显示完整层级路径
+    let hierarchy = catName;
+    if (t.subcategoryId && cat) {
+      const sub = (cat.subcategories || []).find(s => s.id === t.subcategoryId);
+      if (sub) hierarchy += ` > ${sub.name}`;
+    }
+    const preview = (t.propositionAnalysis || '').substring(0, 80);
+    return `
+      <div class="tutorial-card" onclick="openTutorialEditModal('${t.id}')">
+        <div class="tutorial-card-header">
+          <span class="tutorial-card-cat">${hierarchy}</span>
+          <span class="tutorial-card-date">${t.createdAt?.split('T')[0] || ''}</span>
+        </div>
+        <div class="tutorial-card-title">${escapeHtml(t.title)}</div>
+        <div class="tutorial-card-preview">${escapeHtml(preview)}...</div>
+        <div class="tutorial-card-stats">
+          <span>出题方向 ${t.directionsCount || 0}</span>
+          <span>出题示例 ${t.questionsCount || 0}</span>
+          <span>写作示例 ${t.examplesCount || 0}</span>
+          <span>写作锦囊 ${t.tipsCount || 0}</span>
+          <span>范文 ${t.essaysCount || 0}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// 打开教程编辑弹窗
+async function openTutorialEditModal(id) {
+  currentEditTutorialId = id;
+  const modal = document.getElementById('tutorialEditModal');
+  const titleEl = document.getElementById('tutorialModalTitle');
+  const deleteBtn = document.getElementById('tutorialDeleteBtn');
+
+  if (id) {
+    titleEl.textContent = '编辑教程';
+    deleteBtn.style.display = 'inline-block';
+    // 加载教程详情
+    try {
+      const tutorial = await authFetch(`/api/tutorials/${id}`).then(r => r.json());
+      renderTutorialEditForm(tutorial);
+    } catch (err) {
+      showToast('加载教程详情失败', 'error');
+      return;
+    }
+  } else {
+    titleEl.textContent = '新建教程';
+    deleteBtn.style.display = 'none';
+    renderTutorialEditForm(null);
+  }
+
+  modal.classList.add('active');
+}
+
+// 关闭教程编辑弹窗
+function closeTutorialEditModal() {
+  document.getElementById('tutorialEditModal').classList.remove('active');
+  currentEditTutorialId = null;
+}
+
+// 渲染教程编辑表单
+// 生成子分类下拉选项 HTML
+function getSubcategoryOptions(categoryId, selectedId) {
+  if (!categoryId) return '<option value="">请先选择分类</option>';
+  const cat = categories.find(c => c.id === categoryId);
+  if (!cat || !cat.subcategories || cat.subcategories.length === 0) {
+    return '<option value="">无子分类</option>';
+  }
+  let html = '<option value="">（父分类教程）</option>';
+  cat.subcategories.forEach(s => {
+    html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${s.name}</option>`;
+  });
+  return html;
+}
+
+// 分类切换时联动更新子分类下拉
+function updateTutorialSubcategoryOptions() {
+  const catId = document.getElementById('tutCategoryId')?.value || '';
+  const subSelect = document.getElementById('tutSubcategoryId');
+  if (subSelect) {
+    subSelect.innerHTML = getSubcategoryOptions(catId, null);
+  }
+}
+
+function renderTutorialEditForm(tutorial) {
+  const container = document.getElementById('tutorialModalBody');
+  const isNew = !tutorial;
+
+  // 默认数据结构
+  const data = tutorial || {
+    categoryId: '',
+    title: '',
+    propositionAnalysis: '',
+    philosophyGuide: '',
+    directions: [],
+    questions: [],
+    examples: [],
+    tips: [],
+    essays: [],
+    materialIds: []
+  };
+
+  container.innerHTML = `
+    <div class="tutorial-form">
+      <!-- 基本信息 -->
+      <div class="form-row">
+        <div class="form-group" style="flex:1">
+          <label>关联分类 *</label>
+          <select id="tutCategoryId" required onchange="updateTutorialSubcategoryOptions()">
+            <option value="">请选择分类</option>
+            ${categories.map(c => `<option value="${c.id}" ${data.categoryId === c.id ? 'selected' : ''}>${c.icon} ${c.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>子分类（可选）</label>
+          <select id="tutSubcategoryId">
+            ${getSubcategoryOptions(data.categoryId, data.subcategoryId)}
+          </select>
+        </div>
+        <div class="form-group" style="flex:2">
+          <label>教程标题 *</label>
+          <input type="text" id="tutTitle" value="${escapeHtml(data.title)}" placeholder="如：青年成长类作文写作指南" required>
+        </div>
+      </div>
+
+      <!-- 命题分析 -->
+      <div class="form-group">
+        <label>命题分析</label>
+        <textarea id="tutProposition" rows="4" placeholder="分析该分类命题的特点、常见角度...">${escapeHtml(data.propositionAnalysis || '')}</textarea>
+      </div>
+
+      <!-- 哲学素材运用 -->
+      <div class="form-group">
+        <label>哲学素材运用指南</label>
+        <textarea id="tutPhilosophy" rows="4" placeholder="如何运用哲学思辨素材...">${escapeHtml(data.philosophyGuide || '')}</textarea>
+      </div>
+
+      <!-- 出题方向 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>出题方向</label>
+          <button type="button" class="btn-add-item" onclick="addTutorialDirection()">+ 添加方向</button>
+        </div>
+        <div id="tutDirectionsContainer" class="items-container">
+          ${(data.directions || []).map((d, i) => renderDirectionItem(d, i)).join('')}
+        </div>
+      </div>
+
+      <!-- 出题示例 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>出题示例</label>
+          <button type="button" class="btn-add-item" onclick="addTutorialQuestion()">+ 添加示例</button>
+        </div>
+        <div id="tutQuestionsContainer" class="items-container">
+          ${(data.questions || []).map((q, i) => renderQuestionItem(q, i)).join('')}
+        </div>
+      </div>
+
+      <!-- 写作示例 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>写作示例</label>
+          <button type="button" class="btn-add-item" onclick="addTutorialExample()">+ 添加示例</button>
+        </div>
+        <div id="tutExamplesContainer" class="items-container">
+          ${(data.examples || []).map((e, i) => renderExampleItem(e, i)).join('')}
+        </div>
+      </div>
+
+      <!-- 写作锦囊 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>写作锦囊</label>
+          <button type="button" class="btn-add-item" onclick="addTutorialTip()">+ 添加锦囊</button>
+        </div>
+        <div id="tutTipsContainer" class="items-container tips-container">
+          ${(data.tips || []).map((t, i) => renderTipItem(t, i)).join('')}
+        </div>
+      </div>
+
+      <!-- 范文赏析 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>范文赏析</label>
+          <button type="button" class="btn-add-item" onclick="addTutorialEssay()">+ 添加范文</button>
+        </div>
+        <div id="tutEssaysContainer" class="items-container">
+          ${(data.essays || []).map((e, i) => renderEssayItem(e, i)).join('')}
+        </div>
+      </div>
+
+      <!-- 推荐素材 -->
+      <div class="form-section">
+        <div class="form-section-header">
+          <label>推荐素材（最多6条）</label>
+          <button type="button" class="btn-add-item" onclick="openMaterialPicker()">+ 选择素材</button>
+        </div>
+        <div id="tutMaterialsContainer" class="materials-picker-list">
+          ${(data.materials || []).map((m, i) => `
+            <div class="picked-material" data-id="${m.id}">
+              <span class="picked-material-title">${escapeHtml(m.title)}</span>
+              <button type="button" class="btn-remove-item" onclick="removePickedMaterial(${i})">✕</button>
+            </div>
+          `).join('')}
+        </div>
+        <input type="hidden" id="tutMaterialIds" value="${(data.materialIds || []).join(',')}">
+      </div>
+    </div>
+  `;
+}
+
+// 出题方向单项模板
+function renderDirectionItem(d, i) {
+  return `
+    <div class="item-card direction-item" data-index="${i}">
+      <div class="item-card-header">
+        <span>方向 ${i + 1}</span>
+        <button type="button" class="btn-remove-item" onclick="removeTutorialDirection(${i})">删除</button>
+      </div>
+      <div class="item-card-body">
+        <input type="text" class="direction-title" placeholder="方向标题（如：梦想与坚持）" value="${escapeHtml(d.title || '')}">
+        <textarea class="direction-desc" placeholder="方向描述..." rows="2">${escapeHtml(d.description || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+// 出题示例单项模板
+function renderQuestionItem(q, i) {
+  return `
+    <div class="item-card question-item" data-index="${i}">
+      <div class="item-card-header">
+        <span>示例 ${i + 1}</span>
+        <button type="button" class="btn-remove-item" onclick="removeTutorialQuestion(${i})">删除</button>
+      </div>
+      <div class="item-card-body">
+        <div class="form-row compact">
+          <input type="text" class="q-short-title" placeholder="简称（标签显示）" value="${escapeHtml(q.short_title || '')}">
+          <input type="text" class="q-title" placeholder="完整标题" value="${escapeHtml(q.title || '')}" style="flex:2">
+        </div>
+        <textarea class="q-text" placeholder="题目内容..." rows="3">${escapeHtml(q.question_text || '')}</textarea>
+        <textarea class="q-note" placeholder="备注/提示..." rows="2">${escapeHtml(q.note || '')}</textarea>
+        <textarea class="q-approach" placeholder="写作思路..." rows="3">${escapeHtml(q.writing_approach || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+// 写作示例单项模板
+function renderExampleItem(e, i) {
+  return `
+    <div class="item-card example-item" data-index="${i}">
+      <div class="item-card-header">
+        <span>示例 ${i + 1}</span>
+        <button type="button" class="btn-remove-item" onclick="removeTutorialExample(${i})">删除</button>
+      </div>
+      <div class="item-card-body">
+        <div class="form-row compact">
+          <input type="text" class="e-short-title" placeholder="简称" value="${escapeHtml(e.short_title || '')}">
+          <input type="text" class="e-title" placeholder="完整标题" value="${escapeHtml(e.title || '')}" style="flex:2">
+        </div>
+        <textarea class="e-text" placeholder="示例正文..." rows="4">${escapeHtml(e.example_text || '')}</textarea>
+        <textarea class="e-highlight" placeholder="亮点/精彩句段..." rows="2">${escapeHtml(e.highlight || '')}</textarea>
+        <textarea class="e-analysis" placeholder="结构解析..." rows="2">${escapeHtml(e.analysis || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+// 写作锦囊单项模板
+function renderTipItem(t, i) {
+  return `
+    <div class="item-card tip-item" data-index="${i}">
+      <div class="item-card-header">
+        <span>锦囊 ${i + 1}</span>
+        <button type="button" class="btn-remove-item" onclick="removeTutorialTip(${i})">删除</button>
+      </div>
+      <div class="item-card-body compact">
+        <div class="form-row compact">
+          <input type="text" class="tip-icon" placeholder="图标" value="${escapeHtml(t.icon || '💡')}" style="width:60px">
+          <input type="text" class="tip-title" placeholder="锦囊标题" value="${escapeHtml(t.title || '')}" style="flex:2">
+        </div>
+        <textarea class="tip-content" placeholder="锦囊内容..." rows="3">${escapeHtml(t.content || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+// 范文单项模板
+function renderEssayItem(e, i) {
+  return `
+    <div class="item-card essay-edit-item" data-index="${i}">
+      <div class="item-card-header">
+        <span>范文 ${i + 1}</span>
+        <button type="button" class="btn-remove-item" onclick="removeTutorialEssay(${i})">删除</button>
+      </div>
+      <div class="item-card-body">
+        <div class="form-row compact">
+          <input type="text" class="essay-title-input" placeholder="范文标题" value="${escapeHtml(e.title || '')}" style="flex:2">
+          <input type="text" class="essay-score-input" placeholder="评分（如：一类文 55/60）" value="${escapeHtml(e.score || '')}" style="width:160px">
+        </div>
+        <textarea class="essay-text-input" placeholder="范文正文..." rows="6">${escapeHtml(e.essay_text || e.text || '')}</textarea>
+        <textarea class="essay-highlight-input" placeholder="亮点摘录..." rows="2">${escapeHtml(e.highlight || '')}</textarea>
+        <textarea class="essay-analysis-input" placeholder="名师点评..." rows="2">${escapeHtml(e.analysis || '')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+// 添加/删除出题方向
+function addTutorialDirection() {
+  const container = document.getElementById('tutDirectionsContainer');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = renderDirectionItem({}, index);
+  container.appendChild(div.firstElementChild);
+}
+
+function removeTutorialDirection(index) {
+  const container = document.getElementById('tutDirectionsContainer');
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) item.remove();
+  // 重新编号
+  container.querySelectorAll('.direction-item').forEach((el, i) => {
+    el.querySelector('.item-card-header span').textContent = `方向 ${i + 1}`;
+    el.dataset.index = i;
+  });
+}
+
+// 添加/删除出题示例
+function addTutorialQuestion() {
+  const container = document.getElementById('tutQuestionsContainer');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = renderQuestionItem({}, index);
+  container.appendChild(div.firstElementChild);
+}
+
+function removeTutorialQuestion(index) {
+  const container = document.getElementById('tutQuestionsContainer');
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) item.remove();
+  container.querySelectorAll('.question-item').forEach((el, i) => {
+    el.querySelector('.item-card-header span').textContent = `示例 ${i + 1}`;
+    el.dataset.index = i;
+  });
+}
+
+// 添加/删除写作示例
+function addTutorialExample() {
+  const container = document.getElementById('tutExamplesContainer');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = renderExampleItem({}, index);
+  container.appendChild(div.firstElementChild);
+}
+
+function removeTutorialExample(index) {
+  const container = document.getElementById('tutExamplesContainer');
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) item.remove();
+  container.querySelectorAll('.example-item').forEach((el, i) => {
+    el.querySelector('.item-card-header span').textContent = `示例 ${i + 1}`;
+    el.dataset.index = i;
+  });
+}
+
+// 添加/删除写作锦囊
+function addTutorialTip() {
+  const container = document.getElementById('tutTipsContainer');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = renderTipItem({}, index);
+  container.appendChild(div.firstElementChild);
+}
+
+function removeTutorialTip(index) {
+  const container = document.getElementById('tutTipsContainer');
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) item.remove();
+  container.querySelectorAll('.tip-item').forEach((el, i) => {
+    el.querySelector('.item-card-header span').textContent = `锦囊 ${i + 1}`;
+    el.dataset.index = i;
+  });
+}
+
+// 添加/删除范文
+function addTutorialEssay() {
+  const container = document.getElementById('tutEssaysContainer');
+  const index = container.children.length;
+  const div = document.createElement('div');
+  div.innerHTML = renderEssayItem({}, index);
+  container.appendChild(div.firstElementChild);
+}
+
+function removeTutorialEssay(index) {
+  const container = document.getElementById('tutEssaysContainer');
+  const item = container.querySelector(`[data-index="${index}"]`);
+  if (item) item.remove();
+  container.querySelectorAll('.essay-edit-item').forEach((el, i) => {
+    el.querySelector('.item-card-header span').textContent = `范文 ${i + 1}`;
+    el.dataset.index = i;
+  });
+}
+
+// 素材选择器
+let materialPickerData = [];
+let pickedMaterialIds = [];
+
+async function openMaterialPicker() {
+  // 加载素材列表
+  const catId = document.getElementById('tutCategoryId')?.value || '';
+  const params = catId ? `?category=${catId}&pageSize=50` : '?pageSize=50';
+  try {
+    const res = await authFetch(`/api/materials${params}`).then(r => r.json());
+    materialPickerData = res.data || [];
+    showMaterialPickerModal();
+  } catch (err) {
+    showToast('加载素材失败', 'error');
+  }
+}
+
+function showMaterialPickerModal() {
+  // 已选素材
+  pickedMaterialIds = (document.getElementById('tutMaterialIds')?.value || '').split(',').filter(Boolean);
+
+  // 创建临时选择器弹窗
+  let picker = document.getElementById('materialPickerModal');
+  if (!picker) {
+    picker = document.createElement('div');
+    picker.id = 'materialPickerModal';
+    picker.className = 'material-picker-overlay';
+    picker.onclick = (e) => { if (e.target === picker) closeMaterialPicker(); };
+    picker.innerHTML = `
+      <div class="material-picker-modal">
+        <div class="material-picker-header">
+          <h4>选择推荐素材（最多6条）</h4>
+          <button onclick="closeMaterialPicker()">×</button>
+        </div>
+        <div class="material-picker-search">
+          <input type="text" id="materialPickerSearch" placeholder="搜索素材..." oninput="filterMaterialPicker()">
+        </div>
+        <div class="material-picker-list" id="materialPickerList"></div>
+        <div class="material-picker-footer">
+          <button class="btn-primary" onclick="confirmMaterialPicker()">确认选择</button>
+          <button class="btn-secondary" onclick="closeMaterialPicker()">取消</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(picker);
+  }
+
+  renderMaterialPickerList();
+  picker.classList.add('active');
+}
+
+function filterMaterialPicker() {
+  const kw = (document.getElementById('materialPickerSearch')?.value || '').toLowerCase();
+  renderMaterialPickerList(kw);
+}
+
+function renderMaterialPickerList(kw = '') {
+  const list = document.getElementById('materialPickerList');
+  const filtered = kw ? materialPickerData.filter(m => m.title.toLowerCase().includes(kw)) : materialPickerData;
+
+  list.innerHTML = filtered.slice(0, 30).map(m => {
+    const isSelected = pickedMaterialIds.includes(m.id);
+    return `
+      <div class="picker-material-item ${isSelected ? 'selected' : ''}" onclick="togglePickMaterial('${m.id}')">
+        <div class="picker-material-check">${isSelected ? '✓' : ''}</div>
+        <div class="picker-material-info">
+          <div class="picker-material-title">${escapeHtml(m.title)}</div>
+          <div class="picker-material-excerpt">${escapeHtml((m.content || '').substring(0, 50))}...</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function togglePickMaterial(id) {
+  const idx = pickedMaterialIds.indexOf(id);
+  if (idx >= 0) {
+    pickedMaterialIds.splice(idx, 1);
+  } else {
+    if (pickedMaterialIds.length >= 6) {
+      showToast('最多选择6条素材', 'error');
+      return;
+    }
+    pickedMaterialIds.push(id);
+  }
+  renderMaterialPickerList(document.getElementById('materialPickerSearch')?.value || '');
+}
+
+function confirmMaterialPicker() {
+  // 更新已选素材显示
+  const container = document.getElementById('tutMaterialsContainer');
+  const idsInput = document.getElementById('tutMaterialIds');
+
+  idsInput.value = pickedMaterialIds.join(',');
+
+  // 显示选中的素材
+  container.innerHTML = pickedMaterialIds.map(id => {
+    const m = materialPickerData.find(x => x.id === id);
+    if (!m) return '';
+    return `
+      <div class="picked-material" data-id="${id}">
+        <span class="picked-material-title">${escapeHtml(m.title)}</span>
+        <button type="button" class="btn-remove-item" onclick="removePickedMaterialById('${id}')">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  closeMaterialPicker();
+}
+
+function removePickedMaterial(index) {
+  const container = document.getElementById('tutMaterialsContainer');
+  const idsInput = document.getElementById('tutMaterialIds');
+  const ids = idsInput.value.split(',').filter(Boolean);
+  ids.splice(index, 1);
+  idsInput.value = ids.join(',');
+
+  // 重新渲染
+  container.querySelectorAll('.picked-material').forEach((el, i) => {
+    if (i === index) el.remove();
+  });
+}
+
+function removePickedMaterialById(id) {
+  const idsInput = document.getElementById('tutMaterialIds');
+  const ids = idsInput.value.split(',').filter(Boolean);
+  const idx = ids.indexOf(id);
+  if (idx >= 0) {
+    ids.splice(idx, 1);
+    idsInput.value = ids.join(',');
+  }
+  const container = document.getElementById('tutMaterialsContainer');
+  const item = container.querySelector(`[data-id="${id}"]`);
+  if (item) item.remove();
+}
+
+function closeMaterialPicker() {
+  const picker = document.getElementById('materialPickerModal');
+  if (picker) picker.classList.remove('active');
+}
+
+// 收集教程表单数据
+function collectTutorialFormData() {
+  const categoryId = document.getElementById('tutCategoryId')?.value || '';
+  const subcategoryId = document.getElementById('tutSubcategoryId')?.value || null;
+  const title = document.getElementById('tutTitle')?.value.trim() || '';
+  const propositionAnalysis = document.getElementById('tutProposition')?.value.trim() || '';
+  const philosophyGuide = document.getElementById('tutPhilosophy')?.value.trim() || '';
+
+  if (!categoryId || !title) {
+    showToast('请填写分类和标题', 'error');
+    return null;
+  }
+
+  // 收集出题方向
+  const directions = [];
+  document.querySelectorAll('.direction-item').forEach(el => {
+    directions.push({
+      title: el.querySelector('.direction-title')?.value.trim() || '',
+      description: el.querySelector('.direction-desc')?.value.trim() || ''
+    });
+  });
+
+  // 收集出题示例
+  const questions = [];
+  document.querySelectorAll('.question-item').forEach(el => {
+    questions.push({
+      shortTitle: el.querySelector('.q-short-title')?.value.trim() || '',
+      title: el.querySelector('.q-title')?.value.trim() || '',
+      text: el.querySelector('.q-text')?.value.trim() || '',
+      note: el.querySelector('.q-note')?.value.trim() || '',
+      approach: el.querySelector('.q-approach')?.value.trim() || ''
+    });
+  });
+
+  // 收集写作示例
+  const examples = [];
+  document.querySelectorAll('.example-item').forEach(el => {
+    examples.push({
+      shortTitle: el.querySelector('.e-short-title')?.value.trim() || '',
+      title: el.querySelector('.e-title')?.value.trim() || '',
+      text: el.querySelector('.e-text')?.value.trim() || '',
+      highlight: el.querySelector('.e-highlight')?.value.trim() || '',
+      analysis: el.querySelector('.e-analysis')?.value.trim() || ''
+    });
+  });
+
+  // 收集写作锦囊
+  const tips = [];
+  document.querySelectorAll('.tip-item').forEach(el => {
+    tips.push({
+      icon: el.querySelector('.tip-icon')?.value.trim() || '💡',
+      title: el.querySelector('.tip-title')?.value.trim() || '',
+      content: el.querySelector('.tip-content')?.value.trim() || ''
+    });
+  });
+
+  // 收集范文
+  const essays = [];
+  document.querySelectorAll('.essay-edit-item').forEach(el => {
+    essays.push({
+      title: el.querySelector('.essay-title-input')?.value.trim() || '',
+      text: el.querySelector('.essay-text-input')?.value.trim() || '',
+      score: el.querySelector('.essay-score-input')?.value.trim() || '',
+      highlight: el.querySelector('.essay-highlight-input')?.value.trim() || '',
+      analysis: el.querySelector('.essay-analysis-input')?.value.trim() || ''
+    });
+  });
+
+  // 收集推荐素材
+  const materialIds = (document.getElementById('tutMaterialIds')?.value || '').split(',').filter(Boolean);
+
+  return {
+    categoryId,
+    subcategoryId,
+    title,
+    propositionAnalysis,
+    philosophyGuide,
+    directions,
+    questions,
+    examples,
+    tips,
+    essays,
+    materialIds
+  };
+}
+
+// 保存教程
+async function saveTutorial() {
+  const data = collectTutorialFormData();
+  if (!data) return;
+
+  try {
+    let res;
+    if (currentEditTutorialId) {
+      // 更新
+      res = await authFetch(`/api/tutorials/${currentEditTutorialId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(r => r.json());
+    } else {
+      // 新建
+      res = await authFetch('/api/tutorials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      }).then(r => r.json());
+    }
+
+    if (res.success) {
+      showToast(currentEditTutorialId ? '教程已更新' : '教程已创建', 'success');
+      closeTutorialEditModal();
+      loadTutorials();
+    } else {
+      showToast(res.error || '保存失败', 'error');
+    }
+  } catch (err) {
+    showToast('保存失败: ' + err.message, 'error');
+  }
+}
+
+// 删除教程
+async function deleteTutorial() {
+  if (!currentEditTutorialId) return;
+  if (!confirm('确定要删除此教程吗？')) return;
+
+  try {
+    const res = await authFetch(`/api/tutorials/${currentEditTutorialId}`, {
+      method: 'DELETE'
+    }).then(r => r.json());
+
+    if (res.success) {
+      showToast('教程已删除', 'success');
+      closeTutorialEditModal();
+      loadTutorials();
+    } else {
+      showToast(res.error || '删除失败', 'error');
+    }
+  } catch (err) {
+    showToast('删除失败: ' + err.message, 'error');
+  }
+}

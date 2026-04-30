@@ -10,6 +10,10 @@ function initDb() {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
 
+  // 迁移：在 exec 之前补列，避免索引引用不存在的列
+  try { db.exec(`ALTER TABLE materials ADD COLUMN status TEXT DEFAULT 'approved'`); } catch {}
+  try { db.exec(`ALTER TABLE tutorials ADD COLUMN subcategory_id TEXT REFERENCES subcategories(id) ON DELETE CASCADE`); } catch {}
+
   db.exec(`
     -- ========== 主表 ==========
     CREATE TABLE IF NOT EXISTS categories (
@@ -37,7 +41,8 @@ function initDb() {
       subcategory_id TEXT REFERENCES subcategories(id),
       type_id TEXT REFERENCES types(id),
       source TEXT DEFAULT '',
-      created_at TEXT DEFAULT (date('now'))
+      created_at TEXT DEFAULT (date('now')),
+      status TEXT DEFAULT 'approved'
     );
 
     CREATE TABLE IF NOT EXISTS question_analysis (
@@ -138,10 +143,113 @@ function initDb() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+
+    -- ========== 写作教程系统 ==========
+    -- 教程主表（每个分类对应一个教程）
+    CREATE TABLE IF NOT EXISTS tutorials (
+      id TEXT PRIMARY KEY,
+      category_id TEXT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+      subcategory_id TEXT REFERENCES subcategories(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      proposition_analysis TEXT DEFAULT '',
+      philosophy_guide TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- 教程的出题方向
+    CREATE TABLE IF NOT EXISTS tutorial_directions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程的出题示例
+    CREATE TABLE IF NOT EXISTS tutorial_questions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      short_title TEXT NOT NULL,
+      title TEXT NOT NULL,
+      question_text TEXT DEFAULT '',
+      note TEXT DEFAULT '',
+      writing_approach TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程的写作示例
+    CREATE TABLE IF NOT EXISTS tutorial_examples (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      short_title TEXT NOT NULL,
+      title TEXT NOT NULL,
+      example_text TEXT DEFAULT '',
+      highlight TEXT DEFAULT '',
+      analysis TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程的写作锦囊
+    CREATE TABLE IF NOT EXISTS tutorial_tips (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      icon TEXT DEFAULT '💡',
+      title TEXT NOT NULL,
+      content TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- 教程推荐素材关联
+    CREATE TABLE IF NOT EXISTS tutorial_materials (
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      material_id TEXT NOT NULL REFERENCES materials(id) ON DELETE CASCADE,
+      sort_order INTEGER DEFAULT 0,
+      PRIMARY KEY (tutorial_id, material_id)
+    );
+
+    -- 教程范文
+    CREATE TABLE IF NOT EXISTS tutorial_essays (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      tutorial_id TEXT NOT NULL REFERENCES tutorials(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      essay_text TEXT DEFAULT '',
+      score TEXT DEFAULT '',
+      highlight TEXT DEFAULT '',
+      analysis TEXT DEFAULT '',
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- ========== 教程索引 ==========
+    CREATE INDEX IF NOT EXISTS idx_tutorials_category ON tutorials(category_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorials_subcategory ON tutorials(subcategory_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_directions_tutorial ON tutorial_directions(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_questions_tutorial ON tutorial_questions(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_examples_tutorial ON tutorial_examples(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_tips_tutorial ON tutorial_tips(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_materials_tutorial ON tutorial_materials(tutorial_id);
+    CREATE INDEX IF NOT EXISTS idx_tutorial_essays_tutorial ON tutorial_essays(tutorial_id);
   `);
 
-  // 新增 status 字段（兼容重复执行）
-  try { db.exec(`ALTER TABLE materials ADD COLUMN status TEXT DEFAULT 'approved'`); } catch {}
+  // 自动导入种子数据：如果 categories 表为空，从 seed.sql 导入
+  const hasData = db.prepare('SELECT COUNT(*) as c FROM categories').get().c > 0;
+  if (!hasData) {
+    try {
+      const fs = require('fs');
+      const seedPath = path.join(__dirname, 'data', 'seed.sql');
+      if (fs.existsSync(seedPath)) {
+        const sql = fs.readFileSync(seedPath, 'utf8');
+        // 导入期间关闭外键约束，避免 INSERT 顺序导致的 FK 冲突
+        db.pragma('foreign_keys = OFF');
+        db.exec(sql);
+        db.pragma('foreign_keys = ON');
+        console.log('[DB] 已从 seed.sql 导入种子数据');
+      }
+    } catch (e) {
+      db.pragma('foreign_keys = ON');
+      console.error('[DB] seed.sql 导入失败:', e.message);
+    }
+  }
 
   return db;
 }
@@ -151,8 +259,32 @@ function getDb() {
   return db;
 }
 
+// 导出当前数据库为 seed.sql（供开发者使用）
+function exportSeed() {
+  const fs = require('fs');
+  const tables = ['categories','subcategories','types','materials','material_tags','material_topics','material_links','question_analysis','qa_materials','qa_angles','exam_questions','exam_keywords','exam_angles','exam_materials','users','tutorials','tutorial_directions','tutorial_questions','tutorial_examples','tutorial_tips','tutorial_materials','tutorial_essays'];
+  function sqlVal(v) {
+    if (v === null || v === undefined) return 'NULL';
+    return "'" + String(v).replace(/'/g, "''") + "'";
+  }
+  let sql = '';
+  for (const t of tables) {
+    try {
+      const rows = db.prepare('SELECT * FROM ' + t).all();
+      if (rows.length === 0) continue;
+      for (const r of rows) {
+        const cols = Object.keys(r);
+        const vals = cols.map(c => sqlVal(r[c]));
+        sql += 'INSERT OR IGNORE INTO ' + t + '(' + cols.join(',') + ') VALUES(' + vals.join(',') + ');\n';
+      }
+    } catch {}
+  }
+  fs.writeFileSync(path.join(__dirname, 'data', 'seed.sql'), sql);
+  console.log('[DB] seed.sql 已导出');
+}
+
 function generateId(prefix = 'm') {
   return prefix + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-module.exports = { initDb, getDb, generateId };
+module.exports = { initDb, getDb, generateId, exportSeed };

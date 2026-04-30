@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>作文素材 - 拾光阅</title>
+  <title>写作教程 - 拾光阅</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -14,7 +14,6 @@
   <header class="mobile-header">
     <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
     <h1 class="mobile-logo">拾光阅</h1>
-    <a href="/exam" class="mobile-nav-link">📜</a>
   </header>
 
   <!-- 侧边栏遮罩 -->
@@ -25,47 +24,137 @@
     <!-- 左侧：文艺导航 -->
     <aside class="art-sidebar" id="artSidebar">
       <div class="brand">
-        <h1 class="vertical-title">高考<br>作文<br>素材</h1>
+        <h1 class="vertical-title">写作<br>教程</h1>
         <span class="seal">拾光</span>
       </div>
 
       <div class="poetic-quote">
-        " 腹有诗书气自华，<br>&nbsp;&nbsp;读书万卷始通神。"
-      </div>
-
-      <div class="search-v3">
-        <input type="text" id="searchInput" placeholder="寻觅佳句 / 典故..." autocomplete="off">
-        <div class="search-line"></div>
+        " 文以载道，<br>&nbsp;&nbsp;笔耕不辍。"
       </div>
 
       <nav class="filter-nav" id="categoryFilter">
         <!-- 动态分类 + 子分类 -->
       </nav>
 
-      <div class="tag-filter" id="tagFilter">
-        <!-- 动态标签 -->
-      </div>
-
       <div class="sidebar-footer-v3">
         共收录佳作 <span id="totalCount" class="highlight-num">0</span> 篇
       </div>
+
+      <div class="sidebar-cross-nav">
+        <a href="/materials" class="cross-nav-link">素材库 <span class="link-arrow">↗</span></a>
+        <a href="/exam" class="cross-nav-link">历年真题 <span class="link-arrow">↗</span></a>
+      </div>
     </aside>
 
-    <!-- 右侧：阅读区 -->
+    <!-- 右侧：教程区 -->
     <main class="art-main">
-      <div class="page-header">
-        <div class="type-bar" id="typeFilter"></div>
-        <a href="/exam" class="link-exam">阅览历年真题 ➔</a>
+      <!-- 教程全局概览 -->
+      <div class="tutorial-directory" id="tutorialDirectory">
+        <div class="directory-header">
+          <h2 class="directory-title">写作教程总览</h2>
+          <p class="directory-subtitle">选择一个分类，开始你的写作之旅</p>
+        </div>
+        <div class="directory-grid" id="directoryGrid">
+          <!-- 动态渲染教程卡片 -->
+        </div>
       </div>
 
-      <div class="magazine-grid" id="materialsGrid"></div>
+      <!-- 写作教程面板（全屏） -->
+      <div class="tutorial-panel full-height" id="tutorialPanel">
+        <div class="tutorial-header">
+          <h3 class="tutorial-title" id="tutorialTitle">📖 写作教程 · 青年成长</h3>
+          <button class="btn-print" onclick="printTutorial()">打印 / 导出PDF</button>
+        </div>
+        <div class="tutorial-body" id="tutorialBody">
+          <!-- 命题分析 -->
+          <div class="tutorial-section">
+            <div class="section-label">命题分析</div>
+            <div class="section-content" id="tutorialProposition">
+              "青年成长"类命题常聚焦于：梦想与现实的张力、个人选择与社会期待的博弈、成长中的挫折与超越。
+            </div>
+          </div>
 
-      <div class="empty-state-v3" id="emptyState" style="display:none;">
-        未寻得相关笔墨，换个词试试罢。
-      </div>
+          <!-- 出题方向 -->
+          <div class="tutorial-section">
+            <div class="section-label">可能的出题方向</div>
+            <div class="section-content direction-list" id="tutorialDirections">
+              <div class="direction-item">• <strong>梦想与坚持：</strong>探讨青年追梦过程中的困境与坚守</div>
+              <div class="direction-item">• <strong>选择与担当：</strong>个人发展与社会责任的平衡</div>
+              <div class="direction-item">• <strong>挫折与超越：</strong>逆境中成长的价值与意义</div>
+            </div>
+          </div>
 
-      <div class="load-more-v3" id="loadMoreWrapper" style="display:none;">
-        <button class="btn-text" onclick="loadMore()">展卷更多</button>
+          <!-- 出题示例 -->
+          <div class="tutorial-section">
+            <div class="section-label">出题示例</div>
+            <div class="question-tabs" id="questionTabs">
+              <!-- 动态渲染题目标签 -->
+            </div>
+            <div class="question-content" id="questionContent">
+              <!-- 动态渲染题目详情 -->
+            </div>
+            <div class="question-approach" id="tutorialApproach">
+              <!-- 写作思路（属于当前选中题目） -->
+            </div>
+          </div>
+
+          <!-- 哲学素材运用 -->
+          <div class="tutorial-section">
+            <div class="section-label">哲学素材运用</div>
+            <div class="section-content" id="tutorialPhilosophy">
+              <p><strong>辩证法引入：</strong>"成长是矛盾的统一——梦想与现实的张力..."</p>
+            </div>
+          </div>
+
+          <!-- 推荐素材 -->
+          <div class="tutorial-section tutorial-materials">
+            <div class="materials-header">
+              <div class="section-label">推荐素材</div>
+              <div class="materials-controls">
+                <div class="mini-type-bar" id="miniTypeBar">
+                  <button class="mini-type-btn active" onclick="selectMiniType('',this)">全部</button>
+                  <button class="mini-type-btn" onclick="selectMiniType('story',this)">人物事例</button>
+                  <button class="mini-type-btn" onclick="selectMiniType('hot',this)">时事热点</button>
+                  <button class="mini-type-btn" onclick="selectMiniType('quote',this)">名言金句</button>
+                </div>
+                <button class="btn-more-materials" onclick="showMoreMaterials()">更多 ↗</button>
+              </div>
+            </div>
+            <div class="mini-materials" id="tutorialMaterials">
+              <!-- 动态渲染素材卡片 -->
+            </div>
+          </div>
+
+          <!-- 写作示例 -->
+          <div class="tutorial-section writing-example">
+            <div class="section-label">写作示例</div>
+            <div class="example-tabs" id="exampleTabs">
+              <!-- 动态渲染示例标签 -->
+            </div>
+            <div class="example-content" id="exampleContent">
+              <!-- 动态渲染示例内容 -->
+            </div>
+          </div>
+
+          <!-- 写作锦囊 -->
+          <div class="tutorial-section tips-section">
+            <div class="section-label">写作锦囊</div>
+            <div class="tips-grid" id="tipsGrid">
+              <!-- 动态渲染锦囊卡片 -->
+            </div>
+          </div>
+
+          <!-- 范文赏析 -->
+          <div class="tutorial-section essay-section">
+            <div class="section-label">范文赏析</div>
+            <div class="essay-tabs" id="essayTabs">
+              <!-- 动态渲染范文标签 -->
+            </div>
+            <div class="essay-content" id="essayContent">
+              <!-- 动态渲染范文内容 -->
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -84,6 +173,15 @@
   </div>
 
   <div id="toast" class="toast-v3"></div>
+
+  <!-- 移动端底栏导航 -->
+  <div class="global-nav-bar">
+    <nav>
+      <a href="/" class="active"><span class="nav-icon">📖</span>教程</a>
+      <a href="/materials"><span class="nav-icon">📚</span>素材库</a>
+      <a href="/exam"><span class="nav-icon">📜</span>真题</a>
+    </nav>
+  </div>
 
   <script src="/js/main.js"></script>
 </body>

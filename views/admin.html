@@ -16,6 +16,7 @@
         <button onclick="showSection('add')" class="nav-btn" id="navAdd">添加素材</button>
         <button onclick="showSection('import')" class="nav-btn" id="navImport">导入导出</button>
         <button onclick="showSection('categories')" class="nav-btn" id="navCategories">分类管理</button>
+        <button onclick="showSection('tutorials')" class="nav-btn" id="navTutorials">教程管理</button>
         <button onclick="showSection('stats')" class="nav-btn" id="navStats">数据统计</button>
         <button onclick="showSection('ai')" class="nav-btn" id="navAi">AI 素材</button>
         <span class="nav-spacer"></span>
@@ -33,6 +34,12 @@
         <h2>素材列表</h2>
         <div class="toolbar-actions">
           <input type="text" id="adminSearch" placeholder="搜索..." oninput="adminSearchMaterials()">
+          <select id="adminStatusFilter" onchange="adminSearchMaterials()">
+            <option value="">全部状态</option>
+            <option value="approved">已发布</option>
+            <option value="pending">待审核</option>
+            <option value="rejected">已拒绝</option>
+          </select>
           <select id="adminCategoryFilter" onchange="adminSearchMaterials()">
             <option value="">全部分类</option>
           </select>
@@ -49,6 +56,7 @@
             <th>标题</th>
             <th>分类</th>
             <th>类型</th>
+            <th>状态</th>
             <th>标签</th>
             <th>日期</th>
             <th>操作</th>
@@ -216,6 +224,40 @@
       </div>
       <div class="cat-mgmt-grid" id="catMgmtGrid"></div>
     </section>
+
+    <!-- ====== 教程管理 ====== -->
+    <section id="sectionTutorials" class="admin-section" style="display:none;">
+      <div class="section-toolbar">
+        <h2>教程管理</h2>
+        <div class="toolbar-actions">
+          <select id="tutorialCategoryFilter" onchange="loadTutorials()">
+            <option value="">全部分类</option>
+          </select>
+          <button class="btn-primary" onclick="openTutorialEditModal(null)">+ 新建教程</button>
+        </div>
+      </div>
+      <div class="tutorial-list" id="tutorialList">
+        <!-- 动态渲染教程卡片 -->
+      </div>
+    </section>
+
+    <!-- 教程编辑弹窗 -->
+    <div class="tutorial-modal-overlay" id="tutorialEditModal" onclick="if(event.target===this)closeTutorialEditModal()">
+      <div class="tutorial-modal">
+        <div class="tutorial-modal-header">
+          <h3 id="tutorialModalTitle">新建教程</h3>
+          <button class="modal-close" onclick="closeTutorialEditModal()">×</button>
+        </div>
+        <div class="tutorial-modal-body" id="tutorialModalBody">
+          <!-- 动态渲染编辑表单 -->
+        </div>
+        <div class="tutorial-modal-footer">
+          <button class="btn-primary" onclick="saveTutorial()">保存教程</button>
+          <button class="btn-secondary" onclick="closeTutorialEditModal()">取消</button>
+          <button class="btn-danger" id="tutorialDeleteBtn" style="display:none;" onclick="deleteTutorial()">删除教程</button>
+        </div>
+      </div>
+    </div>
 
     <!-- ====== 数据统计 ====== -->
     <section id="sectionStats" class="admin-section" style="display:none;">

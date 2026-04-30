@@ -5,22 +5,10 @@
       "name": "科技创新",
       "icon": "🔬",
       "subcategories": [
-        {
-          "id": "tech-ai",
-          "name": "AI与人工智能"
-        },
-        {
-          "id": "tech-aerospace",
-          "name": "航天科技"
-        },
-        {
-          "id": "tech-ethics",
-          "name": "科技伦理"
-        },
-        {
-          "id": "tech-digital",
-          "name": "数字经济"
-        }
+        { "id": "tech-ai", "name": "智能时代" },
+        { "id": "tech-aerospace", "name": "航天探索" },
+        { "id": "tech-ethics", "name": "科技伦理" },
+        { "id": "tech-innovation", "name": "创新驱动" }
       ]
     },
     {
@@ -28,45 +16,10 @@
       "name": "品德修养",
       "icon": "💎",
       "subcategories": [
-        {
-          "id": "virtue-honesty",
-          "name": "诚信"
-        },
-        {
-          "id": "virtue-persist",
-          "name": "坚持"
-        },
-        {
-          "id": "virtue-modest",
-          "name": "谦虚"
-        },
-        {
-          "id": "virtue-duty",
-          "name": "担当"
-        }
-      ]
-    },
-    {
-      "id": "nature",
-      "name": "人与自然",
-      "icon": "🌿",
-      "subcategories": [
-        {
-          "id": "nature-env",
-          "name": "环境保护"
-        },
-        {
-          "id": "nature-eco",
-          "name": "生态文明"
-        },
-        {
-          "id": "nature-sustain",
-          "name": "可持续发展"
-        },
-        {
-          "id": "nature-revere",
-          "name": "敬畏自然"
-        }
+        { "id": "virtue-empathy", "name": "善良共情" },
+        { "id": "virtue-respect", "name": "尊重包容" },
+        { "id": "virtue-dedication", "name": "大爱担当" },
+        { "id": "virtue-cultivation", "name": "品德涵养" }
       ]
     },
     {
@@ -74,22 +27,10 @@
       "name": "文化传承",
       "icon": "🏮",
       "subcategories": [
-        {
-          "id": "culture-craft",
-          "name": "传统技艺"
-        },
-        {
-          "id": "culture-heritage",
-          "name": "文化遗产"
-        },
-        {
-          "id": "culture-confident",
-          "name": "文化自信"
-        },
-        {
-          "id": "culture-exchange",
-          "name": "中外交流"
-        }
+        { "id": "culture-classics", "name": "经典智慧" },
+        { "id": "culture-confident", "name": "文化自信" },
+        { "id": "culture-exchange", "name": "文明互鉴" },
+        { "id": "culture-heritage", "name": "传统新生" }
       ]
     },
     {
@@ -97,22 +38,10 @@
       "name": "社会民生",
       "icon": "🏘️",
       "subcategories": [
-        {
-          "id": "society-edu",
-          "name": "教育公平"
-        },
-        {
-          "id": "society-rural",
-          "name": "乡村振兴"
-        },
-        {
-          "id": "society-health",
-          "name": "医疗健康"
-        },
-        {
-          "id": "society-fair",
-          "name": "社会公平"
-        }
+        { "id": "society-comm", "name": "人际沟通" },
+        { "id": "society-edu", "name": "教育成长" },
+        { "id": "society-fair", "name": "公平正义" },
+        { "id": "society-observe", "name": "社会观察" }
       ]
     },
     {
@@ -120,22 +49,10 @@
       "name": "青春成长",
       "icon": "🌱",
       "subcategories": [
-        {
-          "id": "youth-dream",
-          "name": "梦想与奋斗"
-        },
-        {
-          "id": "youth-choice",
-          "name": "选择与责任"
-        },
-        {
-          "id": "youth-growth",
-          "name": "挫折与成长"
-        },
-        {
-          "id": "youth-think",
-          "name": "独立思考"
-        }
+        { "id": "youth-dream", "name": "梦想与奋斗" },
+        { "id": "youth-choice", "name": "选择与担当" },
+        { "id": "youth-growth", "name": "挫折与成长" },
+        { "id": "youth-think", "name": "独立思考" }
       ]
     },
     {
@@ -143,22 +60,10 @@
       "name": "家国情怀",
       "icon": "🇨🇳",
       "subcategories": [
-        {
-          "id": "patriotism-spirit",
-          "name": "爱国精神"
-        },
-        {
-          "id": "patriotism-revive",
-          "name": "民族复兴"
-        },
-        {
-          "id": "patriotism-mission",
-          "name": "时代使命"
-        },
-        {
-          "id": "patriotism-duty",
-          "name": "家国担当"
-        }
+        { "id": "patriotism-spirit", "name": "爱国精神" },
+        { "id": "patriotism-revive", "name": "民族复兴" },
+        { "id": "patriotism-mission", "name": "时代使命" },
+        { "id": "patriotism-rolemodel", "name": "楷模力量" }
       ]
     },
     {
@@ -166,68 +71,10 @@
       "name": "哲理思辨",
       "icon": "🧠",
       "subcategories": [
-        {
-          "id": "phil-contradict",
-          "name": "矛盾与统一"
-        },
-        {
-          "id": "phil-change",
-          "name": "变与不变"
-        },
-        {
-          "id": "phil-tradeoff",
-          "name": "得失取舍"
-        },
-        {
-          "id": "phil-dialectic",
-          "name": "辩证思维"
-        }
-      ]
-    },
-    {
-      "id": "humanity",
-      "name": "人文关怀",
-      "icon": "🤝",
-      "subcategories": [
-        {
-          "id": "humanity-empathy",
-          "name": "善良与共情"
-        },
-        {
-          "id": "humanity-respect",
-          "name": "尊重与包容"
-        },
-        {
-          "id": "humanity-love",
-          "name": "大爱无疆"
-        },
-        {
-          "id": "humanity-care",
-          "name": "弱者关怀"
-        }
-      ]
-    },
-    {
-      "id": "rolemodel",
-      "name": "时代楷模",
-      "icon": "⭐",
-      "subcategories": [
-        {
-          "id": "rolemodel-scientist",
-          "name": "科学家精神"
-        },
-        {
-          "id": "rolemodel-hero",
-          "name": "平凡英雄"
-        },
-        {
-          "id": "rolemodel-youth",
-          "name": "青年榜样"
-        },
-        {
-          "id": "rolemodel-dedicate",
-          "name": "奉献担当"
-        }
+        { "id": "phil-contradict", "name": "矛盾与统一" },
+        { "id": "phil-change", "name": "变与不变" },
+        { "id": "phil-tradeoff", "name": "得失取舍" },
+        { "id": "phil-dialectic", "name": "辩证思维" }
       ]
     }
   ],
@@ -293,7 +140,7 @@
       "id": "m003",
       "title": "袁隆平——让中国人端牢饭碗",
       "content": "袁隆平，杂交水稻之父，一生致力于杂交水稻技术的研究。他常说：我毕生的追求就是让所有人远离饥饿。即便年过九旬，他仍坚持下田。他用一粒种子改变了世界，用一生践行了将论文写在祖国大地上的诺言。",
-      "category": "rolemodel",
+      "category": "patriotism",
       "type": "story",
       "tags": [
         "袁隆平",
@@ -309,13 +156,13 @@
         "知行合一"
       ],
       "createdAt": "2026-01-10",
-      "subcategory": "rolemodel-scientist"
+      "subcategory": "patriotism-rolemodel"
     },
     {
       "id": "m004",
       "title": "张桂梅——燃烧自己照亮大山",
       "content": "张桂梅，云南丽江华坪女子高级中学校长。她扎根贫困山区四十余年，创办全国第一所全免费的女子高中，帮助近两千名贫困山区女孩考入大学，改变了她们的命运。身患多种疾病仍坚持陪伴学生，她用瘦弱的肩膀扛起大山女孩的希望。",
-      "category": "rolemodel",
+      "category": "patriotism",
       "type": "story",
       "tags": [
         "张桂梅",
@@ -332,7 +179,7 @@
         "责任"
       ],
       "createdAt": "2026-01-10",
-      "subcategory": "rolemodel-dedicate"
+      "subcategory": "patriotism-rolemodel"
     },
     {
       "id": "m005",
@@ -353,13 +200,13 @@
         "理想与信念"
       ],
       "createdAt": "2026-01-05",
-      "subcategory": "virtue-duty"
+      "subcategory": "virtue-cultivation"
     },
     {
       "id": "m006",
       "title": "绿水青山就是金山银山",
       "content": "绿水青山就是金山银山是习近平提出的科学论断，揭示了经济发展与生态保护的辩证关系。浙江安吉余村从卖石头到卖风景的转型，正是这一理念的生动实践。保护生态环境就是保护生产力，改善生态环境就是发展生产力。",
-      "category": "nature",
+      "category": "society",
       "type": "hot",
       "tags": [
         "环保",
@@ -375,7 +222,7 @@
         "辩证思考"
       ],
       "createdAt": "2026-01-20",
-      "subcategory": "nature-sustain"
+      "subcategory": "society-observe"
     },
     {
       "id": "m007",
@@ -425,7 +272,7 @@
       "id": "m009",
       "title": "外卖小哥彭清林——纵身一跃见勇毅",
       "content": "2023年6月，杭州外卖小哥彭清林在送单途中，看到有人落水，毫不犹豫地从12米高的钱塘江大桥上一跃而下，成功救起落水者。事后他说：我只是一个普通人，做了该做的事。这一跳，跳出了平凡人的英雄本色。",
-      "category": "humanity",
+      "category": "virtue",
       "type": "story",
       "tags": [
         "见义勇为",
@@ -441,7 +288,7 @@
         "担当"
       ],
       "createdAt": "2026-02-10",
-      "subcategory": "rolemodel-hero"
+      "subcategory": "virtue-dedication"
     },
     {
       "id": "m010",
@@ -551,8 +398,8 @@
     {
       "id": "qa003",
       "title": "奉献精神的当代诠释",
-      "category": "rolemodel",
-      "subcategory": "rolemodel-scientist",
+      "category": "patriotism",
+      "subcategory": "patriotism-rolemodel",
       "questionType": "材料作文",
       "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n袁隆平一生致力于杂交水稻研究，即使在九十岁高龄仍坚持下田。他说：\"我毕生的追求就是让所有人远离饥饿。\"",
       "angles": [
@@ -589,8 +436,8 @@
     {
       "id": "qa005",
       "title": "人与自然的和谐共生",
-      "category": "nature",
-      "subcategory": "nature-sustain",
+      "category": "society",
+      "subcategory": "society-observe",
       "questionType": "话题作文",
       "sampleQuestion": "以\"人与自然\"为话题，写一篇文章，谈谈你的感悟与思考。",
       "angles": [
@@ -625,8 +472,8 @@
     {
       "id": "qa007",
       "title": "平凡中的英雄主义",
-      "category": "humanity",
-      "subcategory": "humanity-empathy",
+      "category": "virtue",
+      "subcategory": "virtue-empathy",
       "questionType": "材料作文",
       "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n外卖小哥彭清林从12米高的桥上纵身跃下，救起落水者。事后他说：\"我只是个普通人，做了该做的事。\"",
       "angles": [
@@ -700,7 +547,7 @@
       "id": "qa011",
       "title": "品德修养与人生价值",
       "category": "virtue",
-      "subcategory": "virtue-duty",
+      "subcategory": "virtue-cultivation",
       "questionType": "材料作文",
       "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n曾子曰：\"士不可以不弘毅，任重而道远。\"在当今社会，这句话带给你怎样的启示？",
       "angles": [
@@ -719,8 +566,8 @@
     {
       "id": "qa012",
       "title": "平凡人的不平凡选择",
-      "category": "rolemodel",
-      "subcategory": "rolemodel-hero",
+      "category": "patriotism",
+      "subcategory": "patriotism-rolemodel",
       "questionType": "材料作文",
       "sampleQuestion": "阅读下面的材料，根据要求写作。\n\n有人说英雄是改变历史的人，有人说英雄是在关键时刻做出正确选择的普通人。你如何看待\"英雄\"？",
       "angles": [
